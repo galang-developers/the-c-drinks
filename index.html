@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>THE. C DRINKS - Cipta Premium Rasa</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    
+    <!-- CryptoJS for SHA-256 hashing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.2.0/crypto-js.min.js"></script>
+    
+    <style>
+        .mobile-drawer-open { overflow: hidden; }
+        .backdrop-blur-custom { backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        @media (max-width: 640px) { .modal-content { margin-left: 16px !important; margin-right: 16px !important; } }
+        .line-clamp-2 { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        
+        /* Custom scrollbar for admin panel */
+        .admin-scroll::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .admin-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        .admin-scroll::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        .admin-scroll::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        
+        /* Password input styling */
+        .password-input {
+            letter-spacing: 4px;
+            font-size: 20px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body class="bg-[#F8F8F8] text-[#111111] overflow-x-hidden font-sans">
+
+    <!-- ==================== NAVBAR ==================== -->
+    <div class="fixed top-0 left-0 right-0 z-50 px-4 py-4 md:px-8 transition-all duration-300" id="navbar-container">
+        <nav class="max-w-6xl mx-auto rounded-full bg-white bg-opacity-95 backdrop-blur-md border border-neutral-100 px-6 md:px-8 py-3 flex items-center justify-between transition-all duration-300 shadow-md" id="main-navbar">
+            <button onclick="window.scrollTo({ top: 0, behavior: 'smooth' })" class="flex items-center space-x-2 focus:outline-none group">
+                <div class="w-8 h-8 rounded-full bg-[#111111] flex items-center justify-center text-white font-extrabold text-sm tracking-widest transition-transform group-hover:rotate-12">C</div>
+                <span class="font-extrabold tracking-widest text-[#111111] text-base md:text-lg inline md:hidden lg:inline">THE. C DRINKS</span>
+            </button>
+            <div class="hidden lg:flex items-center space-x-1">
+                <button onclick="scrollToAbout()" class="px-4 py-1.5 text-xs font-medium text-[#555555] hover:text-[#111111] transition-colors rounded-full hover:bg-neutral-50">Tentang</button>
+                <button onclick="scrollToMenu()" class="px-4 py-1.5 text-xs font-medium text-[#555555] hover:text-[#111111] transition-colors rounded-full hover:bg-neutral-50">Menu</button>
+                <button onclick="scrollToPromo()" class="px-4 py-1.5 text-xs font-medium text-[#555555] hover:text-[#111111] transition-colors rounded-full hover:bg-neutral-50">Promo</button>
+                <button onclick="openStoreModal('stores')" class="px-4 py-1.5 text-xs font-medium text-[#555555] hover:text-[#111111] transition-colors rounded-full hover:bg-neutral-50">Outlet</button>
+                <button onclick="scrollToSocial()" class="px-4 py-1.5 text-xs font-medium text-[#555555] hover:text-[#111111] transition-colors rounded-full hover:bg-neutral-50">Berita</button>
+            </div>
+            <div class="hidden lg:flex items-center gap-3">
+                <button onclick="openAdminPanel()" class="bg-neutral-100 hover:bg-neutral-200 text-[#111111] text-xs font-bold py-2 px-4 rounded-full transition-all duration-300 flex items-center gap-1.5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Admin
+                </button>
+                <button onclick="openStoreModal('contact')" class="bg-[#111111] hover:bg-[#1C1C1C] text-white text-xs font-bold py-2 px-5 rounded-full transition-all duration-300 flex items-center gap-1.5 hover:gap-2.5 active:scale-95 shadow-sm hover:shadow-md cursor-pointer">
+                    <span>Hubungi Kami</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </button>
+            </div>
+            <div class="lg:hidden flex gap-2">
+                <button onclick="openAdminPanel()" class="text-[#111111] hover:text-[#555555] p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                </button>
+                <button id="mobile-menu-btn" class="text-[#111111] hover:text-[#555555] focus:outline-none p-1">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                </button>
+            </div>
+        </nav>
+
+        <div id="mobile-drawer" class="lg:hidden fixed top-[90px] left-4 right-4 bg-white/95 backdrop-blur-md rounded-3xl shadow-2xl p-6 border border-neutral-100 hidden flex-col space-y-3 z-50">
+            <button onclick="handleMobileNavClick(scrollToAbout)" class="w-full text-left py-3 border-b border-neutral-100 font-medium text-[#1C1C1C] text-sm hover:pl-3 transition-all">Tentang THE. C DRINKS</button>
+            <button onclick="handleMobileNavClick(scrollToMenu)" class="w-full text-left py-3 border-b border-neutral-100 font-medium text-[#1C1C1C] text-sm hover:pl-3 transition-all">Menu Kami</button>
+            <button onclick="handleMobileNavClick(scrollToPromo)" class="w-full text-left py-3 border-b border-neutral-100 font-medium text-[#1C1C1C] text-sm hover:pl-3 transition-all">Promo Spesial</button>
+            <button onclick="handleMobileNavClick(() => openStoreModal('stores'))" class="w-full text-left py-3 border-b border-neutral-100 font-medium text-[#1C1C1C] text-sm hover:pl-3 transition-all">Temukan Outlet Kami</button>
+            <button onclick="handleMobileNavClick(scrollToSocial)" class="w-full text-left py-3 border-b border-neutral-100 font-medium text-[#1C1C1C] text-sm hover:pl-3 transition-all">Berita Terbaru</button>
+            <div class="pt-4 flex flex-col gap-3">
+                <button onclick="handleMobileNavClick(() => openStoreModal('contact'))" class="w-full bg-[#111111] text-white text-xs font-bold py-3.5 px-4 rounded-full text-center transition-colors flex items-center justify-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Hubungi Kami</button>
+                <button onclick="handleMobileNavClick(() => openStoreModal('stores'))" class="w-full bg-neutral-100 text-[#1C1C1C] text-xs font-bold py-3.5 px-4 rounded-full text-center transition-colors flex items-center justify-center gap-2 hover:bg-neutral-200"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>Lokasi Outlet</button>
+            </div>
+        </div>
+    </div>
+    <div id="mobile-backdrop" class="lg:hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-40 hidden" onclick="closeMobileDrawer()"></div>
+
+    <!-- ==================== HERO SECTION ==================== -->
+<section id="hero-section" class="w-full">
+    <div class="relative bg-gradient-to-br from-[#FFFFFF] via-[#FBFBFB] to-[#F1F1F1] border-b border-neutral-200/80 shadow-xs pb-16 pt-24 md:pb-24 md:pt-32 overflow-hidden min-h-[560px] md:min-h-[620px] flex items-center justify-center w-full">
+        <div class="absolute top-10 left-10 w-24 h-24 rounded-full bg-neutral-200/15 filter blur-2xl pointer-events-none"></div>
+        <div class="absolute bottom-20 right-20 w-48 h-48 rounded-full bg-neutral-300/10 filter blur-3xl pointer-events-none"></div>
+        <div class="max-w-6xl w-full mx-auto px-6 sm:px-12 flex flex-col-reverse md:flex-row items-center justify-between gap-12 relative z-10">
+            <div class="w-full md:w-1/2 flex flex-col justify-center items-start text-left">
+                <div class="inline-flex items-center space-x-2 bg-white/70 backdrop-blur-sm border border-neutral-200/50 px-3.5 py-1.5 rounded-full mb-6 shadow-xs">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-[#111111]"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4"/><path d="M21 5h-4"/></svg>
+                    <span class="text-[10px] font-extrabold tracking-widest text-[#111111] uppercase">THE. C DRINKS • Cipta Premium Rasa</span>
+                </div>
+                <h1 class="text-4xl sm:text-5xl font-extrabold tracking-tight text-neutral-900 leading-[1.12] mb-6">Ritual harian untuk <br><span class="text-neutral-500 underline decoration-neutral-300 underline-offset-4 decoration-2">suasana hati yang ceria.</span></h1>
+                <p class="text-neutral-500 text-sm md:text-base leading-relaxed mb-8 max-w-md font-normal">Minuman premium buatan tangan yang diciptakan dengan bahan-bahan pilihan untuk membawa kebahagiaan dan kesegaran di setiap momen Anda. Rasakan harmoni cita rasa modern.</p>
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-4 w-full sm:w-auto">
+                    <button onclick="openStoreModal('stores')" class="px-8 py-3.5 bg-[#111111] hover:bg-[#1C1C1C] text-white text-xs font-bold rounded-full transition-all duration-300 flex items-center justify-center gap-2 group shadow-sm hover:shadow-md cursor-pointer active:scale-95">
+                        <span>Temukan Outlet Kami</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 transition-transform group-hover:scale-110"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                    </button>
+                    <button onclick="scrollToMenu()" class="px-8 py-3.5 bg-white border border-neutral-200 hover:border-[#111111] text-[#111111] hover:bg-neutral-50 text-xs font-bold rounded-full transition-all duration-300 flex items-center justify-center gap-1.5">
+                        <span>Jelajahi Menu</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </button>
+                </div>
+            </div>
+            <div class="w-full md:w-1/2 flex items-center justify-center relative min-h-[300px] md:min-h-[420px] select-none">
+                <div class="relative w-full max-w-[380px] h-full flex items-center justify-center">
+                    <div id="hero-ambient-glow" class="absolute w-56 h-56 rounded-full opacity-[0.08] filter blur-3xl transition-all duration-700" style="background-color: #4A2C2A"></div>
+                    
+                    <!-- Gambar Kiri - Hazelnut -->
+                    <div id="hero-left-img" class="absolute left-[2%] sm:left-[6%] bottom-[12%] w-[120px] sm:w-[145px] aspect-[3/4] rounded-2xl overflow-hidden border border-neutral-200/50 bg-white/40 backdrop-blur-xs shadow-lg z-10 transition-all duration-500 hover:brightness-105 opacity-75 scale-90">
+                        <img src="img/cokelat-hazelnut.jpeg" alt="Hazelnut Chocolate" class="w-full h-full object-cover pointer-events-none" id="hero-left-src">
+                        <div class="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-full bg-[#111111]/90 text-[8px] text-white font-semibold shadow-xs select-none">THE. C</div>
+                    </div>
+                    
+                    <!-- Gambar Kanan - Coffee -->
+                    <div id="hero-right-img" class="absolute right-[2%] sm:right-[6%] bottom-[8%] w-[110px] sm:w-[135px] aspect-[3/4] rounded-2xl overflow-hidden border border-neutral-200/50 bg-white/40 backdrop-blur-xs shadow-lg z-10 transition-all duration-500 hover:brightness-105 opacity-70 scale-[0.85]">
+                        <img src="img/coffe-americano.jpeg" alt="Coffee Americano" class="w-full h-full object-cover pointer-events-none" id="hero-right-src">
+                        <div class="absolute bottom-2 right-2 px-2.5 py-0.5 rounded-full bg-[#111111]/90 text-[8px] text-white font-semibold shadow-xs select-none">THE. C</div>
+                    </div>
+                    
+                    <!-- Gambar Tengah - Chocolate Original -->
+                    <div class="relative w-[185px] sm:w-[220px] aspect-[3/4] rounded-[2rem] overflow-hidden border-2 border-white/80 bg-white/95 shadow-2xl z-20 transition-all duration-500 filter hover:contrast-[1.03]">
+                        <img src="img/cokelat-original.jpeg" id="hero-center-src" alt="Chocolate Original" class="w-full h-full object-cover pointer-events-none">
+                        <div id="hero-center-badge" class="absolute bottom-3 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-full text-white text-[9px] font-bold tracking-widest shadow-md transition-all duration-500 whitespace-nowrap" style="background-color: #4A2C2A">THE. C DRINKS</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+    <!-- ==================== ABOUT SECTION ==================== -->
+    <section id="about-section" class="py-16 px-4 md:px-8 max-w-6xl mx-auto scroll-mt-24">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 text-left">
+            <div class="md:col-span-2 group bg-white border border-neutral-100 rounded-[2rem] p-8 md:p-10 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between overflow-hidden relative"><div class="absolute top-0 right-0 w-32 h-32 bg-neutral-100 filter blur-xl rounded-full opacity-60 pointer-events-none"></div><div><span class="text-[10px] font-extrabold tracking-widest text-neutral-400 uppercase font-mono block mb-3">Filosofi Inti</span><h3 class="text-2xl font-extrabold text-[#111111] leading-snug mb-4 max-w-lg">Cipta Premium Rasa — Menyajikan kegembiraan mutlak dan kesegaran kelas tinggi di setiap cangkir produk kami.</h3><p class="text-neutral-500 text-xs sm:text-sm leading-relaxed max-w-xl">Di THE. C DRINKS, proses meracik minuman bukan hanya sekadar teknik komersial biasa, melainkan sebuah ritual harian yang penuh dedikasi.</p></div><div class="mt-8 pt-6 border-t border-neutral-100 flex items-center justify-between"><span class="text-xs font-bold text-neutral-400 font-mono">SEJAK 2026 • BONDOWOSO, IDN</span><button onclick="scrollToMenu()" class="text-xs font-extrabold text-[#111111] inline-flex items-center gap-1 hover:underline"><span>Lihat Peta Menu</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M7 7h10v10"/><path d="M7 17 17 7"/></svg></button></div></div>
+            <div class="bg-[#111111] text-white rounded-[2rem] p-8 shadow-xs hover:shadow-lg transition-all duration-300 flex flex-col justify-between overflow-hidden relative"><div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none"></div><div><div class="inline-flex items-center justify-center w-8 h-8 rounded-full bg-white text-[#111111] font-extrabold text-sm mb-4">C</div><h3 class="text-lg font-bold tracking-tight mb-2">Hanya Bahan Murni</h3><p class="text-neutral-400 text-xs leading-relaxed font-medium">Menggunakan susu organik pilihan, biji cokelat premium murni dari Afrika Barat, serta pucuk daun teh yang dipanen langsung dari perbukitan teduh di Uji, Kyoto.</p></div><div class="pt-6 border-t border-neutral-800"><div class="text-[10px] font-mono tracking-widest text-[#EAEAEA] uppercase">100% DIRACIK TANGAN</div><div class="text-[9px] text-neutral-500 font-medium">Tanpa Pengawet dan Tambahan Buatan</div></div></div>
+        </div>
+    </section>
+
+    <!-- ==================== MENU SECTION ==================== -->
+    <section id="menu-section" class="py-16 px-4 md:px-8 max-w-6xl mx-auto scroll-mt-24">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8"><div><h2 class="text-3xl font-extrabold tracking-tight text-[#111111] mb-2">Menu Kami</h2><p class="text-neutral-500 text-xs sm:text-sm font-medium">Cita rasa premium yang dibuat untuk mencerahkan hari Anda.</p></div></div>
+        <div class="flex flex-wrap gap-2.5 mb-10 select-none w-full" id="category-filters"></div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-5 lg:gap-6" id="products-grid"></div>
+    </section>
+
+    <!-- ==================== PROMO SECTION ==================== -->
+    <section id="promo-section" class="py-16 px-4 md:px-8 max-w-6xl mx-auto scroll-mt-24">
+        <div class="rounded-[2.5rem] bg-[#EAEAEA]/80 border border-neutral-200 px-6 py-12 md:p-16 text-center relative overflow-hidden"><div class="max-w-xl mx-auto mb-14 text-center"><span class="text-[10px] font-extrabold tracking-widest text-[#1C1C1C] uppercase mb-3 bg-white px-3.5 py-1.5 rounded-full inline-block border border-neutral-300/40">Peluncuran Eksklusif</span><h2 class="text-3xl md:text-4xl font-extrabold tracking-tight text-[#111111] mt-2 mb-3">Menu Baru Kami</h2><p class="text-[#555555] text-xs sm:text-sm font-medium">Sensasi rasa segar untuk menyegarkan aktivitas harian Anda.</p></div><div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="campaigns-grid"></div></div>
+    </section>
+
+    <!-- ==================== TESTIMONIALS SECTION ==================== -->
+    <section id="testimonial-section" class="py-20 px-4 md:px-8 bg-[#EAEAEA]/30 border-y border-neutral-100 relative overflow-hidden"><div class="max-w-6xl mx-auto z-10 relative"><div class="text-left mb-16"><h2 class="text-3xl font-extrabold tracking-tight text-neutral-900 mb-2">Apa Kata Pelanggan Kami</h2><p class="text-neutral-500 text-xs sm:text-sm font-medium">Testimoni dari mereka yang harinya menjadi lebih ceria setelah menikmati minuman kami.</p></div><div class="grid grid-cols-1 md:grid-cols-3 gap-8" id="testimonials-grid"></div></div></section>
+
+    <!-- ==================== SOCIAL MEDIA SECTION ==================== -->
+    <section id="social-section" class="py-20 px-4 md:px-8 bg-white scroll-mt-24"><div class="max-w-6xl mx-auto text-center"><div class="mb-12 flex flex-col items-center"><div class="w-10 h-10 rounded-full bg-[#111111] flex items-center justify-center text-white font-extrabold text-base tracking-widest mb-3 shadow-md">C</div><h3 class="font-extrabold tracking-[0.25em] text-[#111111] text-lg uppercase mb-1">THE. C DRINKS</h3><p class="text-neutral-400 text-[10px] sm:text-xs font-bold tracking-[0.4em] uppercase mb-5 select-none pl-[0.4em]">Cipta Premium Rasa</p><h2 class="text-2xl md:text-3xl font-extrabold tracking-tight text-neutral-900 mt-2 mb-4">Ikuti kami di media sosial!</h2><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 bg-neutral-50 hover:bg-[#EAEAEA] border border-neutral-200 px-5 py-2 rounded-full text-xs font-semibold text-[#111111] transition-all group scale-100 hover:scale-105 active:scale-95 cursor-pointer shadow-2xs"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#111111] group-hover:rotate-6 transition-transform"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg><span class="font-mono">@the.c_drinks</span><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></div><div class="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6 max-w-4xl mx-auto" id="instagram-grid"></div></div></section>
+
+    <!-- ==================== ADMIN PANEL MODAL (DENGAN HASHED PASSWORD) ==================== -->
+    <!-- Password Modal -->
+    <div id="admin-password-modal" class="fixed inset-0 z-[55] bg-[#111111]/80 backdrop-blur-sm hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 text-center">
+            <div class="w-12 h-12 rounded-full bg-[#111111] flex items-center justify-center text-white font-bold text-lg mx-auto mb-4">C</div>
+            <h3 class="font-extrabold text-sm mb-2">Verifikasi Admin</h3>
+            <p class="text-[10px] text-neutral-500 mb-4">Masukkan password untuk mengakses panel admin</p>
+            <input type="password" id="admin-password-input" placeholder="Masukkan password" class="w-full px-4 py-2 text-sm border border-neutral-200 rounded-lg mb-4 focus:outline-none focus:border-[#111111] text-center password-input" autocomplete="off">
+            <div class="flex gap-2">
+                <button onclick="closePasswordModal()" class="flex-1 px-4 py-2 border border-neutral-200 rounded-lg text-xs font-medium">Batal</button>
+                <button onclick="verifyAdminPassword()" class="flex-1 px-4 py-2 bg-[#111111] text-white rounded-lg text-xs font-medium">Verifikasi</button>
+            </div>
+            <p class="text-[8px] text-neutral-400 mt-4">🔒 Password terenkripsi SHA-256</p>
+        </div>
+    </div>
+
+    <!-- Admin Main Modal -->
+    <div id="admin-modal" class="fixed inset-0 z-[60] bg-[#111111]/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-4xl w-full mx-4 my-8 overflow-hidden shadow-2xl relative flex flex-col max-h-[90vh]">
+            <div class="sticky top-0 bg-white border-b border-neutral-200 px-4 sm:px-6 py-4 flex items-center justify-between z-10 flex-shrink-0">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-full bg-[#111111] flex items-center justify-center text-white font-bold">C</div>
+                    <div>
+                        <h2 class="font-extrabold text-[#111111] text-sm">Panel Admin THE. C DRINKS</h2>
+                        <p class="text-[9px] text-neutral-500 hidden sm:block">Kelola Menu, Promo, Testimoni & Instagram Post</p>
+                    </div>
+                </div>
+                <button onclick="closeAdminPanel()" class="w-8 h-8 rounded-full bg-neutral-100 hover:bg-neutral-200 flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                </button>
+            </div>
+            
+            <!-- Tab Navigation - Responsive scrollable -->
+            <div class="border-b border-neutral-200 px-4 sm:px-6 pt-2 flex-shrink-0 overflow-x-auto admin-scroll">
+                <div class="flex gap-1 sm:gap-2 min-w-max">
+                    <button onclick="setAdminTab('products')" id="admin-tab-products" class="admin-tab-btn px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold transition-all border-b-2 border-[#111111] text-[#111111] whitespace-nowrap">📦 Produk</button>
+                    <button onclick="setAdminTab('campaigns')" id="admin-tab-campaigns" class="admin-tab-btn px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold transition-all border-b-2 border-transparent text-neutral-500 whitespace-nowrap">🎯 Promo</button>
+                    <button onclick="setAdminTab('testimonials')" id="admin-tab-testimonials" class="admin-tab-btn px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold transition-all border-b-2 border-transparent text-neutral-500 whitespace-nowrap">⭐ Testimoni</button>
+                    <button onclick="setAdminTab('instagram')" id="admin-tab-instagram" class="admin-tab-btn px-3 sm:px-4 py-2 text-[10px] sm:text-xs font-bold transition-all border-b-2 border-transparent text-neutral-500 whitespace-nowrap">📷 Instagram</button>
+                </div>
+            </div>
+            
+            <!-- Content Area - Scrollable -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-6 admin-scroll">
+                <div id="admin-products-panel" class="admin-panel">
+                    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                        <h3 class="font-bold text-xs">Daftar Produk</h3>
+                        <button onclick="showAddProductForm()" class="bg-[#111111] text-white text-[9px] font-bold px-3 py-1.5 rounded-lg hover:bg-neutral-800 transition">+ Tambah Produk</button>
+                    </div>
+                    <div id="admin-products-list" class="space-y-2 max-h-[400px] overflow-y-auto admin-scroll"></div>
+                </div>
+                
+                <div id="admin-campaigns-panel" class="admin-panel hidden">
+                    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                        <h3 class="font-bold text-xs">Daftar Promo</h3>
+                        <button onclick="showAddCampaignForm()" class="bg-[#111111] text-white text-[9px] font-bold px-3 py-1.5 rounded-lg hover:bg-neutral-800 transition">+ Tambah Promo</button>
+                    </div>
+                    <div id="admin-campaigns-list" class="space-y-2 max-h-[400px] overflow-y-auto admin-scroll"></div>
+                </div>
+                
+                <div id="admin-testimonials-panel" class="admin-panel hidden">
+                    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                        <h3 class="font-bold text-xs">Daftar Testimoni</h3>
+                        <button onclick="showAddTestimonialForm()" class="bg-[#111111] text-white text-[9px] font-bold px-3 py-1.5 rounded-lg hover:bg-neutral-800 transition">+ Tambah Testimoni</button>
+                    </div>
+                    <div id="admin-testimonials-list" class="space-y-2 max-h-[400px] overflow-y-auto admin-scroll"></div>
+                </div>
+                
+                <div id="admin-instagram-panel" class="admin-panel hidden">
+                    <div class="flex justify-between items-center mb-4 flex-wrap gap-2">
+                        <h3 class="font-bold text-xs">Daftar Instagram Post</h3>
+                        <button onclick="showAddInstagramForm()" class="bg-[#111111] text-white text-[9px] font-bold px-3 py-1.5 rounded-lg hover:bg-neutral-800 transition">+ Tambah Post</button>
+                    </div>
+                    <div id="admin-instagram-list" class="space-y-2 max-h-[400px] overflow-y-auto admin-scroll"></div>
+                </div>
+            </div>
+            
+            <div class="border-t border-neutral-100 px-4 sm:px-6 py-3 bg-neutral-50 flex justify-between items-center flex-shrink-0">
+                <span class="text-[8px] text-neutral-400 hidden sm:block">Perubahan akan langsung tersimpan dan terlihat semua pengguna</span>
+                <button onclick="closeAdminPanel()" class="bg-[#111111] text-white text-[9px] font-bold px-4 py-1.5 rounded-lg hover:bg-neutral-800 transition">Tutup Panel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add/Edit Forms Modals -->
+    <div id="form-modal" class="fixed inset-0 z-[70] bg-[#111111]/80 backdrop-blur-sm hidden items-center justify-center p-4 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 my-8">
+            <h3 id="form-title" class="font-extrabold text-sm mb-4">Form</h3>
+            <div id="form-fields" class="max-h-[60vh] overflow-y-auto admin-scroll"></div>
+            <div class="flex gap-2 mt-4">
+                <button onclick="closeFormModal()" class="flex-1 px-4 py-2 border border-neutral-200 rounded-lg text-xs font-medium hover:bg-neutral-50 transition">Batal</button>
+                <button onclick="submitFormData()" class="flex-1 px-4 py-2 bg-[#111111] text-white rounded-lg text-xs font-medium hover:bg-neutral-800 transition">Simpan</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox-modal" class="fixed inset-0 bg-[#111111]/70 backdrop-blur-sm z-50 hidden items-center justify-center p-4 sm:p-6">
+        <div class="bg-white rounded-3xl max-w-lg w-full mx-4 sm:mx-6 overflow-hidden shadow-2xl relative border border-neutral-200">
+            <button onclick="closeLightbox()" class="absolute top-4 right-4 z-10 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-neutral-800 hover:bg-white hover:text-[#111111] transition-all active:scale-95 cursor-pointer shadow-md"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <div class="aspect-square bg-neutral-100 relative" id="lightbox-image-container"><img id="lightbox-img" src="" alt="Active post illustration" class="w-full h-full object-cover"><div class="absolute bottom-4 left-4 bg-[#111111]/75 backdrop-blur-2xs rounded-full px-3 py-1.5 text-[9px] text-white font-semibold flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3 h-3 text-amber-300"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/><path d="M19 3v4"/><path d="M21 5h-4"/></svg>Unggahan Pilihan dari Instagram</div></div>
+            <div class="p-6 text-left"><div class="flex items-center justify-between mb-4"><div class="flex items-center space-x-2"><div class="w-8 h-8 rounded-full bg-[#111111] flex items-center justify-center text-white font-mono font-bold text-xs uppercase">C</div><div><h4 class="font-extrabold text-xs text-[#111111]">the.c_drinks</h4><span class="text-[9px] text-neutral-400 font-medium">Bondowoso, Indonesia</span></div></div><div class="flex items-center space-x-4 text-xs text-neutral-600 font-mono font-bold"><span class="flex items-center gap-1" id="lightbox-likes"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-[#111111]"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span>0</span></span><span class="flex items-center gap-1" id="lightbox-comments"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5 text-[#111111]"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>0</span></span></div></div><div class="bg-neutral-50 rounded-2xl p-4 border border-neutral-100"><p id="lightbox-caption" class="text-neutral-700 text-xs leading-relaxed"></p><div class="mt-2 text-[9px] font-semibold text-[#555555]">JUNI 2026 • INSTAGRAM STORIES</div></div><div class="mt-5 flex gap-2"><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="flex-1 bg-[#111111] hover:bg-neutral-800 text-white font-bold text-xs py-3 px-4 rounded-xl text-center transition-all flex items-center justify-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg><span>Lihat di Instagram</span></a><button onclick="closeLightbox()" class="px-4 py-3 border border-neutral-200 hover:bg-neutral-50 text-[#111111] font-semibold text-xs rounded-xl transition-all">Tutup</button></div></div>
+        </div>
+    </div>
+
+    <!-- ==================== FOOTER ==================== -->
+    <footer class="bg-[#EAEAEA]/30 border-t border-neutral-200/80 pt-16 pb-8 px-4 md:px-8 select-none"><div class="max-w-6xl mx-auto"><div class="grid grid-cols-1 md:grid-cols-4 gap-10 md:gap-8 pb-12 mb-10 border-b border-neutral-200/60 items-start"><div class="flex flex-col text-left space-y-4"><h4 class="font-extrabold text-xs text-[#111111] tracking-widest uppercase">Layanan Pelanggan</h4><div class="space-y-3.5 text-xs text-neutral-500 font-medium leading-relaxed"><div class="flex items-start space-x-2.5"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#111111] mt-0.5 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span>Jl. Diponegoro, Kotakulon, <br>Kec. Bondowoso, Kab. Bondowoso, <br>Jawa Timur 68213</span></div><div class="flex items-center space-x-2.5"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#111111] flex-shrink-0"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.574 2.81.7A2 2 0 0 1 22 16.92z"/></svg><a href="tel:082299999035" class="hover:text-[#111111] hover:underline transition-colors">0822 9999 9035</a></div><div class="flex items-center space-x-2.5"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#111111] flex-shrink-0"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><button onclick="openStoreModal('contact')" class="hover:text-[#111111] hover:underline transition-colors text-left font-semibold">Hubungi Dukungan Layanan</button></div></div></div><div class="flex flex-col text-left space-y-4"><h4 class="font-extrabold text-xs text-[#111111] tracking-widest uppercase">Tautan</h4><ul class="space-y-2.5 text-xs text-neutral-500 font-medium font-sans"><li><button onclick="scrollToAbout()" class="hover:text-[#111111] hover:underline transition-colors">Tentang Kami</button></li><li><button onclick="scrollToMenu()" class="hover:text-[#111111] hover:underline transition-colors">Menu Kami</button></li><li><button onclick="scrollToPromo()" class="hover:text-[#111111] hover:underline transition-colors">Promo Spesial</button></li><li><button onclick="openStoreModal('stores')" class="hover:text-[#111111] hover:underline transition-colors">Lokasi Outlet</button></li><li><button onclick="scrollToSocial()" class="hover:text-[#111111] hover:underline transition-colors">Berita & Acara</button></li></ul></div><div class="flex flex-col text-left space-y-4"><h4 class="font-extrabold text-xs text-[#111111] tracking-widest uppercase">Media Sosial</h4><ul class="space-y-2.5 text-xs text-neutral-500 font-medium py-0.5"><li><a href="https://instagram.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 hover:text-[#111111] transition-colors"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg><span>Instagram</span><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-2.5 h-2.5 text-neutral-300"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></li><li><a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" class="inline-flex items-center space-x-2 hover:text-[#111111] transition-colors"><svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12.53.15C13.72.08 14.85 0 15.69 0c.05 1.5.47 2.94 1.25 4.1C17.75 5.3 19 6.13 20.44 6.42v3.31c-1.5-.11-2.92-.68-4.1-1.63v7.35c0 4.7-3.8 8.55-8.5 8.55C3.15 24 0 20.85 0 16.15s3.15-8.55 7.85-8.55c.75 0 1.48.1 2.18.29v3.42C9.35 11.1 8.62 11 7.85 11c-2.85 0-5.15 2.3-5.15 5.15S5 21.3 7.85 21.3c2.85 0 5.15-2.3 5.15-5.15V.15z"/></svg><span>TikTok</span><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-2.5 h-2.5 text-neutral-300"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg></a></li></ul></div><div class="flex flex-col items-start md:items-end text-left md:text-right space-y-4"><div class="flex items-center md:justify-end gap-2 px-1"><div class="w-5 h-5 rounded-full bg-[#111111] flex items-center justify-center text-white font-mono font-bold text-[9px]">C</div><span class="font-extrabold tracking-widest text-[#111111] text-sm md:text-[15px] uppercase">THE. C DRINKS</span></div><p class="text-neutral-400 font-bold tracking-[0.3em] uppercase text-[9px] pl-1 md:pl-0">"Cipta Premium Rasa"</p><div class="pt-2 opacity-15 hover:opacity-25 transition-opacity duration-300 pr-1 select-none pointer-events-none flex flex-col items-start md:items-end"><svg class="w-16 h-16 text-[#111111]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg><div class="text-[8px] font-bold font-mono tracking-widest text-neutral-800 text-center uppercase mt-1">the. c drinks • logo</div></div></div></div><div class="flex flex-col sm:flex-row items-center justify-between text-[11px] text-neutral-400 font-medium gap-4"><span>© 2026 THE. C DRINKS. Hak Cipta Dilindungi Undang-Undang. Minuman khas Indonesia kelas premium.</span><div class="flex items-center space-x-4"><a href="#" class="hover:text-[#111111] hover:underline transition-colors">Syarat & Ketentuan</a><span class="text-neutral-300">|</span><a href="#" class="hover:text-[#111111] hover:underline transition-colors">Kebijakan Privasi</a></div></div></div></footer>
+
+    <!-- Floating Cart Button -->
+    <button id="cart-floating-btn" class="fixed bottom-6 right-6 z-40 bg-[#111111] hover:bg-neutral-800 text-white rounded-full p-4 flex items-center justify-center space-x-2 shadow-2xl transition-all hover:scale-105 active:scale-95 animate-bounce cursor-pointer border border-neutral-800 hidden"><div class="relative"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 text-white"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></svg><span id="cart-count-badge" class="absolute -top-2 -right-3 bg-[#E11D48] text-white text-[9px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center shadow-sm">0</span></div><span class="text-xs font-extrabold tracking-widest uppercase font-mono hidden sm:inline pl-1">Proses Pesanan</span></button>
+
+    <!-- Cart Sidebar Drawer -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 bg-[#111111]/60 backdrop-blur-sm hidden justify-end"><div class="bg-white w-full max-w-md h-full flex flex-col justify-between shadow-2xl p-6 relative border-l border-neutral-100"><div><div class="flex items-center justify-between pb-4 border-b border-neutral-100"><div class="flex items-center space-x-2"><div class="w-7 h-7 rounded-full bg-[#111111] flex items-center justify-center text-white text-xs font-bold font-mono uppercase">C</div><h3 class="font-extrabold text-sm text-neutral-900 uppercase tracking-widest">Nampan Pesanan Anda</h3></div><button onclick="closeCartDrawer()" class="w-8 h-8 rounded-full bg-[#F5F5F5] hover:bg-[#EAEAEA] flex items-center justify-center text-neutral-800 hover:text-[#111111] transition-all cursor-pointer active:scale-95"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button></div><div id="cart-items-list" class="mt-4 space-y-4 max-h-[50vh] overflow-y-auto pr-1 admin-scroll"></div></div><div id="cart-footer" class="border-t border-neutral-100 pt-5 space-y-4 text-xs font-medium text-neutral-500 hidden"><div class="space-y-2"><div class="flex items-center justify-between"><span>Subtotal</span><span id="cart-subtotal" class="font-mono text-[#111111]">Rp 0</span></div><div class="flex items-center justify-between"><span>Biaya Ongkir</span><span id="cart-tax" class="font-mono text-[#111111]">Rp 0</span></div><div class="flex items-center justify-between border-t border-neutral-100 pt-3 text-sm font-extrabold text-[#111111]"><span>Total Pembayaran</span><span id="cart-total" class="font-mono">Rp 0</span></div></div><div class="bg-neutral-50 rounded-2xl p-3 border border-neutral-150 flex gap-2 items-start mt-2"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 text-[#555555] mt-0.5 flex-shrink-0"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg><p class="text-[10px] text-neutral-500 text-left leading-relaxed">Selesaikan pesanan Anda melalui mitra aplikasi resmi kami (GrabFood/ShopeeFood) atau langsung via WhatsApp Chat kami.</p></div><button onclick="openCheckoutModal()" class="w-full bg-[#111111] hover:bg-neutral-800 text-white font-bold py-3.5 px-4 rounded-xl transition-all cursor-pointer flex items-center justify-center gap-1.5 focus:outline-none shadow-md active:scale-98"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg><span>Pilih Saluran Pemesanan</span></button></div></div></div>
+
+    <!-- Checkout Modal -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 bg-[#111111]/75 backdrop-blur-sm hidden items-center justify-center p-4 sm:p-6 overflow-y-auto">
+        <div class="bg-white rounded-2xl max-w-md w-full mx-4 sm:mx-6 border border-neutral-100 shadow-2xl relative overflow-hidden my-4 max-h-[90vh] overflow-y-auto">
+            <button onclick="closeCheckoutModal()" class="absolute top-3 right-3 w-7 h-7 rounded-full bg-neutral-50 hover:bg-[#EAEAEA] flex items-center justify-center text-neutral-500 hover:text-[#111111] transition-all cursor-pointer z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
+            <div class="p-5">
+                <div class="text-left mb-4"><span class="text-[9px] font-extrabold tracking-widest text-[#E11D48] bg-rose-50 px-2.5 py-0.5 rounded-full uppercase font-mono inline-block mb-2">Check Out</span><h3 class="text-xl font-extrabold text-[#111111]">Pilih Saluran Pemesanan</h3><p class="text-neutral-500 text-[11px] mt-1">Pilih metode pemesanan favorit Anda di bawah ini</p></div>
+                <div class="p-3 bg-neutral-50 rounded-xl flex items-center justify-between mb-5 text-xs"><div class="flex items-center gap-2"><div class="w-6 h-6 rounded-full bg-neutral-900 flex items-center justify-center text-white font-mono text-[10px] font-bold"><span id="checkout-item-count">0</span></div><div><p class="font-bold text-[#111111] text-[10px] leading-none"><span id="checkout-items-length">0</span> menu</p></div></div><div class="text-right"><p class="text-[9px] text-neutral-400">Total Pembayaran</p><p id="checkout-total" class="font-mono text-sm font-extrabold text-[#E11D48]">Rp 0</p></div></div>
+                
+                <div class="mb-3"><div class="border border-emerald-200 rounded-xl bg-emerald-50/10 p-3"><div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-xl bg-emerald-100 flex items-center justify-center flex-shrink-0"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-emerald-600"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></div><div class="flex-1"><h4 class="text-xs font-extrabold text-[#111111]">WhatsApp Delivery</h4><p class="text-[8px] text-neutral-500">Ongkir Rp2.000/km (min Rp3.000)</p></div><span class="text-[7px] bg-emerald-600 text-white px-1.5 py-0.5 rounded-full">Utama</span></div><div class="mt-1 space-y-2"><input type="text" id="customer-name" placeholder="Nama lengkap Anda" class="w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500"><div id="location-status-wa" class="text-[8px] text-emerald-600 hidden"></div><div class="flex gap-2"><button type="button" onclick="getUserLocationWA()" class="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-1.5 rounded-lg text-[9px] flex items-center justify-center gap-1 transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>📍 Ambil Lokasi Saya</button><button id="reset-permission-btn" type="button" onclick="resetLocationPermission()" class="hidden bg-red-500 hover:bg-red-600 text-white font-bold py-1.5 px-3 rounded-lg text-[9px] flex items-center justify-center gap-1 transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Reset</button></div><div class="flex gap-2"><input type="number" id="delivery-distance" placeholder="Jarak (km)" class="flex-1 text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500" step="0.1" oninput="updateDeliveryFee()"><button type="button" onclick="clearLocationWA()" class="text-[9px] text-red-500 hover:text-red-600 px-2">Hapus</button></div><div id="delivery-fee-display" class="text-[9px] font-semibold text-emerald-700 hidden"></div><button onclick="checkoutViaWhatsApp()" class="w-full bg-[#128C7E] hover:bg-[#075E54] text-white font-bold py-1.5 rounded-lg text-[10px] flex items-center justify-center gap-1 mt-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Kirim via WhatsApp</button></div></div></div>
+                
+                <div class="grid grid-cols-2 gap-3 mb-3"><div class="border border-green-200 rounded-xl bg-green-50/10 p-3 flex flex-col"><div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-xl bg-green-100 flex items-center justify-center"><span class="font-bold text-green-600 text-[11px]">G</span></div><div><h4 class="text-xs font-extrabold text-[#111111]">GrabFood</h4><p class="text-[7px] text-neutral-500">Ongkir dari aplikasi</p></div></div><button onclick="checkoutViaGrabFood()" class="w-full bg-[#00B14F] hover:bg-[#009A44] text-white font-bold py-2 rounded-lg text-[10px] flex items-center justify-center gap-1 mt-1"><span>Pesan</span></button></div><div class="border border-orange-200 rounded-xl bg-orange-50/10 p-3 flex flex-col"><div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-xl bg-orange-100 flex items-center justify-center"><span class="font-bold text-orange-600 text-[10px]">S</span></div><div><h4 class="text-xs font-extrabold text-[#111111]">ShopeeFood</h4><p class="text-[7px] text-neutral-500">Ongkir dari aplikasi</p></div></div><button onclick="checkoutViaShopeeFood()" class="w-full bg-[#EE4D2D] hover:bg-[#D13D20] text-white font-bold py-2 rounded-lg text-[10px] flex items-center justify-center gap-1 mt-1"><span>Pesan</span></button></div></div>
+                
+                <div class="mb-3"><div class="border border-neutral-200 rounded-xl bg-neutral-50 p-3"><div class="flex items-center gap-2 mb-2"><div class="w-7 h-7 rounded-xl bg-neutral-200 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div><div><h4 class="text-xs font-extrabold text-[#111111]">Ambil Sendiri di Toko</h4><p class="text-[8px] text-green-600">✅ GRATIS - Tanpa Biaya Ongkir</p></div></div><div class="mt-1"><input type="text" id="pickup-name" placeholder="Nama lengkap Anda" class="w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-neutral-400 mb-2"><button onclick="checkoutViaStorePickup()" class="w-full bg-[#1C1C1C] hover:bg-neutral-800 text-white font-bold py-2 rounded-lg text-[10px] flex items-center justify-center gap-1"><span>Dapatkan Kode Pesanan</span></button></div></div></div>
+                
+                <div class="mt-2 p-2 bg-neutral-100 rounded-lg text-[8px] text-neutral-500 text-center"><div class="grid grid-cols-2 gap-1"><div>📱 WhatsApp: Ongkir = (min Rp3.000) + Rp2.000/km</div><div>🚗 GrabFood/Shopee: Ongkir dari aplikasi</div><div>🏪 Ambil Sendiri: GRATIS</div><div>📍 Klik "Ambil Lokasi" untuk hitung otomatis</div></div></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Receipt Modal -->
+    <div id="receipt-modal" class="fixed inset-0 z-50 bg-[#111111]/75 backdrop-blur-sm hidden items-center justify-center p-4 sm:p-6">
+        <div id="receipt-card" class="bg-white rounded-2xl max-w-sm w-full mx-4 sm:mx-6 p-5 text-center border border-neutral-200 shadow-2xl relative">
+            <button onclick="closeReceiptModal()" class="absolute top-2 right-2 text-neutral-400 hover:text-[#111111] cursor-pointer p-1"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <div class="mb-3 text-green-600 inline-flex items-center justify-center w-10 h-10 bg-green-50 rounded-full"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div>
+            <h3 class="font-extrabold text-[#111111] text-xs uppercase tracking-widest mb-0.5">THE. C DRINKS</h3>
+            <p id="receipt-id" class="text-zinc-400 text-[9px] font-mono mb-3">ID RESI: TC-REG-XXXXXX</p>
+            <span id="receipt-badge" class="text-[9px] bg-neutral-100 text-[#111111] font-extrabold px-2 py-0.5 rounded-full mb-2 inline-block">Ambil di Toko</span>
+            <div class="border-t border-b border-dashed border-neutral-300 py-3 my-2 text-left text-xs">
+                <div id="receipt-items" class="max-h-[100px] overflow-y-auto space-y-1 text-[10px] admin-scroll"></div>
+                <div class="border-t border-dashed border-neutral-200 pt-2 mt-2">
+                    <div class="flex justify-between text-[9px]"><span>Subtotal</span><span id="receipt-subtotal">Rp 0</span></div>
+                    <div class="flex justify-between text-[9px]" id="receipt-service-fee"><span>Biaya Ongkir</span><span>Rp 0</span></div>
+                    <div class="flex justify-between border-t border-neutral-100 pt-1 mt-1 font-bold text-[10px]"><span>Total</span><span id="receipt-total" class="font-mono">Rp 0</span></div>
+                </div>
+            </div>
+            <p id="receipt-message" class="text-neutral-500 text-[9px] leading-relaxed pt-1">Tunjukkan struk ini ke kasir</p>
+            <button onclick="downloadReceipt()" class="mt-3 w-full bg-[#111111] hover:bg-neutral-800 text-white font-bold py-2 rounded-lg text-[10px] transition-colors">Cetak Transaksi</button>
+        </div>
+    </div>
+
+    <!-- Store Locator Modal -->
+    <div id="store-modal" class="fixed inset-0 z-50 bg-[#111111]/60 backdrop-blur-sm hidden items-center justify-center p-4 sm:p-6">
+        <div class="bg-white rounded-2xl sm:rounded-[1.5rem] max-w-sm sm:max-w-md md:max-w-lg w-full mx-4 sm:mx-6 overflow-hidden shadow-2xl relative border border-neutral-100 flex flex-col md:flex-row max-h-[90vh] overflow-y-auto">
+            <button onclick="closeStoreModal()" class="absolute top-3 right-3 z-10 w-7 h-7 rounded-full bg-[#F5F5F5] hover:bg-[#EAEAEA] flex items-center justify-center text-[#111111] transition-all active:scale-95 cursor-pointer"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+            <div class="w-full md:w-[30%] bg-[#1C1C1C] text-white p-4 md:p-5 flex flex-col justify-between relative overflow-hidden"><div class="absolute inset-0 opacity-10 bg-[radial-gradient(#ffffff_1px,transparent_1px)] [background-size:12px_12px] pointer-events-none"></div><div class="relative z-10"><div class="flex items-center gap-2 mb-2"><div class="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center text-white font-extrabold text-xs">C</div><span class="text-[9px] font-extrabold tracking-widest text-neutral-400 uppercase">Premium</span></div><h3 class="text-sm font-extrabold tracking-tight text-white mb-1">THE. C DRINKS</h3><p class="text-neutral-400 text-[9px] leading-relaxed font-medium">"Cipta Premium Rasa" — kopi spesial berkualitas.</p></div><div class="relative z-10 pt-3 mt-2 border-t border-neutral-800"><div class="flex items-center gap-1 text-[9px] text-neutral-300 font-semibold mb-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>Jam Operasional</span></div><p id="store-hours" class="text-[9px] text-neutral-400">10:00 Pagi - 10:00 Malam</p><p class="text-[8px] text-neutral-500 italic mt-1">*Hanya 1 Outlet Utama</p></div></div>
+            <div class="w-full md:w-[70%] p-4 md:p-5 flex flex-col justify-between"><div><div class="flex gap-3 mb-3 border-b border-neutral-100 pb-1.5"><button id="stores-tab-btn" onclick="setStoreTab('stores')" class="text-[11px] font-bold pb-1 transition-all cursor-pointer text-[#111111] relative">Temukan Outlet<div id="stores-tab-indicator" class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#111111] rounded-full"></div></button><button id="contact-tab-btn" onclick="setStoreTab('contact')" class="text-[11px] font-bold pb-1 transition-all cursor-pointer text-neutral-400 hover:text-[#111111] relative">Hubungi Kami<div id="contact-tab-indicator" class="absolute bottom-0 left-0 right-0 h-0.5 bg-[#111111] rounded-full hidden"></div></button></div><div id="stores-tab-content" class="space-y-3"><div class="p-3 bg-neutral-50 rounded-xl border border-neutral-200/55"><div class="inline-block bg-neutral-900 text-white font-mono text-[8px] font-extrabold px-2 py-0.5 rounded-full uppercase tracking-widest mb-2">Cabang Utama</div><h4 id="store-name" class="font-extrabold text-neutral-900 text-xs mb-1 leading-snug">THE. C DRINKS - Bondowoso</h4><div class="space-y-1.5 text-[10px] text-neutral-600 leading-relaxed"><div class="flex items-start gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mt-0.5 flex-shrink-0"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span id="store-address" class="text-[9px] leading-relaxed">Jl. Diponegoro, Bondowoso, Jawa Timur 68213</span></div><div class="flex items-center gap-1.5"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.574 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span id="store-phone" class="text-[9px]">0822 9999 9035</span></div></div><div class="mt-2 pt-2 border-t border-neutral-200/40 flex items-center justify-between"><span class="text-[8px] text-[#555555] font-mono">Premium Store</span><a id="store-maps-url" href="#" target="_blank" rel="noopener noreferrer" class="text-[9px] font-bold text-white bg-[#111111] hover:bg-neutral-800 px-2.5 py-1 rounded-lg inline-flex items-center gap-1 transition-all active:scale-95"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="3 11 19 11 22 14 3 14"/><path d="M7 11v8"/><path d="M17 11v8"/><path d="M3 14h18"/><line x1="9" y1="6" x2="15" y2="6"/><line x1="12" y1="3" x2="12" y2="6"/></svg><span>Arah</span></a></div></div></div><div id="contact-tab-content" class="space-y-3 hidden"><div id="contact-form-container" class="space-y-2 text-xs text-neutral-600"><form id="contact-form" onsubmit="submitContactForm(event)"><div><label class="block font-bold text-[8px] text-[#111111] mb-0.5 uppercase tracking-wide">Nama Lengkap</label><input type="text" id="contact-name" required placeholder="John Doe" class="w-full px-3 py-1.5 text-[10px] bg-neutral-50 rounded-lg border border-neutral-200 focus:outline-none focus:border-[#111111] transition-colors"></div><div class="mt-2"><label class="block font-bold text-[8px] text-[#111111] mb-0.5 uppercase tracking-wide">Nomor WhatsApp</label><input type="tel" id="contact-phone" required placeholder="08123456789" class="w-full px-3 py-1.5 text-[10px] bg-neutral-50 rounded-lg border border-neutral-200 focus:outline-none focus:border-[#111111] transition-colors"></div><div class="mt-2"><label class="block font-bold text-[8px] text-[#111111] mb-0.5 uppercase tracking-wide">Pesan</label><textarea id="contact-message" required rows="2" placeholder="Tanyakan tentang katering / acara / kemitraan..." class="w-full px-3 py-1.5 text-[10px] bg-neutral-50 rounded-lg border border-neutral-200 focus:outline-none focus:border-[#111111] transition-colors resize-none"></textarea></div><button type="submit" class="w-full bg-[#111111] hover:bg-neutral-800 text-white font-bold py-1.5 rounded-lg transition-all flex items-center justify-center gap-1 cursor-pointer active:scale-98 mt-2 text-[10px]"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg><span>Kirim via WhatsApp</span></button></form></div><div id="contact-success" class="p-3 bg-green-50 text-green-800 rounded-xl border border-green-200 text-center flex flex-col items-center justify-center space-y-1.5 min-h-[160px] hidden"><div class="w-7 h-7 rounded-full bg-green-100 flex items-center justify-center"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></div><h4 class="font-bold text-[10px] text-green-900">Pesan Siap Dikirim!</h4><p class="text-[9px] text-green-700 leading-relaxed">Kami mengarahkan Anda ke WhatsApp resmi kami.</p><a id="whatsapp-link" href="#" target="_blank" rel="noopener noreferrer" class="mt-1 bg-green-600 hover:bg-green-700 text-white font-extrabold text-[9px] px-2.5 py-1 rounded-lg inline-flex items-center gap-1 transition-all"><svg xmlns="http://www.w3.org/2000/svg" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.127.96.362 1.903.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.574 2.81.7A2 2 0 0 1 22 16.92z"/></svg><span>Buka WhatsApp</span></a><button onclick="resetContactForm()" class="text-[8px] font-bold text-green-800/80 underline pt-1">Tulis pesan lain</button></div></div></div><div class="border-t border-neutral-100 pt-2 mt-2 flex items-center justify-between text-[8px] text-neutral-400"><span class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>Terima kasih</span><button onclick="closeStoreModal()" class="text-[#111111] font-bold hover:underline text-[8px]">Kembali</button></div></div>
+        </div>
+    </div>
+
+    <script src="js/main.js"></script>
+    
+    <script>
+        // ==================== HASHED PASSWORD SECURITY ====================
+        const HASHED_ADMIN_PASSWORD = 'ce9675a3b45e948cdd1c09fc6f6a5d770f7f29741ed84cf8588c9a9fc5e242d1';
+        let isAdminAuthenticated = false;
+        
+        // Fungsi untuk hashing password input
+        function hashPassword(password) {
+            return CryptoJS.SHA256(password).toString();
+        }
+        
+        function openAdminPanel() {
+            if (isAdminAuthenticated) {
+                showAdminPanel();
+            } else {
+                showPasswordModal();
+            }
+        }
+        
+        function showPasswordModal() {
+            document.getElementById('admin-password-modal').classList.remove('hidden');
+            document.getElementById('admin-password-modal').classList.add('flex');
+            document.getElementById('admin-password-input').value = '';
+            document.getElementById('admin-password-input').focus();
+        }
+        
+        function closePasswordModal() {
+            document.getElementById('admin-password-modal').classList.add('hidden');
+            document.getElementById('admin-password-modal').classList.remove('flex');
+        }
+        
+        function verifyAdminPassword() {
+            const enteredPassword = document.getElementById('admin-password-input').value;
+            const hashedEntered = hashPassword(enteredPassword);
+            
+            if (hashedEntered === HASHED_ADMIN_PASSWORD) {
+                isAdminAuthenticated = true;
+                closePasswordModal();
+                showAdminPanel();
+                
+                // Optional: Simpan status autentikasi di sessionStorage
+                sessionStorage.setItem('adminAuth', 'true');
+            } else {
+                alert('Password salah! Akses ditolak.');
+                document.getElementById('admin-password-input').value = '';
+                document.getElementById('admin-password-input').focus();
+                
+                // Optional: Animasi shake
+                const modal = document.getElementById('admin-password-modal');
+                modal.classList.add('animate-shake');
+                setTimeout(() => modal.classList.remove('animate-shake'), 500);
+            }
+        }
+        
+        // Cek session storage saat load
+        function checkExistingAuth() {
+            if (sessionStorage.getItem('adminAuth') === 'true') {
+                isAdminAuthenticated = true;
+            }
+        }
+        
+        function showAdminPanel() {
+            document.getElementById('admin-modal').classList.remove('hidden');
+            document.getElementById('admin-modal').classList.add('flex');
+            refreshAdminLists();
+        }
+        
+        // Override closeAdminPanel
+        const originalCloseAdminPanel = window.closeAdminPanel;
+        window.closeAdminPanel = function() {
+            document.getElementById('admin-modal').classList.add('hidden');
+            document.getElementById('admin-modal').classList.remove('flex');
+            // Jangan reset authentication, tetap aktif selama session
+        };
+        
+        // Logout function untuk admin (optional)
+        window.adminLogout = function() {
+            isAdminAuthenticated = false;
+            sessionStorage.removeItem('adminAuth');
+            closeAdminPanel();
+            showNotification('Anda telah logout dari panel admin', 'info');
+        };
+        
+        // Animation shake untuk password salah
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes shake {
+                0%, 100% { transform: translateX(0); }
+                10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+                20%, 40%, 60%, 80% { transform: translateX(5px); }
+            }
+            .animate-shake {
+                animation: shake 0.5s ease-in-out;
+            }
+        `;
+        document.head.appendChild(style);
+        
+        // Make functions global
+        window.closePasswordModal = closePasswordModal;
+        window.verifyAdminPassword = verifyAdminPassword;
+        window.adminLogout = adminLogout;
+        
+        // Check existing auth on load
+        checkExistingAuth();
+    </script>
+</body>
+</html>
