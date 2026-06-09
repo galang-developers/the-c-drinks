@@ -4,37 +4,63 @@
 const JSONBIN_ACCESS_KEY = '$2a$10$Idssm7MPctlzL/quJlXUyOiFa5bSp2W3ERWxRSLbpJS/QKeUj8kt2';
 const JSONBIN_BIN_ID = '6a282856f5f4af5e29d26758';
 
-// === PERBAIKAN: Gunakan path absolut untuk gambar ===
-const IMAGE_PATH = './';  // Path absolut dari root
+// === FUNGSI UNTUK NORMALISASI PATH GAMBAR ===
+function normalizeImagePath(imagePath) {
+    if (!imagePath) return './default.jpeg';
+    
+    // Jika sudah menggunakan ./ (relative path dari root)
+    if (imagePath.startsWith('./')) {
+        return imagePath;
+    }
+    
+    // Jika menggunakan /img/ (absolute path)
+    if (imagePath.startsWith('/img/')) {
+        // Convert ke ./ (relative path)
+        const filename = imagePath.replace('/img/', '');
+        return `./${filename}`;
+    }
+    
+    // Jika hanya nama file saja
+    if (!imagePath.includes('/') && !imagePath.startsWith('http')) {
+        return `./${imagePath}`;
+    }
+    
+    // Jika URL external (placeholder)
+    if (imagePath.startsWith('http')) {
+        return imagePath;
+    }
+    
+    return imagePath;
+}
 
-// Data awal jika bin kosong
+// Data awal jika bin kosong - GUNakan PATH RELATIVE (./)
 const DEFAULT_PRODUCTS = [
-    { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": `${IMAGE_PATH}cokelat-original.jpeg`, "accentColor": "#4A2C2A", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": `${IMAGE_PATH}cokelat-hazelnut.jpeg`, "accentColor": "#A67C52", "priceK": 13000, "priceB": 16000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-chocolate-strawberry", "name": "Chocolate Strawberry", "description": "Perpaduan sempurna antara cokelat premium dan stroberi segar yang manis dan menyegarkan.", "category": "chocolate", "image": `${IMAGE_PATH}cokelat-strawberry.jpeg`, "accentColor": "#E11D48", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-chocolate-coffee", "name": "Chocolate Coffee", "description": "Kombinasi nikmat antara cokelat pekat dan espresso Arabika yang kuat dan beraroma.", "category": "chocolate", "image": `${IMAGE_PATH}cokelat-kopi.jpeg`, "accentColor": "#6F4E37", "priceK": 15000, "priceB": 18000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-matcha-latte", "name": "Matcha Latte", "description": "Bubuk matcha Jepang premium Uji diseduh dengan susu segar organik yang lembut.", "category": "tea", "image": `${IMAGE_PATH}tea-matcha.jpeg`, "accentColor": "#6B8E23", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-thai-tea", "name": "Thai Tea", "description": "Teh Thailand asli dengan rasa khas yang creamy dan manis, disajikan dengan susu kental manis.", "category": "tea", "image": `${IMAGE_PATH}tea-thai.jpeg`, "accentColor": "#D97706", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-lemon-tea", "name": "Lemon Tea", "description": "Kesegaran teh hitam dengan perasan lemon asli dan madu hutan alami.", "category": "tea", "image": `${IMAGE_PATH}tea-lemon.jpeg`, "accentColor": "#EAB308", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-solo-wasgitel", "name": "Solo Wasgitel", "description": "Minuman khas Solo dengan rasa wasgitel yang unik dan menyegarkan.", "category": "tea", "image": `${IMAGE_PATH}tea-solo-wasgitel.jpeg`, "accentColor": "#8B5E3C", "priceK": 7000, "priceB": 7000, "isBestSeller": false, "onlySizeB": true, "noToppings": true },
-    { "id": "prod-americano", "name": "Americano", "description": "Espresso otentik dari biji kopi Arabika pilihan, disajikan dengan air pegunungan dingin yang segar.", "category": "coffee", "image": `${IMAGE_PATH}coffe-americano.jpeg`, "accentColor": "#6F4E37", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-cappucino", "name": "Cappucino", "description": "Perpaduan sempurna antara espresso, susu panas, dan busa susu yang lembut.", "category": "coffee", "image": `${IMAGE_PATH}coffe-cappucino.jpeg`, "accentColor": "#A67C52", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-latte", "name": "Latte", "description": "Espresso dengan susu steamed yang creamy, menghasilkan rasa yang halus dan lembut.", "category": "coffee", "image": `${IMAGE_PATH}coffe-late.jpeg`, "accentColor": "#8B5E3C", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-brown-sugar-latte", "name": "Brown Sugar Latte", "description": "Caramel gula merah Okinawa berpadu indah dengan espresso dan susu segar premium.", "category": "coffee", "image": `${IMAGE_PATH}coffe-late-brown-sugar.jpeg`, "accentColor": "#4A2C2A", "priceK": 15000, "priceB": 18000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-strawberry", "name": "Strawberry", "description": "Puree stroberi segar organik dipadukan dengan es batu serut.", "category": "fruit", "image": `${IMAGE_PATH}fruit-strawberry.jpeg`, "accentColor": "#E11D48", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-mango", "name": "Mango", "description": "Kesegaran puree mangga alami yang manis dan menyegarkan, cocok untuk cuaca panas.", "category": "fruit", "image": `${IMAGE_PATH}fruit-manggo.jpeg`, "accentColor": "#F59E0B", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false }
+    { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": "./cokelat-hazelnut.jpeg", "accentColor": "#A67C52", "priceK": 13000, "priceB": 16000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-chocolate-strawberry", "name": "Chocolate Strawberry", "description": "Perpaduan sempurna antara cokelat premium dan stroberi segar yang manis dan menyegarkan.", "category": "chocolate", "image": "./cokelat-strawberry.jpeg", "accentColor": "#E11D48", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-chocolate-coffee", "name": "Chocolate Coffee", "description": "Kombinasi nikmat antara cokelat pekat dan espresso Arabika yang kuat dan beraroma.", "category": "chocolate", "image": "./cokelat-kopi.jpeg", "accentColor": "#6F4E37", "priceK": 15000, "priceB": 18000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-matcha-latte", "name": "Matcha Latte", "description": "Bubuk matcha Jepang premium Uji diseduh dengan susu segar organik yang lembut.", "category": "tea", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-thai-tea", "name": "Thai Tea", "description": "Teh Thailand asli dengan rasa khas yang creamy dan manis, disajikan dengan susu kental manis.", "category": "tea", "image": "./tea-thai.jpeg", "accentColor": "#D97706", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-lemon-tea", "name": "Lemon Tea", "description": "Kesegaran teh hitam dengan perasan lemon asli dan madu hutan alami.", "category": "tea", "image": "./tea-lemon.jpeg", "accentColor": "#EAB308", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-solo-wasgitel", "name": "Solo Wasgitel", "description": "Minuman khas Solo dengan rasa wasgitel yang unik dan menyegarkan.", "category": "tea", "image": "./tea-solo-wasgitel.jpeg", "accentColor": "#8B5E3C", "priceK": 7000, "priceB": 7000, "isBestSeller": false, "onlySizeB": true, "noToppings": true },
+    { "id": "prod-americano", "name": "Americano", "description": "Espresso otentik dari biji kopi Arabika pilihan, disajikan dengan air pegunungan dingin yang segar.", "category": "coffee", "image": "./coffe-americano.jpeg", "accentColor": "#6F4E37", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-cappucino", "name": "Cappucino", "description": "Perpaduan sempurna antara espresso, susu panas, dan busa susu yang lembut.", "category": "coffee", "image": "./coffe-cappucino.jpeg", "accentColor": "#A67C52", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-latte", "name": "Latte", "description": "Espresso dengan susu steamed yang creamy, menghasilkan rasa yang halus dan lembut.", "category": "coffee", "image": "./coffe-late.jpeg", "accentColor": "#8B5E3C", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-brown-sugar-latte", "name": "Brown Sugar Latte", "description": "Caramel gula merah Okinawa berpadu indah dengan espresso dan susu segar premium.", "category": "coffee", "image": "./coffe-late-brown-sugar.jpeg", "accentColor": "#4A2C2A", "priceK": 15000, "priceB": 18000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-strawberry", "name": "Strawberry", "description": "Puree stroberi segar organik dipadukan dengan es batu serut.", "category": "fruit", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-mango", "name": "Mango", "description": "Kesegaran puree mangga alami yang manis dan menyegarkan, cocok untuk cuaca panas.", "category": "fruit", "image": "./fruit-manggo.jpeg", "accentColor": "#F59E0B", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false }
 ];
 
 const DEFAULT_CAMPAIGNS = [
-    { "id": "campaign-midnight-chocolate", "title": "Midnight Chocolate", "subTitle": "Sensasi Kakao Pekat yang Elegan", "badge": "Edisi Terbatas", "description": "Masuki petualangan rasa yang mendalam. Bubuk cokelat hitam pilihan dari Afrika Barat berpadu dengan susu premium organik, menghasilkan rasa yang intens, lembut, dan menenangkan malam Anda.", "image": `${IMAGE_PATH}cokelat-original.jpeg`, "accentColor": "#4A2C2A", "highlightText": "KOSMIK COKELAT" },
-    { "id": "campaign-matcha-signature", "title": "Matcha Signature", "subTitle": "Ketenangan Zen dalam Setiap Tegukan", "badge": "Terlaris", "description": "Ditanam di kebun teh Kyoto yang sejuk, digiling secara tradisional dengan presisi tingkat tinggi, lalu dibalur susu organik segar demi memberikan fokus dan kesegaran penuh.", "image": `${IMAGE_PATH}tea-matcha.jpeg`, "accentColor": "#6B8E23", "highlightText": "MATCHA KYOTO" },
-    { "id": "campaign-strawberry", "title": "Strawberry Mango Fusion", "subTitle": "Kebahagiaan Tropis Penuh Kesegaran", "badge": "Edisi Spesial", "description": "Kesegaran buah stroberi matang pilihan yang dipadukan secara harmonis dengan kelembutan puree mangga Alfonzo berlapis madu. Ledakan rasa menakjubkan bagi hari Anda.", "image": `${IMAGE_PATH}fruit-strawberry.jpeg`, "accentColor": "#E11D48", "highlightText": "PERPADUAN TROPIS" }
+    { "id": "campaign-midnight-chocolate", "title": "Midnight Chocolate", "subTitle": "Sensasi Kakao Pekat yang Elegan", "badge": "Edisi Terbatas", "description": "Masuki petualangan rasa yang mendalam. Bubuk cokelat hitam pilihan dari Afrika Barat berpadu dengan susu premium organik, menghasilkan rasa yang intens, lembut, dan menenangkan malam Anda.", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "highlightText": "KOSMIK COKELAT" },
+    { "id": "campaign-matcha-signature", "title": "Matcha Signature", "subTitle": "Ketenangan Zen dalam Setiap Tegukan", "badge": "Terlaris", "description": "Ditanam di kebun teh Kyoto yang sejuk, digiling secara tradisional dengan presisi tingkat tinggi, lalu dibalur susu organik segar demi memberikan fokus dan kesegaran penuh.", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "highlightText": "MATCHA KYOTO" },
+    { "id": "campaign-strawberry", "title": "Strawberry Mango Fusion", "subTitle": "Kebahagiaan Tropis Penuh Kesegaran", "badge": "Edisi Spesial", "description": "Kesegaran buah stroberi matang pilihan yang dipadukan secara harmonis dengan kelembutan puree mangga Alfonzo berlapis madu. Ledakan rasa menakjubkan bagi hari Anda.", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "highlightText": "PERPADUAN TROPIS" }
 ];
 
 const DEFAULT_TESTIMONIALS = [
-    { "id": "test-ronald", "reviewTitle": "Belum pernah menikmati Brown Sugar Latte seenak ini!", "reviewText": "Saya sudah mencoba banyak Brown Sugar Latte di Indonesia, dan jujur ini adalah yang terbaik yang pernah saya rasakan! Rasa manisnya alami dan aroma kopinya tetap kuat.", "customerName": "Ronald Simatupang", "city": "Jakarta, Indonesia", "date": "25 Maret 2025", "productImage": `${IMAGE_PATH}coffe-late-brown-sugar.jpeg`, "ratingValue": 5 },
-    { "id": "test-olivia", "reviewTitle": "Banyak pilihan rasa dan semuanya kualitas terbaik! Tidak ada yang mengecewakan", "reviewText": "THE. C DRINKS memiliki variasi yang sangat beragam dan semuanya lezat! Konsistensinya pas dan kemasannya sangat premium. Benar-benar direkomendasikan!", "customerName": "Olivia Grace Tjondro", "city": "Surabaya, Indonesia", "date": "5 Juli 2025", "productImage": `${IMAGE_PATH}tea-matcha.jpeg`, "ratingValue": 5 },
-    { "id": "test-stephanie", "reviewTitle": "Sangat menyukai varian Stroberi!", "reviewText": "Varian stroberi selalu menjadi favorit saya. Belum pernah menemukan minuman yang bisa meningkatkan mood saya secepat ini! Premium, segar, dan sangat cantik saat difoto.", "customerName": "Stephanie Raitama", "city": "Bandung, Indonesia", "date": "7 September 2025", "productImage": `${IMAGE_PATH}fruit-strawberry.jpeg`, "ratingValue": 5 }
+    { "id": "test-ronald", "reviewTitle": "Belum pernah menikmati Brown Sugar Latte seenak ini!", "reviewText": "Saya sudah mencoba banyak Brown Sugar Latte di Indonesia, dan jujur ini adalah yang terbaik yang pernah saya rasakan! Rasa manisnya alami dan aroma kopinya tetap kuat.", "customerName": "Ronald Simatupang", "city": "Jakarta, Indonesia", "date": "25 Maret 2025", "productImage": "./coffe-late-brown-sugar.jpeg", "ratingValue": 5 },
+    { "id": "test-olivia", "reviewTitle": "Banyak pilihan rasa dan semuanya kualitas terbaik! Tidak ada yang mengecewakan", "reviewText": "THE. C DRINKS memiliki variasi yang sangat beragam dan semuanya lezat! Konsistensinya pas dan kemasannya sangat premium. Benar-benar direkomendasikan!", "customerName": "Olivia Grace Tjondro", "city": "Surabaya, Indonesia", "date": "5 Juli 2025", "productImage": "./tea-matcha.jpeg", "ratingValue": 5 },
+    { "id": "test-stephanie", "reviewTitle": "Sangat menyukai varian Stroberi!", "reviewText": "Varian stroberi selalu menjadi favorit saya. Belum pernah menemukan minuman yang bisa meningkatkan mood saya secepat ini! Premium, segar, dan sangat cantik saat difoto.", "customerName": "Stephanie Raitama", "city": "Bandung, Indonesia", "date": "7 September 2025", "productImage": "./fruit-strawberry.jpeg", "ratingValue": 5 }
 ];
 
 const DEFAULT_INSTAGRAM = [
@@ -83,7 +109,6 @@ async function loadDataFromAPI() {
     try {
         console.log('🔄 Loading data from JSONBin...');
         
-        // PERBAIKAN: Tambahkan mode cors dan cache
         const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
             method: 'GET',
             headers: { 
@@ -96,30 +121,28 @@ async function loadDataFromAPI() {
         if (response.ok) {
             const data = await response.json();
             const record = data.record;
-            console.log('📦 Data from JSONBin:', record);
+            console.log('📦 Raw data from JSONBin:', record);
             
             if (record && record.products && record.products.length > 0) {
-                // PERBAIKAN: Pastikan path gambar benar saat load dari API
+                // === PERBAIKAN: Normalisasi path gambar dari JSONBin ===
                 productsData = record.products.map(p => ({
                     ...p,
-                    image: p.image && !p.image.startsWith('http') && !p.image.startsWith('/img/') 
-                        ? `/img/${p.image.split('/').pop()}` 
-                        : p.image
+                    image: normalizeImagePath(p.image)
                 }));
                 campaignsData = (record.campaigns || DEFAULT_CAMPAIGNS).map(c => ({
                     ...c,
-                    image: c.image && !c.image.startsWith('http') && !c.image.startsWith('/img/')
-                        ? `/img/${c.image.split('/').pop()}`
-                        : c.image
+                    image: normalizeImagePath(c.image)
                 }));
                 testimonialsData = (record.testimonials || DEFAULT_TESTIMONIALS).map(t => ({
                     ...t,
-                    productImage: t.productImage && !t.productImage.startsWith('http') && !t.productImage.startsWith('/img/')
-                        ? `/img/${t.productImage.split('/').pop()}`
-                        : t.productImage
+                    productImage: normalizeImagePath(t.productImage)
                 }));
                 instagramPostsData = record.instagram || DEFAULT_INSTAGRAM;
-                console.log('✅ Data loaded successfully from JSONBin');
+                
+                console.log('✅ Data after normalization:', { 
+                    products: productsData.map(p => p.image),
+                    campaigns: campaignsData.map(c => c.image)
+                });
             } else {
                 console.log('⚠️ Bin kosong, mengisi dengan data default...');
                 await initializeDefaultData();
@@ -142,6 +165,7 @@ async function initializeDefaultData() {
     instagramPostsData = DEFAULT_INSTAGRAM;
     
     try {
+        // Simpan data default ke JSONBin dengan format path yang benar
         await saveAllDataToAPI();
         console.log('✅ Data default berhasil diinisialisasi!');
     } catch(e) {
@@ -150,25 +174,26 @@ async function initializeDefaultData() {
 }
 
 async function saveAllDataToAPI() {
+    // === PENTING: Saat menyimpan ke JSONBin, konversi path ./ ke /img/ ===
     const dataToSave = {
         products: productsData.map(p => ({
             ...p,
-            image: p.image?.replace('/img/', '') || p.image
+            image: convertToAbsolutePath(p.image)
         })),
         campaigns: campaignsData.map(c => ({
             ...c,
-            image: c.image?.replace('/img/', '') || c.image
+            image: convertToAbsolutePath(c.image)
         })),
         testimonials: testimonialsData.map(t => ({
             ...t,
-            productImage: t.productImage?.replace('/img/', '') || t.productImage
+            productImage: convertToAbsolutePath(t.productImage)
         })),
         instagram: instagramPostsData,
         lastUpdated: new Date().toISOString()
     };
     
     try {
-        console.log('💾 Saving data to JSONBin...');
+        console.log('💾 Saving data to JSONBin with absolute paths...');
         const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
             method: 'PUT',
             headers: {
@@ -187,6 +212,34 @@ async function saveAllDataToAPI() {
     } catch (error) {
         console.error('❌ Error saving data:', error);
     }
+}
+
+// === FUNGSI KONVERSI PATH UNTUK DISIMPAN KE JSONBIN ===
+function convertToAbsolutePath(path) {
+    if (!path) return '/img/default.jpeg';
+    
+    // Jika sudah dalam format /img/, biarkan
+    if (path.startsWith('/img/')) {
+        return path;
+    }
+    
+    // Jika dalam format ./namafile.jpeg, konversi ke /img/namafile.jpeg
+    if (path.startsWith('./')) {
+        const filename = path.substring(2);
+        return `/img/${filename}`;
+    }
+    
+    // Jika hanya nama file
+    if (!path.includes('/') && !path.startsWith('http')) {
+        return `/img/${path}`;
+    }
+    
+    // Jika URL external, biarkan
+    if (path.startsWith('http')) {
+        return path;
+    }
+    
+    return path;
 }
 
 async function saveProducts() { await saveAllDataToAPI(); }
@@ -404,9 +457,7 @@ function deg2rad(deg) { return deg * (Math.PI / 180); }
 
 // ==================== LOAD & RENDER ====================
 async function loadData() {
-    // Tampilkan loading indicator
     showLoadingIndicator(true);
-    
     await loadDataFromAPI();
     renderCategories();
     renderProductsByCategory('all');
@@ -414,7 +465,6 @@ async function loadData() {
     renderTestimonials();
     renderInstagramPosts();
     updateStoreInfo();
-    
     showLoadingIndicator(false);
 }
 
@@ -565,12 +615,15 @@ function renderProducts(products) {
             ? 'bg-[#111111] text-white border-[#111111]' 
             : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50';
         
+        // Gunakan normalizeImagePath untuk memastikan path gambar benar saat render
+        const imageSrc = normalizeImagePath(product.image);
+        
         return `<div class="product-card group bg-white rounded-[1.75rem] border border-neutral-100 shadow-sm p-3.5 hover:shadow-xl hover:translate-y-[-6px] transition-all duration-300 flex flex-col justify-between">
             <div>
                 <div class="product-image-container relative w-full aspect-square bg-[#FBFBFB] rounded-[18px] mb-4 flex items-center justify-center overflow-hidden">
                     ${product.isBestSeller ? '<span class="absolute top-2.5 left-2.5 z-20 bg-neutral-900 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Terlaris</span>' : ''}
                     ${product.onlySizeB ? '<span class="absolute top-2.5 right-2.5 z-20 bg-amber-600 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Only Size B</span>' : ''}
-                    <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x800/1a1a1a/white?text=Image'">
+                    <img src="${imageSrc}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x800/1a1a1a/white?text=Image'">
                 </div>
                 <div class="text-left px-1">
                     <h3 class="font-bold text-neutral-900 text-xs mb-1 truncate">${product.name}</h3>
@@ -670,13 +723,19 @@ function addToCartFromCard(productId, size) {
 function renderCampaigns() {
     const container = document.getElementById('campaigns-grid');
     if (!container) return;
-    container.innerHTML = campaignsData.map(camp => `<div class="group relative rounded-[2rem] bg-[#1C1C1C] overflow-hidden shadow-lg flex flex-col transition-all duration-500 hover:translate-y-[-8px]"><div class="absolute inset-0 bg-gradient-to-t from-[#111111] via-[#1C1C1C]/95 to-[#1C1C1C]/90"></div><div class="relative z-10 p-6 flex flex-col h-full"><div class="flex items-start justify-between mb-4"><div><span class="text-[9px] font-bold text-neutral-400 uppercase block mb-1">${camp.subTitle}</span><h3 class="text-base font-bold text-white">${camp.title}</h3></div><span class="text-[9px] font-extrabold text-neutral-900 bg-white px-2.5 py-1 rounded-full">${camp.badge}</span></div><div class="relative mb-4"><div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-white/5"><img src="${camp.image}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x800/1a1a1a/white?text=Image'"></div></div><div class="mt-auto"><div class="border-t border-white/10 pt-4"><div class="font-mono text-[10px] text-zinc-300 mb-3 flex justify-between"><span>${camp.highlightText}</span><span>EDISI: 2026</span></div><p class="text-neutral-200/90 text-xs leading-relaxed line-clamp-3 mb-4">${camp.description}</p><button onclick="scrollToMenu()" class="w-full bg-white hover:bg-neutral-100 text-[#111111] text-xs font-bold py-2.5 rounded-xl transition-all">Temukan Rasa</button></div></div></div></div>`).join('');
+    container.innerHTML = campaignsData.map(camp => {
+        const imageSrc = normalizeImagePath(camp.image);
+        return `<div class="group relative rounded-[2rem] bg-[#1C1C1C] overflow-hidden shadow-lg flex flex-col transition-all duration-500 hover:translate-y-[-8px]"><div class="absolute inset-0 bg-gradient-to-t from-[#111111] via-[#1C1C1C]/95 to-[#1C1C1C]/90"></div><div class="relative z-10 p-6 flex flex-col h-full"><div class="flex items-start justify-between mb-4"><div><span class="text-[9px] font-bold text-neutral-400 uppercase block mb-1">${camp.subTitle}</span><h3 class="text-base font-bold text-white">${camp.title}</h3></div><span class="text-[9px] font-extrabold text-neutral-900 bg-white px-2.5 py-1 rounded-full">${camp.badge}</span></div><div class="relative mb-4"><div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-white/5"><img src="${imageSrc}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x800/1a1a1a/white?text=Image'"></div></div><div class="mt-auto"><div class="border-t border-white/10 pt-4"><div class="font-mono text-[10px] text-zinc-300 mb-3 flex justify-between"><span>${camp.highlightText}</span><span>EDISI: 2026</span></div><p class="text-neutral-200/90 text-xs leading-relaxed line-clamp-3 mb-4">${camp.description}</p><button onclick="scrollToMenu()" class="w-full bg-white hover:bg-neutral-100 text-[#111111] text-xs font-bold py-2.5 rounded-xl transition-all">Temukan Rasa</button></div></div></div></div>`;
+    }).join('');
 }
 
 function renderTestimonials() {
     const container = document.getElementById('testimonials-grid');
     if (!container) return;
-    container.innerHTML = testimonialsData.map(test => `<div class="bg-white rounded-3xl border border-neutral-100 shadow-xs hover:shadow-xl transition-all p-6 flex flex-col justify-between"><div><div class="bg-[#F8F8F8] rounded-2xl p-4 mb-6 flex items-center gap-2"><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white -rotate-6"><img src="${test.productImage}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500/1a1a1a/white?text=Image'"></div><div class="aspect-[3/4] w-[35%] rounded-xl overflow-hidden shadow-md border bg-white z-10 scale-105"><img src="${test.productImage}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500/1a1a1a/white?text=Image'"></div><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white rotate-6"><img src="${test.productImage}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500/1a1a1a/white?text=Image'"></div></div><div class="flex items-center gap-1 mb-4">${'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" class="w-3.5 h-3.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'.repeat(test.ratingValue)}</div><h3 class="text-sm font-extrabold text-[#111111] mb-3">"${test.reviewTitle}"</h3><p class="text-neutral-500 text-xs leading-relaxed mb-6">${test.reviewText}</p></div><div class="border-t border-neutral-100 pt-4"><div class="flex justify-between"><div><h4 class="font-bold text-neutral-900 text-xs">${test.customerName}</h4><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${test.city}</span></div><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${test.date}</span></div></div></div>`).join('');
+    container.innerHTML = testimonialsData.map(test => {
+        const imageSrc = normalizeImagePath(test.productImage);
+        return `<div class="bg-white rounded-3xl border border-neutral-100 shadow-xs hover:shadow-xl transition-all p-6 flex flex-col justify-between"><div><div class="bg-[#F8F8F8] rounded-2xl p-4 mb-6 flex items-center gap-2"><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white -rotate-6"><img src="${imageSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500/1a1a1a/white?text=Image'"></div><div class="aspect-[3/4] w-[35%] rounded-xl overflow-hidden shadow-md border bg-white z-10 scale-105"><img src="${imageSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500/1a1a1a/white?text=Image'"></div><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white rotate-6"><img src="${imageSrc}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500/1a1a1a/white?text=Image'"></div></div><div class="flex items-center gap-1 mb-4">${'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" class="w-3.5 h-3.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'.repeat(test.ratingValue)}</div><h3 class="text-sm font-extrabold text-[#111111] mb-3">"${test.reviewTitle}"</h3><p class="text-neutral-500 text-xs leading-relaxed mb-6">${test.reviewText}</p></div><div class="border-t border-neutral-100 pt-4"><div class="flex justify-between"><div><h4 class="font-bold text-neutral-900 text-xs">${test.customerName}</h4><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${test.city}</span></div><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${test.date}</span></div></div></div>`;
+    }).join('');
 }
 
 function renderInstagramPosts() {
@@ -727,8 +786,9 @@ function renderCartItems() {
         if (item.toppings.creamCheese) toppingsText += 'Cream Cheese ';
         if (!toppingsText) toppingsText = 'Tanpa Topping';
         const tempIcon = item.temperature === 'PANAS' ? '🔥' : '❄️';
+        const imageSrc = normalizeImagePath(item.product.image);
         
-        return `<div class="p-3 bg-neutral-50 rounded-xl flex gap-3"><div class="w-14 h-14 bg-white rounded-lg p-1"><img src="${item.product.image}" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/100x100/1a1a1a/white?text=Image'"></div><div class="flex-grow"><div class="flex justify-between"><h4 class="font-bold text-xs">${item.product.name}</h4><button onclick="removeCartItem('${item.id}')" class="text-neutral-400 hover:text-red-500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div><div class="flex flex-wrap gap-1 mt-1"><span class="bg-neutral-900 text-white px-1.5 py-0.5 rounded text-[8px]">${item.size === 'B' ? 'Besar' : 'Kecil'}</span><span class="bg-neutral-200 text-neutral-800 px-1.5 py-0.5 rounded text-[8px]">${tempIcon} ${item.temperature}</span>${item.toppings.boba ? '<span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[8px]">+Boba</span>' : ''}${item.toppings.creamCheese ? '<span class="bg-pink-100 text-pink-800 px-1.5 py-0.5 rounded text-[8px]">+Cream Cheese</span>' : ''}</div><div class="flex justify-between mt-2"><div class="flex items-center bg-white rounded border"><button onclick="updateQuantity('${item.id}', -1)" class="w-6 h-6 flex items-center justify-center">-</button><span class="w-6 text-center text-xs">${item.quantity}</span><button onclick="updateQuantity('${item.id}', 1)" class="w-6 h-6 flex items-center justify-center">+</button></div><span class="font-mono text-xs font-bold">Rp ${totalItemPrice.toLocaleString()}</span></div></div></div>`;
+        return `<div class="p-3 bg-neutral-50 rounded-xl flex gap-3"><div class="w-14 h-14 bg-white rounded-lg p-1"><img src="${imageSrc}" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/100x100/1a1a1a/white?text=Image'"></div><div class="flex-grow"><div class="flex justify-between"><h4 class="font-bold text-xs">${item.product.name}</h4><button onclick="removeCartItem('${item.id}')" class="text-neutral-400 hover:text-red-500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div><div class="flex flex-wrap gap-1 mt-1"><span class="bg-neutral-900 text-white px-1.5 py-0.5 rounded text-[8px]">${item.size === 'B' ? 'Besar' : 'Kecil'}</span><span class="bg-neutral-200 text-neutral-800 px-1.5 py-0.5 rounded text-[8px]">${tempIcon} ${item.temperature}</span>${item.toppings.boba ? '<span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[8px]">+Boba</span>' : ''}${item.toppings.creamCheese ? '<span class="bg-pink-100 text-pink-800 px-1.5 py-0.5 rounded text-[8px]">+Cream Cheese</span>' : ''}</div><div class="flex justify-between mt-2"><div class="flex items-center bg-white rounded border"><button onclick="updateQuantity('${item.id}', -1)" class="w-6 h-6 flex items-center justify-center">-</button><span class="w-6 text-center text-xs">${item.quantity}</span><button onclick="updateQuantity('${item.id}', 1)" class="w-6 h-6 flex items-center justify-center">+</button></div><span class="font-mono text-xs font-bold">Rp ${totalItemPrice.toLocaleString()}</span></div></div></div>`;
     }).join('');
     if (footer) footer.classList.remove('hidden');
 }
@@ -1048,7 +1108,7 @@ function editProduct(id) {
         <input type="text" id="form-name" value="${product.name}" placeholder="Nama Produk" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <textarea id="form-desc" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="2">${product.description}</textarea>
         <input type="text" id="form-category" value="${product.category}" placeholder="Kategori" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-image" value="${product.image?.replace('/img/', '') || ''}" placeholder="Nama file gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="text" id="form-image" value="${product.image?.replace('./', '').replace('/img/', '') || ''}" placeholder="Nama file gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="number" id="form-priceK" value="${product.priceK}" placeholder="Harga Kecil" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="number" id="form-priceB" value="${product.priceB}" placeholder="Harga Besar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-bestSeller" ${product.isBestSeller ? 'checked' : ''}> Best Seller</label>
@@ -1099,7 +1159,7 @@ function editCampaign(id) {
         <input type="text" id="form-subtitle" value="${campaign.subTitle}" placeholder="Subtitle" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-badge" value="${campaign.badge}" placeholder="Badge" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <textarea id="form-desc-camp" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="3">${campaign.description}</textarea>
-        <input type="text" id="form-image-camp" value="${campaign.image?.replace('/img/', '') || ''}" placeholder="Nama file gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="text" id="form-image-camp" value="${campaign.image?.replace('./', '').replace('/img/', '') || ''}" placeholder="Nama file gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-highlight" value="${campaign.highlightText}" placeholder="Highlight Text" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-accentColor-camp" value="${campaign.accentColor || '#4A2C2A'}" placeholder="Warna Aksen" class="w-full px-3 py-2 text-xs border rounded-lg">
     `;
@@ -1151,7 +1211,7 @@ function editTestimonial(id) {
         <textarea id="form-text-test" placeholder="Isi Testimoni" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="3">${testimonial.reviewText}</textarea>
         <input type="text" id="form-city" value="${testimonial.city}" placeholder="Kota" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-date" value="${testimonial.date}" placeholder="Tanggal" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-image-test" value="${testimonial.productImage?.replace('/img/', '') || ''}" placeholder="Nama file gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="text" id="form-image-test" value="${testimonial.productImage?.replace('./', '').replace('/img/', '') || ''}" placeholder="Nama file gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <select id="form-rating" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
             <option value="5" ${testimonial.ratingValue === 5 ? 'selected' : ''}>⭐⭐⭐⭐⭐ (5)</option>
             <option value="4" ${testimonial.ratingValue === 4 ? 'selected' : ''}>⭐⭐⭐⭐ (4)</option>
@@ -1238,7 +1298,7 @@ async function submitFormData() {
             name: document.getElementById('form-name').value,
             description: document.getElementById('form-desc').value,
             category: document.getElementById('form-category').value,
-            image: imageFileName ? `/img/${imageFileName}` : '/img/default.jpeg',
+            image: imageFileName ? `./${imageFileName}` : './default.jpeg',
             priceK: parseInt(document.getElementById('form-priceK').value) || 0,
             priceB: parseInt(document.getElementById('form-priceB').value) || 0,
             isBestSeller: document.getElementById('form-bestSeller')?.checked || false,
@@ -1267,7 +1327,7 @@ async function submitFormData() {
             subTitle: document.getElementById('form-subtitle').value,
             badge: document.getElementById('form-badge').value,
             description: document.getElementById('form-desc-camp').value,
-            image: imageFileName ? `/img/${imageFileName}` : '/img/default.jpeg',
+            image: imageFileName ? `./${imageFileName}` : './default.jpeg',
             highlightText: document.getElementById('form-highlight').value,
             accentColor: document.getElementById('form-accentColor-camp').value || '#4A2C2A'
         };
@@ -1293,7 +1353,7 @@ async function submitFormData() {
             reviewText: document.getElementById('form-text-test').value,
             city: document.getElementById('form-city').value,
             date: document.getElementById('form-date').value,
-            productImage: imageFileName ? `/img/${imageFileName}` : '/img/default.jpeg',
+            productImage: imageFileName ? `./${imageFileName}` : './default.jpeg',
             ratingValue: parseInt(document.getElementById('form-rating').value)
         };
         
@@ -1498,3 +1558,45 @@ window.editInstagram = editInstagram;
 window.deleteInstagram = deleteInstagram;
 window.closeFormModal = closeFormModal;
 window.submitFormData = submitFormData;
+
+// ==================== TAMBAHAN: Update data lama di JSONBin ====================
+// Fungsi untuk memperbaiki data yang sudah ada di JSONBin
+async function fixExistingDataInJSONBin() {
+    try {
+        console.log('🔧 Memeriksa dan memperbaiki data di JSONBin...');
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+            headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const record = data.record;
+            let needUpdate = false;
+            
+            // Periksa apakah masih ada path /img/
+            if (record && record.products) {
+                record.products.forEach(product => {
+                    if (product.image && product.image.startsWith('/img/')) {
+                        needUpdate = true;
+                        console.log('⚠️ Ditemukan path /img/ yang perlu diperbaiki:', product.image);
+                    }
+                });
+            }
+            
+            if (needUpdate) {
+                console.log('🔄 Memperbaiki data di JSONBin...');
+                await saveAllDataToAPI();
+                console.log('✅ Data di JSONBin telah diperbaiki!');
+            } else {
+                console.log('✅ Data di JSONBin sudah menggunakan format yang benar (./)');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Gagal memeriksa data:', error);
+    }
+}
+
+// Jalankan perbaikan setelah load data
+setTimeout(() => {
+    fixExistingDataInJSONBin();
+}, 2000);
