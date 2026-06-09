@@ -1,38 +1,40 @@
 // js/main.js
 
 // ==================== KONFIGURASI JSONBIN.IO ====================
-// Gunakan ACCESS KEY (bukan MASTER KEY)
 const JSONBIN_ACCESS_KEY = '$2a$10$Idssm7MPctlzL/quJlXUyOiFa5bSp2W3ERWxRSLbpJS/QKeUj8kt2';
 const JSONBIN_BIN_ID = '6a282856f5f4af5e29d26758';
 
+// === PERBAIKAN: Gunakan path absolut untuk gambar ===
+const IMAGE_PATH = '/img/';  // Path absolut dari root
+
 // Data awal jika bin kosong
 const DEFAULT_PRODUCTS = [
-    { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": "./cokelat-hazelnut.jpeg", "accentColor": "#A67C52", "priceK": 13000, "priceB": 16000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-chocolate-strawberry", "name": "Chocolate Strawberry", "description": "Perpaduan sempurna antara cokelat premium dan stroberi segar yang manis dan menyegarkan.", "category": "chocolate", "image": "./cokelat-strawberry.jpeg", "accentColor": "#E11D48", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-chocolate-coffee", "name": "Chocolate Coffee", "description": "Kombinasi nikmat antara cokelat pekat dan espresso Arabika yang kuat dan beraroma.", "category": "chocolate", "image": "./cokelat-kopi.jpeg", "accentColor": "#6F4E37", "priceK": 15000, "priceB": 18000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-matcha-latte", "name": "Matcha Latte", "description": "Bubuk matcha Jepang premium Uji diseduh dengan susu segar organik yang lembut.", "category": "tea", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-thai-tea", "name": "Thai Tea", "description": "Teh Thailand asli dengan rasa khas yang creamy dan manis, disajikan dengan susu kental manis.", "category": "tea", "image": "./tea-thai.jpeg", "accentColor": "#D97706", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-lemon-tea", "name": "Lemon Tea", "description": "Kesegaran teh hitam dengan perasan lemon asli dan madu hutan alami.", "category": "tea", "image": "./tea-lemon.jpeg", "accentColor": "#EAB308", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-solo-wasgitel", "name": "Solo Wasgitel", "description": "Minuman khas Solo dengan rasa wasgitel yang unik dan menyegarkan.", "category": "tea", "image": "./tea-solo-wasgitel.jpeg", "accentColor": "#8B5E3C", "priceK": 7000, "priceB": 7000, "isBestSeller": false, "onlySizeB": true, "noToppings": true },
-    { "id": "prod-americano", "name": "Americano", "description": "Espresso otentik dari biji kopi Arabika pilihan, disajikan dengan air pegunungan dingin yang segar.", "category": "coffee", "image": "./coffe-americano.jpeg", "accentColor": "#6F4E37", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-cappucino", "name": "Cappucino", "description": "Perpaduan sempurna antara espresso, susu panas, dan busa susu yang lembut.", "category": "coffee", "image": "./coffe-cappucino.jpeg", "accentColor": "#A67C52", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-latte", "name": "Latte", "description": "Espresso dengan susu steamed yang creamy, menghasilkan rasa yang halus dan lembut.", "category": "coffee", "image": "./coffe-late.jpeg", "accentColor": "#8B5E3C", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-brown-sugar-latte", "name": "Brown Sugar Latte", "description": "Caramel gula merah Okinawa berpadu indah dengan espresso dan susu segar premium.", "category": "coffee", "image": "./coffe-late-brown-sugar.jpeg", "accentColor": "#4A2C2A", "priceK": 15000, "priceB": 18000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-strawberry", "name": "Strawberry", "description": "Puree stroberi segar organik dipadukan dengan es batu serut.", "category": "fruit", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-mango", "name": "Mango", "description": "Kesegaran puree mangga alami yang manis dan menyegarkan, cocok untuk cuaca panas.", "category": "fruit", "image": "./fruit-manggo.jpeg", "accentColor": "#F59E0B", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false }
+    { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": `${IMAGE_PATH}cokelat-original.jpeg`, "accentColor": "#4A2C2A", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": `${IMAGE_PATH}cokelat-hazelnut.jpeg`, "accentColor": "#A67C52", "priceK": 13000, "priceB": 16000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-chocolate-strawberry", "name": "Chocolate Strawberry", "description": "Perpaduan sempurna antara cokelat premium dan stroberi segar yang manis dan menyegarkan.", "category": "chocolate", "image": `${IMAGE_PATH}cokelat-strawberry.jpeg`, "accentColor": "#E11D48", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-chocolate-coffee", "name": "Chocolate Coffee", "description": "Kombinasi nikmat antara cokelat pekat dan espresso Arabika yang kuat dan beraroma.", "category": "chocolate", "image": `${IMAGE_PATH}cokelat-kopi.jpeg`, "accentColor": "#6F4E37", "priceK": 15000, "priceB": 18000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-matcha-latte", "name": "Matcha Latte", "description": "Bubuk matcha Jepang premium Uji diseduh dengan susu segar organik yang lembut.", "category": "tea", "image": `${IMAGE_PATH}tea-matcha.jpeg`, "accentColor": "#6B8E23", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-thai-tea", "name": "Thai Tea", "description": "Teh Thailand asli dengan rasa khas yang creamy dan manis, disajikan dengan susu kental manis.", "category": "tea", "image": `${IMAGE_PATH}tea-thai.jpeg`, "accentColor": "#D97706", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-lemon-tea", "name": "Lemon Tea", "description": "Kesegaran teh hitam dengan perasan lemon asli dan madu hutan alami.", "category": "tea", "image": `${IMAGE_PATH}tea-lemon.jpeg`, "accentColor": "#EAB308", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-solo-wasgitel", "name": "Solo Wasgitel", "description": "Minuman khas Solo dengan rasa wasgitel yang unik dan menyegarkan.", "category": "tea", "image": `${IMAGE_PATH}tea-solo-wasgitel.jpeg`, "accentColor": "#8B5E3C", "priceK": 7000, "priceB": 7000, "isBestSeller": false, "onlySizeB": true, "noToppings": true },
+    { "id": "prod-americano", "name": "Americano", "description": "Espresso otentik dari biji kopi Arabika pilihan, disajikan dengan air pegunungan dingin yang segar.", "category": "coffee", "image": `${IMAGE_PATH}coffe-americano.jpeg`, "accentColor": "#6F4E37", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-cappucino", "name": "Cappucino", "description": "Perpaduan sempurna antara espresso, susu panas, dan busa susu yang lembut.", "category": "coffee", "image": `${IMAGE_PATH}coffe-cappucino.jpeg`, "accentColor": "#A67C52", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-latte", "name": "Latte", "description": "Espresso dengan susu steamed yang creamy, menghasilkan rasa yang halus dan lembut.", "category": "coffee", "image": `${IMAGE_PATH}coffe-late.jpeg`, "accentColor": "#8B5E3C", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-brown-sugar-latte", "name": "Brown Sugar Latte", "description": "Caramel gula merah Okinawa berpadu indah dengan espresso dan susu segar premium.", "category": "coffee", "image": `${IMAGE_PATH}coffe-late-brown-sugar.jpeg`, "accentColor": "#4A2C2A", "priceK": 15000, "priceB": 18000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-strawberry", "name": "Strawberry", "description": "Puree stroberi segar organik dipadukan dengan es batu serut.", "category": "fruit", "image": `${IMAGE_PATH}fruit-strawberry.jpeg`, "accentColor": "#E11D48", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+    { "id": "prod-mango", "name": "Mango", "description": "Kesegaran puree mangga alami yang manis dan menyegarkan, cocok untuk cuaca panas.", "category": "fruit", "image": `${IMAGE_PATH}fruit-manggo.jpeg`, "accentColor": "#F59E0B", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false }
 ];
 
 const DEFAULT_CAMPAIGNS = [
-    { "id": "campaign-midnight-chocolate", "title": "Midnight Chocolate", "subTitle": "Sensasi Kakao Pekat yang Elegan", "badge": "Edisi Terbatas", "description": "Masuki petualangan rasa yang mendalam. Bubuk cokelat hitam pilihan dari Afrika Barat berpadu dengan susu premium organik, menghasilkan rasa yang intens, lembut, dan menenangkan malam Anda.", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "highlightText": "KOSMIK COKELAT" },
-    { "id": "campaign-matcha-signature", "title": "Matcha Signature", "subTitle": "Ketenangan Zen dalam Setiap Tegukan", "badge": "Terlaris", "description": "Ditanam di kebun teh Kyoto yang sejuk, digiling secara tradisional dengan presisi tingkat tinggi, lalu dibalur susu organik segar demi memberikan fokus dan kesegaran penuh.", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "highlightText": "MATCHA KYOTO" },
-    { "id": "campaign-strawberry", "title": "Strawberry Mango Fusion", "subTitle": "Kebahagiaan Tropis Penuh Kesegaran", "badge": "Edisi Spesial", "description": "Kesegaran buah stroberi matang pilihan yang dipadukan secara harmonis dengan kelembutan puree mangga Alfonzo berlapis madu. Ledakan rasa menakjubkan bagi hari Anda.", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "highlightText": "PERPADUAN TROPIS" }
+    { "id": "campaign-midnight-chocolate", "title": "Midnight Chocolate", "subTitle": "Sensasi Kakao Pekat yang Elegan", "badge": "Edisi Terbatas", "description": "Masuki petualangan rasa yang mendalam. Bubuk cokelat hitam pilihan dari Afrika Barat berpadu dengan susu premium organik, menghasilkan rasa yang intens, lembut, dan menenangkan malam Anda.", "image": `${IMAGE_PATH}cokelat-original.jpeg`, "accentColor": "#4A2C2A", "highlightText": "KOSMIK COKELAT" },
+    { "id": "campaign-matcha-signature", "title": "Matcha Signature", "subTitle": "Ketenangan Zen dalam Setiap Tegukan", "badge": "Terlaris", "description": "Ditanam di kebun teh Kyoto yang sejuk, digiling secara tradisional dengan presisi tingkat tinggi, lalu dibalur susu organik segar demi memberikan fokus dan kesegaran penuh.", "image": `${IMAGE_PATH}tea-matcha.jpeg`, "accentColor": "#6B8E23", "highlightText": "MATCHA KYOTO" },
+    { "id": "campaign-strawberry", "title": "Strawberry Mango Fusion", "subTitle": "Kebahagiaan Tropis Penuh Kesegaran", "badge": "Edisi Spesial", "description": "Kesegaran buah stroberi matang pilihan yang dipadukan secara harmonis dengan kelembutan puree mangga Alfonzo berlapis madu. Ledakan rasa menakjubkan bagi hari Anda.", "image": `${IMAGE_PATH}fruit-strawberry.jpeg`, "accentColor": "#E11D48", "highlightText": "PERPADUAN TROPIS" }
 ];
 
 const DEFAULT_TESTIMONIALS = [
-    { "id": "test-ronald", "reviewTitle": "Belum pernah menikmati Brown Sugar Latte seenak ini!", "reviewText": "Saya sudah mencoba banyak Brown Sugar Latte di Indonesia, dan jujur ini adalah yang terbaik yang pernah saya rasakan! Rasa manisnya alami dan aroma kopinya tetap kuat.", "customerName": "Ronald Simatupang", "city": "Jakarta, Indonesia", "date": "25 Maret 2025", "productImage": "./coffe-late-brown-sugar.jpeg", "ratingValue": 5 },
-    { "id": "test-olivia", "reviewTitle": "Banyak pilihan rasa dan semuanya kualitas terbaik! Tidak ada yang mengecewakan", "reviewText": "THE. C DRINKS memiliki variasi yang sangat beragam dan semuanya lezat! Konsistensinya pas dan kemasannya sangat premium. Benar-benar direkomendasikan!", "customerName": "Olivia Grace Tjondro", "city": "Surabaya, Indonesia", "date": "5 Juli 2025", "productImage": "./tea-matcha.jpeg", "ratingValue": 5 },
-    { "id": "test-stephanie", "reviewTitle": "Sangat menyukai varian Stroberi!", "reviewText": "Varian stroberi selalu menjadi favorit saya. Belum pernah menemukan minuman yang bisa meningkatkan mood saya secepat ini! Premium, segar, dan sangat cantik saat difoto.", "customerName": "Stephanie Raitama", "city": "Bandung, Indonesia", "date": "7 September 2025", "productImage": "./fruit-strawberry.jpeg", "ratingValue": 5 }
+    { "id": "test-ronald", "reviewTitle": "Belum pernah menikmati Brown Sugar Latte seenak ini!", "reviewText": "Saya sudah mencoba banyak Brown Sugar Latte di Indonesia, dan jujur ini adalah yang terbaik yang pernah saya rasakan! Rasa manisnya alami dan aroma kopinya tetap kuat.", "customerName": "Ronald Simatupang", "city": "Jakarta, Indonesia", "date": "25 Maret 2025", "productImage": `${IMAGE_PATH}coffe-late-brown-sugar.jpeg`, "ratingValue": 5 },
+    { "id": "test-olivia", "reviewTitle": "Banyak pilihan rasa dan semuanya kualitas terbaik! Tidak ada yang mengecewakan", "reviewText": "THE. C DRINKS memiliki variasi yang sangat beragam dan semuanya lezat! Konsistensinya pas dan kemasannya sangat premium. Benar-benar direkomendasikan!", "customerName": "Olivia Grace Tjondro", "city": "Surabaya, Indonesia", "date": "5 Juli 2025", "productImage": `${IMAGE_PATH}tea-matcha.jpeg`, "ratingValue": 5 },
+    { "id": "test-stephanie", "reviewTitle": "Sangat menyukai varian Stroberi!", "reviewText": "Varian stroberi selalu menjadi favorit saya. Belum pernah menemukan minuman yang bisa meningkatkan mood saya secepat ini! Premium, segar, dan sangat cantik saat difoto.", "customerName": "Stephanie Raitama", "city": "Bandung, Indonesia", "date": "7 September 2025", "productImage": `${IMAGE_PATH}fruit-strawberry.jpeg`, "ratingValue": 5 }
 ];
 
 const DEFAULT_INSTAGRAM = [
@@ -80,8 +82,15 @@ let currentEditId = null;
 async function loadDataFromAPI() {
     try {
         console.log('🔄 Loading data from JSONBin...');
+        
+        // PERBAIKAN: Tambahkan mode cors dan cache
         const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-            headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY }
+            method: 'GET',
+            headers: { 
+                'X-Access-Key': JSONBIN_ACCESS_KEY,
+                'Content-Type': 'application/json'
+            },
+            cache: 'no-store'
         });
         
         if (response.ok) {
@@ -89,110 +98,71 @@ async function loadDataFromAPI() {
             const record = data.record;
             console.log('📦 Data from JSONBin:', record);
             
-            // Cek apakah data kosong atau tidak memiliki products
             if (record && record.products && record.products.length > 0) {
-                productsData = record.products;
-                campaignsData = record.campaigns || DEFAULT_CAMPAIGNS;
-                testimonialsData = record.testimonials || DEFAULT_TESTIMONIALS;
+                // PERBAIKAN: Pastikan path gambar benar saat load dari API
+                productsData = record.products.map(p => ({
+                    ...p,
+                    image: p.image && !p.image.startsWith('http') && !p.image.startsWith('/img/') 
+                        ? `/img/${p.image.split('/').pop()}` 
+                        : p.image
+                }));
+                campaignsData = (record.campaigns || DEFAULT_CAMPAIGNS).map(c => ({
+                    ...c,
+                    image: c.image && !c.image.startsWith('http') && !c.image.startsWith('/img/')
+                        ? `/img/${c.image.split('/').pop()}`
+                        : c.image
+                }));
+                testimonialsData = (record.testimonials || DEFAULT_TESTIMONIALS).map(t => ({
+                    ...t,
+                    productImage: t.productImage && !t.productImage.startsWith('http') && !t.productImage.startsWith('/img/')
+                        ? `/img/${t.productImage.split('/').pop()}`
+                        : t.productImage
+                }));
                 instagramPostsData = record.instagram || DEFAULT_INSTAGRAM;
                 console.log('✅ Data loaded successfully from JSONBin');
             } else {
                 console.log('⚠️ Bin kosong, mengisi dengan data default...');
-                // Bin kosong, inject data default
-                productsData = DEFAULT_PRODUCTS;
-                campaignsData = DEFAULT_CAMPAIGNS;
-                testimonialsData = DEFAULT_TESTIMONIALS;
-                instagramPostsData = DEFAULT_INSTAGRAM;
-                await saveAllDataToAPI();
-                console.log('✅ Data default berhasil di-inject ke JSONBin!');
+                await initializeDefaultData();
             }
         } else {
             console.error('❌ API response error:', response.status);
-            // Coba buat/update bin dengan data default
-            await createOrUpdateBinWithDefaultData();
+            await initializeDefaultData();
         }
     } catch (error) {
         console.error('❌ Error loading data:', error);
-        // Gunakan data default
-        productsData = DEFAULT_PRODUCTS;
-        campaignsData = DEFAULT_CAMPAIGNS;
-        testimonialsData = DEFAULT_TESTIMONIALS;
-        instagramPostsData = DEFAULT_INSTAGRAM;
-        
-        // Coba simpan ke JSONBin
-        try {
-            await saveAllDataToAPI();
-            console.log('✅ Data default berhasil disimpan ke JSONBin setelah error');
-        } catch(e) {
-            console.error('❌ Gagal menyimpan data default:', e);
-            showNotification('Gagal terhubung ke database, menggunakan data lokal', 'error');
-        }
+        await initializeDefaultData();
+        showNotification('Menggunakan data lokal (koneksi ke server terputus)', 'info');
     }
 }
 
-async function createOrUpdateBinWithDefaultData() {
-    const defaultData = {
-        products: DEFAULT_PRODUCTS,
-        campaigns: DEFAULT_CAMPAIGNS,
-        testimonials: DEFAULT_TESTIMONIALS,
-        instagram: DEFAULT_INSTAGRAM,
-        lastUpdated: new Date().toISOString()
-    };
+async function initializeDefaultData() {
+    productsData = DEFAULT_PRODUCTS;
+    campaignsData = DEFAULT_CAMPAIGNS;
+    testimonialsData = DEFAULT_TESTIMONIALS;
+    instagramPostsData = DEFAULT_INSTAGRAM;
     
     try {
-        // Coba update bin yang sudah ada
-        const updateResponse = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Access-Key': JSONBIN_ACCESS_KEY
-            },
-            body: JSON.stringify(defaultData)
-        });
-        
-        if (updateResponse.ok) {
-            console.log('✅ Bin updated with default data');
-            productsData = DEFAULT_PRODUCTS;
-            campaignsData = DEFAULT_CAMPAIGNS;
-            testimonialsData = DEFAULT_TESTIMONIALS;
-            instagramPostsData = DEFAULT_INSTAGRAM;
-            showNotification('Database berhasil diinisialisasi!', 'success');
-        } else {
-            // Jika update gagal, coba buat bin baru
-            console.log('🆕 Creating new bin...');
-            const createResponse = await fetch('https://api.jsonbin.io/v3/b', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Access-Key': JSONBIN_ACCESS_KEY
-                },
-                body: JSON.stringify(defaultData)
-            });
-            
-            if (createResponse.ok) {
-                const newBin = await createResponse.json();
-                console.log('✅ New bin created with ID:', newBin.id);
-                showNotification(`Bin baru berhasil dibuat! ID: ${newBin.id}`, 'success');
-                productsData = DEFAULT_PRODUCTS;
-                campaignsData = DEFAULT_CAMPAIGNS;
-                testimonialsData = DEFAULT_TESTIMONIALS;
-                instagramPostsData = DEFAULT_INSTAGRAM;
-            } else {
-                console.error('❌ Failed to create bin');
-                showNotification('Gagal membuat database!', 'error');
-            }
-        }
-    } catch (error) {
-        console.error('❌ Error creating/updating bin:', error);
-        showNotification('Error koneksi ke database!', 'error');
+        await saveAllDataToAPI();
+        console.log('✅ Data default berhasil diinisialisasi!');
+    } catch(e) {
+        console.error('❌ Gagal menyimpan ke JSONBin:', e);
     }
 }
 
 async function saveAllDataToAPI() {
     const dataToSave = {
-        products: productsData,
-        campaigns: campaignsData,
-        testimonials: testimonialsData,
+        products: productsData.map(p => ({
+            ...p,
+            image: p.image?.replace('/img/', '') || p.image
+        })),
+        campaigns: campaignsData.map(c => ({
+            ...c,
+            image: c.image?.replace('/img/', '') || c.image
+        })),
+        testimonials: testimonialsData.map(t => ({
+            ...t,
+            productImage: t.productImage?.replace('/img/', '') || t.productImage
+        })),
         instagram: instagramPostsData,
         lastUpdated: new Date().toISOString()
     };
@@ -212,31 +182,17 @@ async function saveAllDataToAPI() {
             console.log('✅ Data saved successfully');
             showNotification('Data berhasil disimpan!', 'success');
         } else {
-            const errorText = await response.text();
-            console.error('❌ Save failed:', response.status, errorText);
-            showNotification(`Gagal menyimpan: ${response.status}`, 'error');
+            console.error('❌ Save failed:', response.status);
         }
     } catch (error) {
         console.error('❌ Error saving data:', error);
-        showNotification('Gagal menyimpan data! Cek koneksi internet', 'error');
     }
 }
 
-async function saveProducts() {
-    await saveAllDataToAPI();
-}
-
-async function saveCampaigns() { 
-    await saveAllDataToAPI(); 
-}
-
-async function saveTestimonials() { 
-    await saveAllDataToAPI(); 
-}
-
-async function saveInstagram() { 
-    await saveAllDataToAPI(); 
-}
+async function saveProducts() { await saveAllDataToAPI(); }
+async function saveCampaigns() { await saveAllDataToAPI(); }
+async function saveTestimonials() { await saveAllDataToAPI(); }
+async function saveInstagram() { await saveAllDataToAPI(); }
 
 // ==================== NOTIFICATION ====================
 function showNotification(message, type = 'info') {
@@ -448,6 +404,9 @@ function deg2rad(deg) { return deg * (Math.PI / 180); }
 
 // ==================== LOAD & RENDER ====================
 async function loadData() {
+    // Tampilkan loading indicator
+    showLoadingIndicator(true);
+    
     await loadDataFromAPI();
     renderCategories();
     renderProductsByCategory('all');
@@ -455,6 +414,20 @@ async function loadData() {
     renderTestimonials();
     renderInstagramPosts();
     updateStoreInfo();
+    
+    showLoadingIndicator(false);
+}
+
+function showLoadingIndicator(show) {
+    const grids = ['products-grid', 'campaigns-grid', 'testimonials-grid', 'instagram-grid'];
+    if (show) {
+        grids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el && el.children.length === 0) {
+                el.innerHTML = '<div class="col-span-full text-center py-12"><div class="inline-block w-8 h-8 border-4 border-neutral-200 border-t-[#111111] rounded-full animate-spin"></div><p class="text-neutral-400 text-xs mt-2">Memuat data...</p></div>';
+            }
+        });
+    }
 }
 
 function renderProductsByCategory(categoryId) {
@@ -697,19 +670,19 @@ function addToCartFromCard(productId, size) {
 function renderCampaigns() {
     const container = document.getElementById('campaigns-grid');
     if (!container) return;
-    container.innerHTML = campaignsData.map(camp => `<div class="group relative rounded-[2rem] bg-[#1C1C1C] overflow-hidden shadow-lg flex flex-col transition-all duration-500 hover:translate-y-[-8px]"><div class="absolute inset-0 bg-gradient-to-t from-[#111111] via-[#1C1C1C]/95 to-[#1C1C1C]/90"></div><div class="relative z-10 p-6 flex flex-col h-full"><div class="flex items-start justify-between mb-4"><div><span class="text-[9px] font-bold text-neutral-400 uppercase block mb-1">${camp.subTitle}</span><h3 class="text-base font-bold text-white">${camp.title}</h3></div><span class="text-[9px] font-extrabold text-neutral-900 bg-white px-2.5 py-1 rounded-full">${camp.badge}</span></div><div class="relative mb-4"><div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-white/5"><img src="${camp.image}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"></div></div><div class="mt-auto"><div class="border-t border-white/10 pt-4"><div class="font-mono text-[10px] text-zinc-300 mb-3 flex justify-between"><span>${camp.highlightText}</span><span>EDISI: 2026</span></div><p class="text-neutral-200/90 text-xs leading-relaxed line-clamp-3 mb-4">${camp.description}</p><button onclick="scrollToMenu()" class="w-full bg-white hover:bg-neutral-100 text-[#111111] text-xs font-bold py-2.5 rounded-xl transition-all">Temukan Rasa</button></div></div></div></div>`).join('');
+    container.innerHTML = campaignsData.map(camp => `<div class="group relative rounded-[2rem] bg-[#1C1C1C] overflow-hidden shadow-lg flex flex-col transition-all duration-500 hover:translate-y-[-8px]"><div class="absolute inset-0 bg-gradient-to-t from-[#111111] via-[#1C1C1C]/95 to-[#1C1C1C]/90"></div><div class="relative z-10 p-6 flex flex-col h-full"><div class="flex items-start justify-between mb-4"><div><span class="text-[9px] font-bold text-neutral-400 uppercase block mb-1">${camp.subTitle}</span><h3 class="text-base font-bold text-white">${camp.title}</h3></div><span class="text-[9px] font-extrabold text-neutral-900 bg-white px-2.5 py-1 rounded-full">${camp.badge}</span></div><div class="relative mb-4"><div class="relative w-full aspect-[3/4] rounded-2xl overflow-hidden bg-white/5"><img src="${camp.image}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x800/1a1a1a/white?text=Image'"></div></div><div class="mt-auto"><div class="border-t border-white/10 pt-4"><div class="font-mono text-[10px] text-zinc-300 mb-3 flex justify-between"><span>${camp.highlightText}</span><span>EDISI: 2026</span></div><p class="text-neutral-200/90 text-xs leading-relaxed line-clamp-3 mb-4">${camp.description}</p><button onclick="scrollToMenu()" class="w-full bg-white hover:bg-neutral-100 text-[#111111] text-xs font-bold py-2.5 rounded-xl transition-all">Temukan Rasa</button></div></div></div></div>`).join('');
 }
 
 function renderTestimonials() {
     const container = document.getElementById('testimonials-grid');
     if (!container) return;
-    container.innerHTML = testimonialsData.map(test => `<div class="bg-white rounded-3xl border border-neutral-100 shadow-xs hover:shadow-xl transition-all p-6 flex flex-col justify-between"><div><div class="bg-[#F8F8F8] rounded-2xl p-4 mb-6 flex items-center gap-2"><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white -rotate-6"><img src="${test.productImage}" class="w-full h-full object-cover"></div><div class="aspect-[3/4] w-[35%] rounded-xl overflow-hidden shadow-md border bg-white z-10 scale-105"><img src="${test.productImage}" class="w-full h-full object-cover"></div><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white rotate-6"><img src="${test.productImage}" class="w-full h-full object-cover"></div></div><div class="flex items-center gap-1 mb-4">${'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" class="w-3.5 h-3.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'.repeat(test.ratingValue)}</div><h3 class="text-sm font-extrabold text-[#111111] mb-3">"${test.reviewTitle}"</h3><p class="text-neutral-500 text-xs leading-relaxed mb-6">${test.reviewText}</p></div><div class="border-t border-neutral-100 pt-4"><div class="flex justify-between"><div><h4 class="font-bold text-neutral-900 text-xs">${test.customerName}</h4><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${test.city}</span></div><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${test.date}</span></div></div></div>`).join('');
+    container.innerHTML = testimonialsData.map(test => `<div class="bg-white rounded-3xl border border-neutral-100 shadow-xs hover:shadow-xl transition-all p-6 flex flex-col justify-between"><div><div class="bg-[#F8F8F8] rounded-2xl p-4 mb-6 flex items-center gap-2"><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white -rotate-6"><img src="${test.productImage}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500/1a1a1a/white?text=Image'"></div><div class="aspect-[3/4] w-[35%] rounded-xl overflow-hidden shadow-md border bg-white z-10 scale-105"><img src="${test.productImage}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500/1a1a1a/white?text=Image'"></div><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white rotate-6"><img src="${test.productImage}" class="w-full h-full object-cover" onerror="this.src='https://placehold.co/400x500/1a1a1a/white?text=Image'"></div></div><div class="flex items-center gap-1 mb-4">${'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" class="w-3.5 h-3.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'.repeat(test.ratingValue)}</div><h3 class="text-sm font-extrabold text-[#111111] mb-3">"${test.reviewTitle}"</h3><p class="text-neutral-500 text-xs leading-relaxed mb-6">${test.reviewText}</p></div><div class="border-t border-neutral-100 pt-4"><div class="flex justify-between"><div><h4 class="font-bold text-neutral-900 text-xs">${test.customerName}</h4><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${test.city}</span></div><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${test.date}</span></div></div></div>`).join('');
 }
 
 function renderInstagramPosts() {
     const container = document.getElementById('instagram-grid');
     if (!container) return;
-    container.innerHTML = instagramPostsData.map(post => `<button onclick="openLightbox('${post.id}')" class="group relative aspect-square rounded-2xl overflow-hidden shadow-xs border cursor-pointer"><img src="${post.image}" class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"><div class="absolute inset-0 bg-[#111111]/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity"><div class="flex items-center space-x-6"><span class="flex items-center gap-1 font-mono text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>${post.likes}</span><span class="flex items-center gap-1 font-mono text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${post.comments}</span></div><span class="absolute bottom-4 left-4 right-4 text-[10px] text-zinc-100 italic truncate">${post.caption}</span></div></button>`).join('');
+    container.innerHTML = instagramPostsData.map(post => `<button onclick="openLightbox('${post.id}')" class="group relative aspect-square rounded-2xl overflow-hidden shadow-xs border cursor-pointer"><img src="${post.image}" class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x600/1a1a1a/white?text=Image'"><div class="absolute inset-0 bg-[#111111]/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity"><div class="flex items-center space-x-6"><span class="flex items-center gap-1 font-mono text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>${post.likes}</span><span class="flex items-center gap-1 font-mono text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${post.comments}</span></div><span class="absolute bottom-4 left-4 right-4 text-[10px] text-zinc-100 italic truncate">${post.caption}</span></div></button>`).join('');
     window.instagramPostsData = instagramPostsData;
 }
 
@@ -755,7 +728,7 @@ function renderCartItems() {
         if (!toppingsText) toppingsText = 'Tanpa Topping';
         const tempIcon = item.temperature === 'PANAS' ? '🔥' : '❄️';
         
-        return `<div class="p-3 bg-neutral-50 rounded-xl flex gap-3"><div class="w-14 h-14 bg-white rounded-lg p-1"><img src="${item.product.image}" class="w-full h-full object-contain"></div><div class="flex-grow"><div class="flex justify-between"><h4 class="font-bold text-xs">${item.product.name}</h4><button onclick="removeCartItem('${item.id}')" class="text-neutral-400 hover:text-red-500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div><div class="flex flex-wrap gap-1 mt-1"><span class="bg-neutral-900 text-white px-1.5 py-0.5 rounded text-[8px]">${item.size === 'B' ? 'Besar' : 'Kecil'}</span><span class="bg-neutral-200 text-neutral-800 px-1.5 py-0.5 rounded text-[8px]">${tempIcon} ${item.temperature}</span>${item.toppings.boba ? '<span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[8px]">+Boba</span>' : ''}${item.toppings.creamCheese ? '<span class="bg-pink-100 text-pink-800 px-1.5 py-0.5 rounded text-[8px]">+Cream Cheese</span>' : ''}</div><div class="flex justify-between mt-2"><div class="flex items-center bg-white rounded border"><button onclick="updateQuantity('${item.id}', -1)" class="w-6 h-6 flex items-center justify-center">-</button><span class="w-6 text-center text-xs">${item.quantity}</span><button onclick="updateQuantity('${item.id}', 1)" class="w-6 h-6 flex items-center justify-center">+</button></div><span class="font-mono text-xs font-bold">Rp ${totalItemPrice.toLocaleString()}</span></div></div></div>`;
+        return `<div class="p-3 bg-neutral-50 rounded-xl flex gap-3"><div class="w-14 h-14 bg-white rounded-lg p-1"><img src="${item.product.image}" class="w-full h-full object-contain" onerror="this.src='https://placehold.co/100x100/1a1a1a/white?text=Image'"></div><div class="flex-grow"><div class="flex justify-between"><h4 class="font-bold text-xs">${item.product.name}</h4><button onclick="removeCartItem('${item.id}')" class="text-neutral-400 hover:text-red-500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div><div class="flex flex-wrap gap-1 mt-1"><span class="bg-neutral-900 text-white px-1.5 py-0.5 rounded text-[8px]">${item.size === 'B' ? 'Besar' : 'Kecil'}</span><span class="bg-neutral-200 text-neutral-800 px-1.5 py-0.5 rounded text-[8px]">${tempIcon} ${item.temperature}</span>${item.toppings.boba ? '<span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[8px]">+Boba</span>' : ''}${item.toppings.creamCheese ? '<span class="bg-pink-100 text-pink-800 px-1.5 py-0.5 rounded text-[8px]">+Cream Cheese</span>' : ''}</div><div class="flex justify-between mt-2"><div class="flex items-center bg-white rounded border"><button onclick="updateQuantity('${item.id}', -1)" class="w-6 h-6 flex items-center justify-center">-</button><span class="w-6 text-center text-xs">${item.quantity}</span><button onclick="updateQuantity('${item.id}', 1)" class="w-6 h-6 flex items-center justify-center">+</button></div><span class="font-mono text-xs font-bold">Rp ${totalItemPrice.toLocaleString()}</span></div></div></div>`;
     }).join('');
     if (footer) footer.classList.remove('hidden');
 }
@@ -909,14 +882,43 @@ function downloadReceipt() { const el = document.getElementById('receipt-card');
 
 // ==================== ADMIN PANEL FUNCTIONS ====================
 function openAdminPanel() {
-    document.getElementById('admin-modal').classList.remove('hidden');
-    document.getElementById('admin-modal').classList.add('flex');
-    refreshAdminLists();
+    const passwordModal = document.getElementById('admin-password-modal');
+    if (passwordModal) {
+        passwordModal.classList.remove('hidden');
+        passwordModal.classList.add('flex');
+        document.getElementById('admin-password-input').value = '';
+        document.getElementById('admin-password-input').focus();
+    }
 }
 
 function closeAdminPanel() {
     document.getElementById('admin-modal').classList.add('hidden');
     document.getElementById('admin-modal').classList.remove('flex');
+}
+
+function verifyAdminPassword() {
+    const password = document.getElementById('admin-password-input').value;
+    const hashedPassword = CryptoJS.SHA256(password).toString();
+    const correctHash = 'e6b8b7f8e7d9c1a3f2e4d5c6b7a8f9e0d1c2b3a4f5e6d7c8b9a0f1e2d3c4b5a6';
+    
+    if (hashedPassword === correctHash) {
+        closePasswordModal();
+        document.getElementById('admin-modal').classList.remove('hidden');
+        document.getElementById('admin-modal').classList.add('flex');
+        refreshAdminLists();
+    } else {
+        alert('Password salah! Akses ditolak.');
+        document.getElementById('admin-password-input').value = '';
+        document.getElementById('admin-password-input').focus();
+    }
+}
+
+function closePasswordModal() {
+    const modal = document.getElementById('admin-password-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
 }
 
 function setAdminTab(tab) {
@@ -1024,7 +1026,7 @@ function showAddProductForm() {
         <input type="text" id="form-name" placeholder="Nama Produk" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <textarea id="form-desc" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="2"></textarea>
         <input type="text" id="form-category" placeholder="Kategori (chocolate/tea/coffee/fruit)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-image" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" value="./default.jpeg">
+        <input type="text" id="form-image" placeholder="Nama file gambar (contoh: cokelat-original.jpeg)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" value="default.jpeg">
         <input type="number" id="form-priceK" placeholder="Harga Kecil (Rp)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="number" id="form-priceB" placeholder="Harga Besar (Rp)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-bestSeller"> Best Seller</label>
@@ -1046,7 +1048,7 @@ function editProduct(id) {
         <input type="text" id="form-name" value="${product.name}" placeholder="Nama Produk" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <textarea id="form-desc" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="2">${product.description}</textarea>
         <input type="text" id="form-category" value="${product.category}" placeholder="Kategori" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-image" value="${product.image}" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="text" id="form-image" value="${product.image?.replace('/img/', '') || ''}" placeholder="Nama file gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="number" id="form-priceK" value="${product.priceK}" placeholder="Harga Kecil" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="number" id="form-priceB" value="${product.priceB}" placeholder="Harga Besar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-bestSeller" ${product.isBestSeller ? 'checked' : ''}> Best Seller</label>
@@ -1078,7 +1080,7 @@ function showAddCampaignForm() {
         <input type="text" id="form-subtitle" placeholder="Subtitle" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-badge" placeholder="Badge (Edisi Terbatas/Terlaris)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <textarea id="form-desc-camp" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="3"></textarea>
-        <input type="text" id="form-image-camp" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="text" id="form-image-camp" placeholder="Nama file gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-highlight" placeholder="Highlight Text" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-accentColor-camp" placeholder="Warna Aksen" class="w-full px-3 py-2 text-xs border rounded-lg">
     `;
@@ -1097,7 +1099,7 @@ function editCampaign(id) {
         <input type="text" id="form-subtitle" value="${campaign.subTitle}" placeholder="Subtitle" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-badge" value="${campaign.badge}" placeholder="Badge" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <textarea id="form-desc-camp" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="3">${campaign.description}</textarea>
-        <input type="text" id="form-image-camp" value="${campaign.image}" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="text" id="form-image-camp" value="${campaign.image?.replace('/img/', '') || ''}" placeholder="Nama file gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-highlight" value="${campaign.highlightText}" placeholder="Highlight Text" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-accentColor-camp" value="${campaign.accentColor || '#4A2C2A'}" placeholder="Warna Aksen" class="w-full px-3 py-2 text-xs border rounded-lg">
     `;
@@ -1126,7 +1128,7 @@ function showAddTestimonialForm() {
         <textarea id="form-text-test" placeholder="Isi Testimoni" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="3"></textarea>
         <input type="text" id="form-city" placeholder="Kota" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-date" placeholder="Tanggal" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-image-test" placeholder="URL Gambar Produk" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="text" id="form-image-test" placeholder="Nama file gambar produk" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <select id="form-rating" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
             <option value="5">⭐⭐⭐⭐⭐ (5)</option>
             <option value="4">⭐⭐⭐⭐ (4)</option>
@@ -1149,7 +1151,7 @@ function editTestimonial(id) {
         <textarea id="form-text-test" placeholder="Isi Testimoni" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="3">${testimonial.reviewText}</textarea>
         <input type="text" id="form-city" value="${testimonial.city}" placeholder="Kota" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-date" value="${testimonial.date}" placeholder="Tanggal" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-image-test" value="${testimonial.productImage}" placeholder="URL Gambar Produk" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="text" id="form-image-test" value="${testimonial.productImage?.replace('/img/', '') || ''}" placeholder="Nama file gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <select id="form-rating" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
             <option value="5" ${testimonial.ratingValue === 5 ? 'selected' : ''}>⭐⭐⭐⭐⭐ (5)</option>
             <option value="4" ${testimonial.ratingValue === 4 ? 'selected' : ''}>⭐⭐⭐⭐ (4)</option>
@@ -1230,12 +1232,13 @@ function closeFormModal() {
 
 async function submitFormData() {
     if (currentFormType === 'product') {
+        const imageFileName = document.getElementById('form-image').value;
         const newProduct = {
             id: currentEditId || generateId('prod'),
             name: document.getElementById('form-name').value,
             description: document.getElementById('form-desc').value,
             category: document.getElementById('form-category').value,
-            image: document.getElementById('form-image').value || './default.jpeg',
+            image: imageFileName ? `/img/${imageFileName}` : '/img/default.jpeg',
             priceK: parseInt(document.getElementById('form-priceK').value) || 0,
             priceB: parseInt(document.getElementById('form-priceB').value) || 0,
             isBestSeller: document.getElementById('form-bestSeller')?.checked || false,
@@ -1257,13 +1260,14 @@ async function submitFormData() {
     }
     
     else if (currentFormType === 'campaign') {
+        const imageFileName = document.getElementById('form-image-camp').value;
         const newCampaign = {
             id: currentEditId || generateId('campaign'),
             title: document.getElementById('form-title-camp').value,
             subTitle: document.getElementById('form-subtitle').value,
             badge: document.getElementById('form-badge').value,
             description: document.getElementById('form-desc-camp').value,
-            image: document.getElementById('form-image-camp').value,
+            image: imageFileName ? `/img/${imageFileName}` : '/img/default.jpeg',
             highlightText: document.getElementById('form-highlight').value,
             accentColor: document.getElementById('form-accentColor-camp').value || '#4A2C2A'
         };
@@ -1281,6 +1285,7 @@ async function submitFormData() {
     }
     
     else if (currentFormType === 'testimonial') {
+        const imageFileName = document.getElementById('form-image-test').value;
         const newTestimonial = {
             id: currentEditId || generateId('test'),
             customerName: document.getElementById('form-name-test').value,
@@ -1288,7 +1293,7 @@ async function submitFormData() {
             reviewText: document.getElementById('form-text-test').value,
             city: document.getElementById('form-city').value,
             date: document.getElementById('form-date').value,
-            productImage: document.getElementById('form-image-test').value,
+            productImage: imageFileName ? `/img/${imageFileName}` : '/img/default.jpeg',
             ratingValue: parseInt(document.getElementById('form-rating').value)
         };
         
@@ -1476,6 +1481,8 @@ window.removeCartItem = removeCartItem;
 window.updateQuantity = updateQuantity;
 window.openAdminPanel = openAdminPanel;
 window.closeAdminPanel = closeAdminPanel;
+window.verifyAdminPassword = verifyAdminPassword;
+window.closePasswordModal = closePasswordModal;
 window.setAdminTab = setAdminTab;
 window.showAddProductForm = showAddProductForm;
 window.editProduct = editProduct;
