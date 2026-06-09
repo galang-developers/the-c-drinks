@@ -5,7 +5,7 @@ const JSONBIN_ACCESS_KEY = '$2a$10$Idssm7MPctlzL/quJlXUyOiFa5bSp2W3ERWxRSLbpJS/Q
 const JSONBIN_BIN_ID = '6a282856f5f4af5e29d26758';
 
 // === PERBAIKAN: Gunakan path absolut untuk gambar ===
-const IMAGE_PATH = '/img/';  // Path absolut dari root
+const IMAGE_PATH = './';  // Path absolut dari root
 
 // Data awal jika bin kosong
 const DEFAULT_PRODUCTS = [
