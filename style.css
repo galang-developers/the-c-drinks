@@ -60,6 +60,30 @@ body {
     100% { transform: translateY(0px) rotate(12deg) translateX(1rem); }
 }
 
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+    20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes heroFloatLeft {
+    0% { transform: rotate(-12deg) translateX(-1rem) translateY(0px); }
+    50% { transform: rotate(-12deg) translateX(-1rem) translateY(-15px); }
+    100% { transform: rotate(-12deg) translateX(-1rem) translateY(0px); }
+}
+
+@keyframes heroFloatRight {
+    0% { transform: rotate(12deg) translateX(1rem) translateY(0px); }
+    50% { transform: rotate(12deg) translateX(1rem) translateY(-8px); }
+    100% { transform: rotate(12deg) translateX(1rem) translateY(0px); }
+}
+
+@keyframes heroFloatCenter {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+    100% { transform: translateY(0px); }
+}
+
 .animate-float {
     animation: float 6s ease-in-out infinite;
 }
@@ -72,6 +96,10 @@ body {
 .animate-float-slow {
     animation: float-slow 7s ease-in-out infinite;
     animation-delay: 0.7s;
+}
+
+.animate-shake {
+    animation: shake 0.5s ease-in-out;
 }
 
 /* Utility Classes */
@@ -123,21 +151,18 @@ img {
     object-fit: cover;
 }
 
-/* ==================== PERBAIKAN CARD HOVER ==================== */
-/* Card container - jangan ada transform yang mempengaruhi absolute children */
+/* Product Card Styles */
 .product-card {
     overflow: hidden;
     position: relative;
 }
 
-/* Image container - tempat zoom berlaku */
 .product-image-container {
     overflow: hidden;
     position: relative;
     border-radius: 18px;
 }
 
-/* Image zoom - hanya gambar yang membesar, bukan container-nya */
 .product-image-container img {
     transition: transform 0.5s ease;
     width: 100%;
@@ -149,20 +174,18 @@ img {
     transform: scale(1.08);
 }
 
-/* Label absolute harus tetap di atas dan tidak terpengaruh zoom */
 .product-image-container .absolute {
     z-index: 10;
     pointer-events: none;
 }
 
-/* Pastikan badge dan harga tetap terlihat */
 .product-image-container .absolute span,
 .product-image-container .absolute div {
     position: relative;
     z-index: 11;
 }
 
-/* Hero Section Fix */
+/* Hero Section Animation */
 #hero-left-img {
     transform: rotate(-12deg) translateX(-1rem) !important;
     transition: all 0.5s ease-in-out !important;
@@ -181,24 +204,6 @@ img {
     transform: rotate(12deg) translateX(1rem) scale(1.05) !important;
 }
 
-@keyframes heroFloatLeft {
-    0% { transform: rotate(-12deg) translateX(-1rem) translateY(0px); }
-    50% { transform: rotate(-12deg) translateX(-1rem) translateY(-15px); }
-    100% { transform: rotate(-12deg) translateX(-1rem) translateY(0px); }
-}
-
-@keyframes heroFloatRight {
-    0% { transform: rotate(12deg) translateX(1rem) translateY(0px); }
-    50% { transform: rotate(12deg) translateX(1rem) translateY(-8px); }
-    100% { transform: rotate(12deg) translateX(1rem) translateY(0px); }
-}
-
-@keyframes heroFloatCenter {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-    100% { transform: translateY(0px); }
-}
-
 #hero-left-img {
     animation: heroFloatLeft 8s ease-in-out infinite !important;
     animation-delay: 1.5s !important;
@@ -209,6 +214,26 @@ img {
     animation-delay: 0.7s !important;
 }
 
-#hero-center-img {
-    animation: heroFloatCenter 6s ease-in-out infinite !important;
+/* Custom scrollbar for admin panel */
+.admin-scroll::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+.admin-scroll::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+.admin-scroll::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 10px;
+}
+.admin-scroll::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Password input styling */
+.password-input {
+    letter-spacing: 4px;
+    font-size: 20px;
+    font-family: monospace;
 }
