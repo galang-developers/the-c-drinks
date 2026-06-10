@@ -1,73 +1,89 @@
-// js/main.js
+// ==================== GLOBAL KONFIGURASI ====================
+// Semua konfigurasi global ada di sini untuk memudahkan perubahan
 
-// ==================== KONFIGURASI JSONBIN.IO ====================
-const JSONBIN_ACCESS_KEY = '$2a$10$Idssm7MPctlzL/quJlXUyOiFa5bSp2W3ERWxRSLbpJS/QKeUj8kt2';
-const JSONBIN_BIN_ID = '6a282856f5f4af5e29d26758';
+const APP_CONFIG = {
+    // JSONBin Configuration
+    JSONBIN_ACCESS_KEY: '$2a$10$Idssm7MPctlzL/quJlXUyOiFa5bSp2W3ERWxRSLbpJS/QKeUj8kt2',
+    JSONBIN_BIN_ID: '6a282856f5f4af5e29d26758',
+    
+    // Admin Panel Configuration
+    ADMIN_PASSWORD: 'thecadmin2026', // Password: "thecadmin2026"
+    DATA_VERSION: '2.0',
+    
+    // Store Contact Information
+    STORE_PHONE_NUMBER: '6281288862602', // Nomor WhatsApp toko (tanpa 0 di depan)
+    STORE_NAME: 'THE. C DRINKS',
+    STORE_ADDRESS: 'Jl. Diponegoro, Kotakulon, Kec. Bondowoso, Kab. Bondowoso, Jawa Timur 68213',
+    STORE_LOCATION: { lat: -7.9108787, lng: 113.8193598 },
+    
+    // Delivery Fee Configuration
+    DELIVERY_FLAT_RATE_KM: 3,      // 1-3 km flat rate
+    DELIVERY_FLAT_FEE: 5000,       // Flat fee untuk 1-3 km = Rp5.000
+    DELIVERY_EXTRA_PER_KM: 2000,   // Per km berikutnya = Rp2.000
+    
+    // Default Menu Data (akan diinject jika bin kosong)
+    DEFAULT_PRODUCTS: [
+        { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": "./cokelat-hazelnut.jpeg", "accentColor": "#A67C52", "priceK": 13000, "priceB": 16000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-chocolate-strawberry", "name": "Chocolate Strawberry", "description": "Perpaduan sempurna antara cokelat premium dan stroberi segar yang manis dan menyegarkan.", "category": "chocolate", "image": "./cokelat-strawberry.jpeg", "accentColor": "#E11D48", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-chocolate-coffee", "name": "Chocolate Coffee", "description": "Kombinasi nikmat antara cokelat pekat dan espresso Arabika yang kuat dan beraroma.", "category": "chocolate", "image": "./cokelat-kopi.jpeg", "accentColor": "#6F4E37", "priceK": 15000, "priceB": 18000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-matcha-latte", "name": "Matcha Latte", "description": "Bubuk matcha Jepang premium Uji diseduh dengan susu segar organik yang lembut.", "category": "tea", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-thai-tea", "name": "Thai Tea", "description": "Teh Thailand asli dengan rasa khas yang creamy dan manis, disajikan dengan susu kental manis.", "category": "tea", "image": "./tea-thai.jpeg", "accentColor": "#D97706", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-lemon-tea", "name": "Lemon Tea", "description": "Kesegaran teh hitam dengan perasan lemon asli dan madu hutan alami.", "category": "tea", "image": "./tea-lemon.jpeg", "accentColor": "#EAB308", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-solo-wasgitel", "name": "Solo Wasgitel", "description": "Minuman khas Solo dengan rasa wasgitel yang unik dan menyegarkan.", "category": "tea", "image": "./tea-solo-wasgitel.jpeg", "accentColor": "#8B5E3C", "priceK": 7000, "priceB": 7000, "isBestSeller": false, "onlySizeB": true, "noToppings": true },
+        { "id": "prod-americano", "name": "Americano", "description": "Espresso otentik dari biji kopi Arabika pilihan, disajikan dengan air pegunungan dingin yang segar.", "category": "coffee", "image": "./coffe-americano.jpeg", "accentColor": "#6F4E37", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-cappucino", "name": "Cappucino", "description": "Perpaduan sempurna antara espresso, susu panas, dan busa susu yang lembut.", "category": "coffee", "image": "./coffe-cappucino.jpeg", "accentColor": "#A67C52", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-latte", "name": "Latte", "description": "Espresso dengan susu steamed yang creamy, menghasilkan rasa yang halus dan lembut.", "category": "coffee", "image": "./coffe-late.jpeg", "accentColor": "#8B5E3C", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-brown-sugar-latte", "name": "Brown Sugar Latte", "description": "Caramel gula merah Okinawa berpadu indah dengan espresso dan susu segar premium.", "category": "coffee", "image": "./coffe-late-brown-sugar.jpeg", "accentColor": "#4A2C2A", "priceK": 15000, "priceB": 18000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-strawberry", "name": "Strawberry", "description": "Puree stroberi segar organik dipadukan dengan es batu serut.", "category": "fruit", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-mango", "name": "Mango", "description": "Kesegaran puree mangga alami yang manis dan menyegarkan, cocok untuk cuaca panas.", "category": "fruit", "image": "./fruit-manggo.jpeg", "accentColor": "#F59E0B", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-taro", "name": "Taro Milk Tea", "description": "Minuman taro creamy dengan aroma khas dan rasa manis alami yang lembut di lidah.", "category": "cake", "image": "./taro.jpeg", "accentColor": "#9B59B6", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
+        { "id": "prod-red-velvet", "name": "Red Velvet Latte", "description": "Perpaduan sempurna antara red velvet cake dan susu segar, menghasilkan rasa yang manis dan elegan.", "category": "cake", "image": "./red-velvet.jpeg", "accentColor": "#E74C3C", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false }
+    ],
+    
+    DEFAULT_CAMPAIGNS: [
+        { "id": "campaign-midnight-chocolate", "title": "Midnight Chocolate", "subTitle": "Sensasi Kakao Pekat yang Elegan", "badge": "Edisi Terbatas", "description": "Masuki petualangan rasa yang mendalam. Bubuk cokelat hitam pilihan dari Afrika Barat berpadu dengan susu premium organik, menghasilkan rasa yang intens, lembut, dan menenangkan malam Anda.", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "highlightText": "KOSMIK COKELAT" },
+        { "id": "campaign-matcha-signature", "title": "Matcha Signature", "subTitle": "Ketenangan Zen dalam Setiap Tegukan", "badge": "Terlaris", "description": "Ditanam di kebun teh Kyoto yang sejuk, digiling secara tradisional dengan presisi tingkat tinggi, lalu dibalur susu organik segar demi memberikan fokus dan kesegaran penuh.", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "highlightText": "MATCHA KYOTO" },
+        { "id": "campaign-strawberry", "title": "Strawberry Mango Fusion", "subTitle": "Kebahagiaan Tropis Penuh Kesegaran", "badge": "Edisi Spesial", "description": "Kesegaran buah stroberi matang pilihan yang dipadukan secara harmonis dengan kelembutan puree mangga Alfonzo berlapis madu. Ledakan rasa menakjubkan bagi hari Anda.", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "highlightText": "PERPADUAN TROPIS" }
+    ],
+    
+    DEFAULT_TESTIMONIALS: [
+        { "id": "test-ronald", "reviewTitle": "Belum pernah menikmati Brown Sugar Latte seenak ini!", "reviewText": "Saya sudah mencoba banyak Brown Sugar Latte di Indonesia, dan jujur ini adalah yang terbaik yang pernah saya rasakan! Rasa manisnya alami dan aroma kopinya tetap kuat.", "customerName": "Ronald Simatupang", "city": "Jakarta, Indonesia", "date": "25 Maret 2025", "productImage": "./coffe-late-brown-sugar.jpeg", "ratingValue": 5 },
+        { "id": "test-olivia", "reviewTitle": "Banyak pilihan rasa dan semuanya kualitas terbaik! Tidak ada yang mengecewakan", "reviewText": "THE. C DRINKS memiliki variasi yang sangat beragam dan semuanya lezat! Konsistensinya pas dan kemasannya sangat premium. Benar-benar direkomendasikan!", "customerName": "Olivia Grace Tjondro", "city": "Surabaya, Indonesia", "date": "5 Juli 2025", "productImage": "./tea-matcha.jpeg", "ratingValue": 5 },
+        { "id": "test-stephanie", "reviewTitle": "Sangat menyukai varian Stroberi!", "reviewText": "Varian stroberi selalu menjadi favorit saya. Belum pernah menemukan minuman yang bisa meningkatkan mood saya secepat ini! Premium, segar, dan sangat cantik saat difoto.", "customerName": "Stephanie Raitama", "city": "Bandung, Indonesia", "date": "7 September 2025", "productImage": "./fruit-strawberry.jpeg", "ratingValue": 5 }
+    ],
+    
+    DEFAULT_INSTAGRAM: [
+        { "id": "post-1", "image": "https://placehold.co/600x600/333333/white?text=Instagram+1", "likes": "1,420", "comments": "48", "caption": "Pagi hari di sudut kota yang chic ditemani americano yang kuat. ✨ #thecdrinks", "type": "photo" },
+        { "id": "post-2", "image": "https://placehold.co/600x600/444444/white?text=Instagram+2", "likes": "2,110", "comments": "92", "caption": "Proses brewing dengan presisi tinggi. Setiap cangkir disajikan dengan penuh kasih.", "type": "carousel" },
+        { "id": "post-3", "image": "https://placehold.co/600x600/2a2a2a/white?text=Instagram+3", "likes": "1,894", "comments": "64", "caption": "Sensasi menikmati cokelat premium larut malam yang meningkatkan suasana hati Anda.", "type": "photo" },
+        { "id": "post-4", "image": "https://placehold.co/600x600/3a3a3a/white?text=Instagram+4", "likes": "3,020", "comments": "124", "caption": "Matcha latte hangat untuk fokus kognitif yang bersih di sore hari. 🍃", "type": "video" },
+        { "id": "post-5", "image": "https://placehold.co/600x600/4a4a4a/white?text=Instagram+5", "likes": "4,103", "comments": "210", "caption": "Saat kehangatan mentari berpadu di dalam gelas: Puree mangga manis dan stroberi segar.", "type": "photo" },
+        { "id": "post-6", "image": "https://placehold.co/600x600/252525/white?text=Instagram+6", "likes": "2,740", "comments": "88", "caption": "Arsitektur minimalis yang elegan. Outlet Jl. Premium Rasa kami kini resmi dibuka.", "type": "photo" }
+    ],
+    
+    // WhatsApp Message Templates
+    WHATSAPP_MESSAGE_TEMPLATE: `Halo THE. C DRINKS! 🥤✨
 
-// Hashed password untuk admin panel (password: "thecadmin2025" - SHA256)
-const HASHED_ADMIN_PASSWORD = 'ce9675a3b45e948cdd1c09fc6f6a5d770f7f29741ed84cf8588c9a9fc5e242d1';
-let isAdminAuthenticated = false;
+Saya ingin memesan:
+{ITEMS}
 
-// Versi data untuk tracking perubahan
-const DATA_VERSION = '2.0';
+{SHIPPING_INFO}
+Subtotal: Rp {SUBTOTAL}
+Total: Rp {TOTAL}
 
-// Data awal jika bin kosong
-const DEFAULT_PRODUCTS = [
-    { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": "./cokelat-hazelnut.jpeg", "accentColor": "#A67C52", "priceK": 13000, "priceB": 16000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-chocolate-strawberry", "name": "Chocolate Strawberry", "description": "Perpaduan sempurna antara cokelat premium dan stroberi segar yang manis dan menyegarkan.", "category": "chocolate", "image": "./cokelat-strawberry.jpeg", "accentColor": "#E11D48", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-chocolate-coffee", "name": "Chocolate Coffee", "description": "Kombinasi nikmat antara cokelat pekat dan espresso Arabika yang kuat dan beraroma.", "category": "chocolate", "image": "./cokelat-kopi.jpeg", "accentColor": "#6F4E37", "priceK": 15000, "priceB": 18000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-matcha-latte", "name": "Matcha Latte", "description": "Bubuk matcha Jepang premium Uji diseduh dengan susu segar organik yang lembut.", "category": "tea", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-thai-tea", "name": "Thai Tea", "description": "Teh Thailand asli dengan rasa khas yang creamy dan manis, disajikan dengan susu kental manis.", "category": "tea", "image": "./tea-thai.jpeg", "accentColor": "#D97706", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-lemon-tea", "name": "Lemon Tea", "description": "Kesegaran teh hitam dengan perasan lemon asli dan madu hutan alami.", "category": "tea", "image": "./tea-lemon.jpeg", "accentColor": "#EAB308", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-solo-wasgitel", "name": "Solo Wasgitel", "description": "Minuman khas Solo dengan rasa wasgitel yang unik dan menyegarkan.", "category": "tea", "image": "./tea-solo-wasgitel.jpeg", "accentColor": "#8B5E3C", "priceK": 7000, "priceB": 7000, "isBestSeller": false, "onlySizeB": true, "noToppings": true },
-    { "id": "prod-americano", "name": "Americano", "description": "Espresso otentik dari biji kopi Arabika pilihan, disajikan dengan air pegunungan dingin yang segar.", "category": "coffee", "image": "./coffe-americano.jpeg", "accentColor": "#6F4E37", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-cappucino", "name": "Cappucino", "description": "Perpaduan sempurna antara espresso, susu panas, dan busa susu yang lembut.", "category": "coffee", "image": "./coffe-cappucino.jpeg", "accentColor": "#A67C52", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-latte", "name": "Latte", "description": "Espresso dengan susu steamed yang creamy, menghasilkan rasa yang halus dan lembut.", "category": "coffee", "image": "./coffe-late.jpeg", "accentColor": "#8B5E3C", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-brown-sugar-latte", "name": "Brown Sugar Latte", "description": "Caramel gula merah Okinawa berpadu indah dengan espresso dan susu segar premium.", "category": "coffee", "image": "./coffe-late-brown-sugar.jpeg", "accentColor": "#4A2C2A", "priceK": 15000, "priceB": 18000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-strawberry", "name": "Strawberry", "description": "Puree stroberi segar organik dipadukan dengan es batu serut.", "category": "fruit", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-mango", "name": "Mango", "description": "Kesegaran puree mangga alami yang manis dan menyegarkan, cocok untuk cuaca panas.", "category": "fruit", "image": "./fruit-manggo.jpeg", "accentColor": "#F59E0B", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-    // ==================== SERI KUE ====================
-    { "id": "prod-taro", "name": "Taro Milk Tea", "description": "Minuman taro creamy dengan aroma khas dan rasa manis alami yang lembut di lidah.", "category": "cake", "image": "./taro.jpeg", "accentColor": "#9B59B6", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-    { "id": "prod-red-velvet", "name": "Red Velvet Latte", "description": "Perpaduan sempurna antara red velvet cake dan susu segar, menghasilkan rasa yang manis dan elegan.", "category": "cake", "image": "./red-velvet.jpeg", "accentColor": "#E74C3C", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false }
-];
+Nama: {CUSTOMER_NAME}
+Metode: {METHOD}`,
 
-const DEFAULT_CAMPAIGNS = [
-    { "id": "campaign-midnight-chocolate", "title": "Midnight Chocolate", "subTitle": "Sensasi Kakao Pekat yang Elegan", "badge": "Edisi Terbatas", "description": "Masuki petualangan rasa yang mendalam. Bubuk cokelat hitam pilihan dari Afrika Barat berpadu dengan susu premium organik, menghasilkan rasa yang intens, lembut, dan menenangkan malam Anda.", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "highlightText": "KOSMIK COKELAT" },
-    { "id": "campaign-matcha-signature", "title": "Matcha Signature", "subTitle": "Ketenangan Zen dalam Setiap Tegukan", "badge": "Terlaris", "description": "Ditanam di kebun teh Kyoto yang sejuk, digiling secara tradisional dengan presisi tingkat tinggi, lalu dibalur susu organik segar demi memberikan fokus dan kesegaran penuh.", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "highlightText": "MATCHA KYOTO" },
-    { "id": "campaign-strawberry", "title": "Strawberry Mango Fusion", "subTitle": "Kebahagiaan Tropis Penuh Kesegaran", "badge": "Edisi Spesial", "description": "Kesegaran buah stroberi matang pilihan yang dipadukan secara harmonis dengan kelembutan puree mangga Alfonzo berlapis madu. Ledakan rasa menakjubkan bagi hari Anda.", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "highlightText": "PERPADUAN TROPIS" }
-];
+    CONTACT_MESSAGE_TEMPLATE: `Halo THE. C DRINKS! Saya {NAME} ({PHONE}).
 
-const DEFAULT_TESTIMONIALS = [
-    { "id": "test-ronald", "reviewTitle": "Belum pernah menikmati Brown Sugar Latte seenak ini!", "reviewText": "Saya sudah mencoba banyak Brown Sugar Latte di Indonesia, dan jujur ini adalah yang terbaik yang pernah saya rasakan! Rasa manisnya alami dan aroma kopinya tetap kuat.", "customerName": "Ronald Simatupang", "city": "Jakarta, Indonesia", "date": "25 Maret 2025", "productImage": "./coffe-late-brown-sugar.jpeg", "ratingValue": 5 },
-    { "id": "test-olivia", "reviewTitle": "Banyak pilihan rasa dan semuanya kualitas terbaik! Tidak ada yang mengecewakan", "reviewText": "THE. C DRINKS memiliki variasi yang sangat beragam dan semuanya lezat! Konsistensinya pas dan kemasannya sangat premium. Benar-benar direkomendasikan!", "customerName": "Olivia Grace Tjondro", "city": "Surabaya, Indonesia", "date": "5 Juli 2025", "productImage": "./tea-matcha.jpeg", "ratingValue": 5 },
-    { "id": "test-stephanie", "reviewTitle": "Sangat menyukai varian Stroberi!", "reviewText": "Varian stroberi selalu menjadi favorit saya. Belum pernah menemukan minuman yang bisa meningkatkan mood saya secepat ini! Premium, segar, dan sangat cantik saat difoto.", "customerName": "Stephanie Raitama", "city": "Bandung, Indonesia", "date": "7 September 2025", "productImage": "./fruit-strawberry.jpeg", "ratingValue": 5 }
-];
-
-const DEFAULT_INSTAGRAM = [
-    { "id": "post-1", "image": "https://placehold.co/600x600/333333/white?text=Instagram+1", "likes": "1,420", "comments": "48", "caption": "Pagi hari di sudut kota yang chic ditemani americano yang kuat. ✨ #thecdrinks", "type": "photo" },
-    { "id": "post-2", "image": "https://placehold.co/600x600/444444/white?text=Instagram+2", "likes": "2,110", "comments": "92", "caption": "Proses brewing dengan presisi tinggi. Setiap cangkir disajikan dengan penuh kasih.", "type": "carousel" },
-    { "id": "post-3", "image": "https://placehold.co/600x600/2a2a2a/white?text=Instagram+3", "likes": "1,894", "comments": "64", "caption": "Sensasi menikmati cokelat premium larut malam yang meningkatkan suasana hati Anda.", "type": "photo" },
-    { "id": "post-4", "image": "https://placehold.co/600x600/3a3a3a/white?text=Instagram+4", "likes": "3,020", "comments": "124", "caption": "Matcha latte hangat untuk fokus kognitif yang bersih di sore hari. 🍃", "type": "video" },
-    { "id": "post-5", "image": "https://placehold.co/600x600/4a4a4a/white?text=Instagram+5", "likes": "4,103", "comments": "210", "caption": "Saat kehangatan mentari berpadu di dalam gelas: Puree mangga manis dan stroberi segar.", "type": "photo" },
-    { "id": "post-6", "image": "https://placehold.co/600x600/252525/white?text=Instagram+6", "likes": "2,740", "comments": "88", "caption": "Arsitektur minimalis yang elegan. Outlet Jl. Premium Rasa kami kini resmi dibuka.", "type": "photo" }
-];
-
-const categoriesData = [
-    { "id": "all", "name": "Semua Koleksi" },
-    { "id": "best-seller", "name": "Terlaris" },
-    { "id": "chocolate", "name": "Seri Cokelat" },
-    { "id": "tea", "name": "Seri Teh" },
-    { "id": "cake", "name": "Seri Kue" },
-    { "id": "fruit", "name": "Seri Buah" },
-    { "id": "coffee", "name": "Seri Kopi" }
-];
-
-const storeData = {
-    "id": "store-bondowoso", "name": "The. C Drinks, Diponegoro, Bondowoso", "address": "Jl. Diponegoro, Kotakulon, Kec. Bondowoso, Kabupaten Bondowoso, Jawa Timur 68213", "phone": "0822 9999 9035", "hours": "10:00 Pagi - 10:00 Malam", "mapsUrl": "https://www.google.com/maps/place/The.+C+Drinks/@-7.9108787,113.8193598", "city": "Bondowoso"
+Pesan:
+{MESSAGE}`
 };
 
-const STORE_LOCATION = { lat: -7.9108787, lng: 113.8193598 };
+// Hashed password untuk admin panel
+const HASHED_ADMIN_PASSWORD = CryptoJS.SHA256(APP_CONFIG.ADMIN_PASSWORD).toString();
+let isAdminAuthenticated = false;
 
 // ==================== GLOBAL DATA ====================
 let productsData = [];
@@ -156,7 +172,7 @@ function adminLogout() {
 // ==================== DATA MIGRATION FUNCTIONS ====================
 async function migrateNewProducts() {
     const existingIds = productsData.map(p => p.id);
-    const newProducts = DEFAULT_PRODUCTS.filter(p => !existingIds.includes(p.id));
+    const newProducts = APP_CONFIG.DEFAULT_PRODUCTS.filter(p => !existingIds.includes(p.id));
     
     if (newProducts.length > 0) {
         console.log(`🆕 Menemukan ${newProducts.length} produk baru yang belum ada:`, newProducts.map(p => p.name));
@@ -180,7 +196,7 @@ async function migrateNewProducts() {
 
 async function migrateNewCampaigns() {
     const existingIds = campaignsData.map(c => c.id);
-    const newCampaigns = DEFAULT_CAMPAIGNS.filter(c => !existingIds.includes(c.id));
+    const newCampaigns = APP_CONFIG.DEFAULT_CAMPAIGNS.filter(c => !existingIds.includes(c.id));
     
     if (newCampaigns.length > 0) {
         console.log(`🆕 Menemukan ${newCampaigns.length} campaign baru`);
@@ -199,17 +215,17 @@ async function migrateNewCampaigns() {
 async function runMigrations() {
     const savedVersion = localStorage.getItem('thec_data_version');
     
-    if (savedVersion !== DATA_VERSION) {
-        console.log(`📦 Migrasi data dari versi ${savedVersion || 'unknown'} ke ${DATA_VERSION}`);
+    if (savedVersion !== APP_CONFIG.DATA_VERSION) {
+        console.log(`📦 Migrasi data dari versi ${savedVersion || 'unknown'} ke ${APP_CONFIG.DATA_VERSION}`);
         
         const productsAdded = await migrateNewProducts();
         const campaignsAdded = await migrateNewCampaigns();
         
         if (productsAdded || campaignsAdded) {
-            localStorage.setItem('thec_data_version', DATA_VERSION);
+            localStorage.setItem('thec_data_version', APP_CONFIG.DATA_VERSION);
             showNotification('Database berhasil diperbarui!', 'success');
         } else {
-            localStorage.setItem('thec_data_version', DATA_VERSION);
+            localStorage.setItem('thec_data_version', APP_CONFIG.DATA_VERSION);
         }
     }
 }
@@ -218,8 +234,8 @@ async function runMigrations() {
 async function loadDataFromAPI() {
     try {
         console.log('🔄 Loading data from JSONBin...');
-        const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-            headers: { 'X-Access-Key': JSONBIN_ACCESS_KEY }
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.JSONBIN_BIN_ID}/latest`, {
+            headers: { 'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY }
         });
         
         if (response.ok) {
@@ -229,38 +245,38 @@ async function loadDataFromAPI() {
             
             if (record && record.products && record.products.length > 0) {
                 productsData = record.products;
-                campaignsData = record.campaigns || DEFAULT_CAMPAIGNS;
-                testimonialsData = record.testimonials || DEFAULT_TESTIMONIALS;
-                instagramPostsData = record.instagram || DEFAULT_INSTAGRAM;
+                campaignsData = record.campaigns || APP_CONFIG.DEFAULT_CAMPAIGNS;
+                testimonialsData = record.testimonials || APP_CONFIG.DEFAULT_TESTIMONIALS;
+                instagramPostsData = record.instagram || APP_CONFIG.DEFAULT_INSTAGRAM;
                 console.log('✅ Data loaded successfully from JSONBin');
                 
                 await runMigrations();
                 
             } else {
                 console.log('⚠️ Bin kosong, mengisi dengan data default...');
-                productsData = DEFAULT_PRODUCTS;
-                campaignsData = DEFAULT_CAMPAIGNS;
-                testimonialsData = DEFAULT_TESTIMONIALS;
-                instagramPostsData = DEFAULT_INSTAGRAM;
+                productsData = APP_CONFIG.DEFAULT_PRODUCTS;
+                campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
+                testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
+                instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
                 await saveAllDataToAPI();
-                localStorage.setItem('thec_data_version', DATA_VERSION);
+                localStorage.setItem('thec_data_version', APP_CONFIG.DATA_VERSION);
                 console.log('✅ Data default berhasil di-inject ke JSONBin!');
             }
         } else {
             console.error('❌ API response error:', response.status);
             await createOrUpdateBinWithDefaultData();
-            localStorage.setItem('thec_data_version', DATA_VERSION);
+            localStorage.setItem('thec_data_version', APP_CONFIG.DATA_VERSION);
         }
     } catch (error) {
         console.error('❌ Error loading data:', error);
-        productsData = DEFAULT_PRODUCTS;
-        campaignsData = DEFAULT_CAMPAIGNS;
-        testimonialsData = DEFAULT_TESTIMONIALS;
-        instagramPostsData = DEFAULT_INSTAGRAM;
+        productsData = APP_CONFIG.DEFAULT_PRODUCTS;
+        campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
+        testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
+        instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
         
         try {
             await saveAllDataToAPI();
-            localStorage.setItem('thec_data_version', DATA_VERSION);
+            localStorage.setItem('thec_data_version', APP_CONFIG.DATA_VERSION);
             console.log('✅ Data default berhasil disimpan ke JSONBin setelah error');
         } catch(e) {
             console.error('❌ Gagal menyimpan data default:', e);
@@ -271,29 +287,29 @@ async function loadDataFromAPI() {
 
 async function createOrUpdateBinWithDefaultData() {
     const defaultData = {
-        products: DEFAULT_PRODUCTS,
-        campaigns: DEFAULT_CAMPAIGNS,
-        testimonials: DEFAULT_TESTIMONIALS,
-        instagram: DEFAULT_INSTAGRAM,
+        products: APP_CONFIG.DEFAULT_PRODUCTS,
+        campaigns: APP_CONFIG.DEFAULT_CAMPAIGNS,
+        testimonials: APP_CONFIG.DEFAULT_TESTIMONIALS,
+        instagram: APP_CONFIG.DEFAULT_INSTAGRAM,
         lastUpdated: new Date().toISOString()
     };
     
     try {
-        const updateResponse = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+        const updateResponse = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.JSONBIN_BIN_ID}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Access-Key': JSONBIN_ACCESS_KEY
+                'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY
             },
             body: JSON.stringify(defaultData)
         });
         
         if (updateResponse.ok) {
             console.log('✅ Bin updated with default data');
-            productsData = DEFAULT_PRODUCTS;
-            campaignsData = DEFAULT_CAMPAIGNS;
-            testimonialsData = DEFAULT_TESTIMONIALS;
-            instagramPostsData = DEFAULT_INSTAGRAM;
+            productsData = APP_CONFIG.DEFAULT_PRODUCTS;
+            campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
+            testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
+            instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
             showNotification('Database berhasil diinisialisasi!', 'success');
         } else {
             console.log('🆕 Creating new bin...');
@@ -301,7 +317,7 @@ async function createOrUpdateBinWithDefaultData() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-Access-Key': JSONBIN_ACCESS_KEY
+                    'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY
                 },
                 body: JSON.stringify(defaultData)
             });
@@ -310,10 +326,10 @@ async function createOrUpdateBinWithDefaultData() {
                 const newBin = await createResponse.json();
                 console.log('✅ New bin created with ID:', newBin.id);
                 showNotification(`Bin baru berhasil dibuat! ID: ${newBin.id}`, 'success');
-                productsData = DEFAULT_PRODUCTS;
-                campaignsData = DEFAULT_CAMPAIGNS;
-                testimonialsData = DEFAULT_TESTIMONIALS;
-                instagramPostsData = DEFAULT_INSTAGRAM;
+                productsData = APP_CONFIG.DEFAULT_PRODUCTS;
+                campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
+                testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
+                instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
             } else {
                 console.error('❌ Failed to create bin');
                 showNotification('Gagal membuat database!', 'error');
@@ -336,11 +352,11 @@ async function saveAllDataToAPI() {
     
     try {
         console.log('💾 Saving data to JSONBin...');
-        const response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.JSONBIN_BIN_ID}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
-                'X-Access-Key': JSONBIN_ACCESS_KEY
+                'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY
             },
             body: JSON.stringify(dataToSave)
         });
@@ -386,25 +402,14 @@ function generateId(prefix) {
     return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
 }
 
-// ==================== PRODUCT FUNCTIONS ====================
-function getProductPrice(product, size) {
-    if (product.id === "prod-solo-wasgitel") return product.priceB;
-    return size === 'B' ? product.priceB : product.priceK;
-}
-
-function getToppingPrice(toppings, productId) {
-    if (productId === "prod-solo-wasgitel") return 0;
-    let total = 0;
-    if (toppings.boba) total += 3000;
-    if (toppings.creamCheese) total += 5000;
-    return total;
-}
-
+// ==================== DELIVERY FEE CALCULATION ====================
 function calculateDeliveryFee(distance) {
     if (isNaN(distance) || distance <= 0) return 0;
-    if (distance <= 3) return 3000;
-    const extraKm = Math.ceil(distance - 3);
-    return 3000 + (extraKm * 2000);
+    // 1-3 km flat rate Rp5.000
+    if (distance <= APP_CONFIG.DELIVERY_FLAT_RATE_KM) return APP_CONFIG.DELIVERY_FLAT_FEE;
+    // Per km berikutnya Rp2.000
+    const extraKm = Math.ceil(distance - APP_CONFIG.DELIVERY_FLAT_RATE_KM);
+    return APP_CONFIG.DELIVERY_FLAT_FEE + (extraKm * APP_CONFIG.DELIVERY_EXTRA_PER_KM);
 }
 
 function getDeliveryFee() {
@@ -427,11 +432,11 @@ function updateDeliveryFee() {
     if (display) {
         if (fee > 0 && distance > 0) {
             let feeExplanation = '';
-            if (distance <= 3) {
-                feeExplanation = `(${distance} km × flat rate Rp3.000)`;
+            if (distance <= APP_CONFIG.DELIVERY_FLAT_RATE_KM) {
+                feeExplanation = `(${distance} km × flat rate Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()})`;
             } else {
-                const extraKm = Math.ceil(distance - 3);
-                feeExplanation = `(${distance} km: Rp3.000 + ${extraKm} km × Rp2.000)`;
+                const extraKm = Math.ceil(distance - APP_CONFIG.DELIVERY_FLAT_RATE_KM);
+                feeExplanation = `(${distance} km: Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()} + ${extraKm} km × Rp${APP_CONFIG.DELIVERY_EXTRA_PER_KM.toLocaleString()})`;
             }
             display.textContent = `Ongkir: Rp ${fee.toLocaleString()} ${feeExplanation}`;
             display.classList.remove('hidden');
@@ -440,6 +445,20 @@ function updateDeliveryFee() {
         }
     }
     updateCartTotals();
+}
+
+// ==================== PRODUCT FUNCTIONS ====================
+function getProductPrice(product, size) {
+    if (product.id === "prod-solo-wasgitel") return product.priceB;
+    return size === 'B' ? product.priceB : product.priceK;
+}
+
+function getToppingPrice(toppings, productId) {
+    if (productId === "prod-solo-wasgitel") return 0;
+    let total = 0;
+    if (toppings.boba) total += 3000;
+    if (toppings.creamCheese) total += 5000;
+    return total;
 }
 
 // ==================== GEOLOCATION ====================
@@ -469,18 +488,18 @@ function getUserLocationWA() {
     navigator.geolocation.getCurrentPosition(
         function(position) {
             userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
-            const distance = calculateDistance(STORE_LOCATION.lat, STORE_LOCATION.lng, userLocation.lat, userLocation.lng);
+            const distance = calculateDistance(APP_CONFIG.STORE_LOCATION.lat, APP_CONFIG.STORE_LOCATION.lng, userLocation.lat, userLocation.lng);
             if (distanceInput) distanceInput.value = distance.toFixed(1);
             
             const fee = calculateDeliveryFee(distance);
             
             if (statusEl) {
                 let feeInfo = '';
-                if (distance <= 3) {
-                    feeInfo = ` (Ongkir flat Rp3.000)`;
+                if (distance <= APP_CONFIG.DELIVERY_FLAT_RATE_KM) {
+                    feeInfo = ` (Ongkir flat Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()})`;
                 } else {
-                    const extraKm = Math.ceil(distance - 3);
-                    feeInfo = ` (Ongkir Rp3.000 + ${extraKm}km × Rp2.000 = Rp${fee.toLocaleString()})`;
+                    const extraKm = Math.ceil(distance - APP_CONFIG.DELIVERY_FLAT_RATE_KM);
+                    feeInfo = ` (Ongkir Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()} + ${extraKm}km × Rp${APP_CONFIG.DELIVERY_EXTRA_PER_KM.toLocaleString()} = Rp${fee.toLocaleString()})`;
                 }
                 statusEl.innerHTML = `📍 Jarak ke toko: ${distance.toFixed(1)} km ✅${feeInfo}`;
                 statusEl.classList.remove('text-blue-600', 'text-red-600');
@@ -589,6 +608,16 @@ function renderProductsByCategory(categoryId) {
     else if (categoryId !== 'all') filtered = filtered.filter(p => p.category === categoryId);
     renderProducts(filtered);
 }
+
+const categoriesData = [
+    { "id": "all", "name": "Semua Koleksi" },
+    { "id": "best-seller", "name": "Terlaris" },
+    { "id": "chocolate", "name": "Seri Cokelat" },
+    { "id": "tea", "name": "Seri Teh" },
+    { "id": "cake", "name": "Seri Kue" },
+    { "id": "fruit", "name": "Seri Buah" },
+    { "id": "coffee", "name": "Seri Kopi" }
+];
 
 function renderCategories() {
     const container = document.getElementById('category-filters');
@@ -960,19 +989,32 @@ function checkoutViaWhatsApp() {
     
     let feeText = '';
     if (deliveryFee > 0) {
-        if (distance <= 3) feeText = `Ongkir (${distance} km): Rp ${deliveryFee.toLocaleString()} (flat rate Rp3.000)`;
-        else { const extraKm = Math.ceil(distance - 3); feeText = `Ongkir (${distance} km): Rp ${deliveryFee.toLocaleString()} (Rp3.000 + ${extraKm} km × Rp2.000)`; }
+        if (distance <= APP_CONFIG.DELIVERY_FLAT_RATE_KM) {
+            feeText = `Ongkir (${distance} km): Rp ${deliveryFee.toLocaleString()} (flat rate Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()})`;
+        } else {
+            const extraKm = Math.ceil(distance - APP_CONFIG.DELIVERY_FLAT_RATE_KM);
+            feeText = `Ongkir (${distance} km): Rp ${deliveryFee.toLocaleString()} (Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()} + ${extraKm} km × Rp${APP_CONFIG.DELIVERY_EXTRA_PER_KM.toLocaleString()})`;
+        }
     } else feeText = 'Ongkir: GRATIS (Ambil Sendiri)';
     
-    const msg = `Halo THE. C DRINKS! 🥤✨\n\nSaya ingin memesan:\n${itemsText}\n\n${feeText}\nSubtotal: Rp ${subtotal.toLocaleString()}\nTotal: Rp ${total.toLocaleString()}\n\nNama: ${customerName}\nMetode: ${deliveryFee > 0 ? 'WhatsApp Delivery' : 'Ambil di Toko'}`;
-    const waUrl = `https://wa.me/6282299999035?text=${encodeURIComponent(msg)}`;
+    const msg = APP_CONFIG.WHATSAPP_MESSAGE_TEMPLATE
+        .replace('{ITEMS}', itemsText)
+        .replace('{SHIPPING_INFO}', feeText)
+        .replace('{SUBTOTAL}', subtotal.toLocaleString())
+        .replace('{TOTAL}', total.toLocaleString())
+        .replace('{CUSTOMER_NAME}', customerName)
+        .replace('{METHOD}', deliveryFee > 0 ? 'WhatsApp Delivery' : 'Ambil di Toko');
+    
+    const waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(msg)}`;
     window.open(waUrl, '_blank');
     processCheckout('whatsapp', customerName, deliveryFee, distance);
 }
 
-function checkoutViaGrabFood() { if (cartItems.length === 0) return; window.open('https://food.grab.com/id/id/', '_blank'); processCheckout('grab', 'Pelanggan GrabFood', 0, 0); }
-function checkoutViaShopeeFood() { if (cartItems.length === 0) return; window.open('https://shopee.co.id/', '_blank'); processCheckout('shopee', 'Pelanggan ShopeeFood', 0, 0); }
-function checkoutViaStorePickup() { if (cartItems.length === 0) return; const customerName = document.getElementById('pickup-name')?.value || 'Pelanggan'; processCheckout('pickup', customerName, 0, 0); }
+function checkoutViaStorePickup() { 
+    if (cartItems.length === 0) return; 
+    const customerName = document.getElementById('pickup-name')?.value || 'Pelanggan'; 
+    processCheckout('pickup', customerName, 0, 0); 
+}
 
 function processCheckout(type, customerName, deliveryFee, distance) {
     const subtotal = getSubtotal();
@@ -997,10 +1039,13 @@ function processCheckout(type, customerName, deliveryFee, distance) {
 function showReceipt() {
     document.getElementById('receipt-id').textContent = `ID RESI: ${receiptData.receiptId}`;
     const badge = document.getElementById('receipt-badge');
-    if (receiptData.orderType === 'grab') { badge.textContent = 'Order via GrabFood'; badge.className = 'text-[9px] bg-emerald-100 text-[#00B14F] font-bold px-2 py-0.5 rounded-full mb-2 inline-block'; }
-    else if (receiptData.orderType === 'shopee') { badge.textContent = 'Order via ShopeeFood'; badge.className = 'text-[9px] bg-orange-100 text-[#EE4D2D] font-bold px-2 py-0.5 rounded-full mb-2 inline-block'; }
-    else if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) { badge.textContent = `WhatsApp Delivery (Ongkir Rp${receiptData.deliveryFee.toLocaleString()})`; badge.className = 'text-[9px] bg-emerald-100 text-[#128C7E] font-bold px-2 py-0.5 rounded-full mb-2 inline-block'; }
-    else { badge.textContent = 'Ambil di Toko (GRATIS)'; badge.className = 'text-[9px] bg-neutral-100 text-[#111111] font-extrabold px-2 py-0.5 rounded-full mb-2 inline-block'; }
+    if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) { 
+        badge.textContent = `WhatsApp Delivery (Ongkir Rp${receiptData.deliveryFee.toLocaleString()})`; 
+        badge.className = 'text-[9px] bg-emerald-100 text-[#128C7E] font-bold px-2 py-0.5 rounded-full mb-2 inline-block'; 
+    } else { 
+        badge.textContent = 'Ambil di Toko (GRATIS)'; 
+        badge.className = 'text-[9px] bg-neutral-100 text-[#111111] font-extrabold px-2 py-0.5 rounded-full mb-2 inline-block'; 
+    }
     
     document.getElementById('receipt-items').innerHTML = receiptData.items.map(item => {
         const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
@@ -1014,17 +1059,21 @@ function showReceipt() {
     document.getElementById('receipt-subtotal').textContent = `Rp ${receiptData.subtotal?.toLocaleString() || 0}`;
     const serviceFeeEl = document.getElementById('receipt-service-fee');
     if (serviceFeeEl) {
-        if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) serviceFeeEl.innerHTML = `<span>Biaya Ongkir (${receiptData.distance} km)</span><span>Rp ${receiptData.deliveryFee?.toLocaleString()}</span>`;
-        else if (receiptData.orderType === 'whatsapp') serviceFeeEl.innerHTML = '<span>Biaya Ongkir</span><span class="text-green-600">GRATIS (Ambil Sendiri)</span>';
-        else if (receiptData.orderType === 'grab' || receiptData.orderType === 'shopee') serviceFeeEl.innerHTML = '<span>Biaya Ongkir</span><span class="text-blue-600">Dari Aplikasi Mitra</span>';
-        else serviceFeeEl.innerHTML = '<span>Biaya Ongkir</span><span class="text-green-600">GRATIS</span>';
+        if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) {
+            serviceFeeEl.innerHTML = `<span>Biaya Ongkir (${receiptData.distance} km)</span><span>Rp ${receiptData.deliveryFee?.toLocaleString()}</span>`;
+        } else if (receiptData.orderType === 'whatsapp') {
+            serviceFeeEl.innerHTML = '<span>Biaya Ongkir</span><span class="text-green-600">GRATIS (Ambil Sendiri)</span>';
+        } else {
+            serviceFeeEl.innerHTML = '<span>Biaya Ongkir</span><span class="text-green-600">GRATIS</span>';
+        }
     }
     document.getElementById('receipt-total').textContent = `Rp ${receiptData.total?.toLocaleString() || 0}`;
     let message = '';
-    if (receiptData.orderType === 'grab') message = 'Pesanan dialihkan ke GrabFood. Ongkir akan dihitung oleh aplikasi Grab.';
-    else if (receiptData.orderType === 'shopee') message = 'Pesanan dialihkan ke ShopeeFood. Ongkir akan dihitung oleh aplikasi Shopee.';
-    else if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) message = `Pesanan akan segera diproses dan dikirim dengan ongkir Rp${receiptData.deliveryFee.toLocaleString()}. Terima kasih!`;
-    else message = `Tunjukkan struk digital atas nama <strong>${receiptData.customerName}</strong> ke kasir.`;
+    if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) {
+        message = `Pesanan akan segera diproses dan dikirim dengan ongkir Rp${receiptData.deliveryFee.toLocaleString()}. Terima kasih!`;
+    } else {
+        message = `Tunjukkan struk digital atas nama <strong>${receiptData.customerName}</strong> ke kasir.`;
+    }
     document.getElementById('receipt-message').innerHTML = message;
     const modal = document.getElementById('receipt-modal');
     if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
@@ -1442,6 +1491,15 @@ async function submitFormData() {
 }
 
 // ==================== MODAL FUNCTIONS ====================
+const storeData = {
+    "id": "store-bondowoso", "name": "The. C Drinks, Diponegoro, Bondowoso", 
+    "address": APP_CONFIG.STORE_ADDRESS, 
+    "phone": APP_CONFIG.STORE_PHONE_NUMBER, 
+    "hours": "10:00 Pagi - 10:00 Malam", 
+    "mapsUrl": "https://www.google.com/maps/place/The.+C+Drinks/@-7.9108787,113.8193598", 
+    "city": "Bondowoso"
+};
+
 function openStoreModal(tab) { setStoreTab(tab); const modal = document.getElementById('store-modal'); if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); } }
 function closeStoreModal() { const modal = document.getElementById('store-modal'); if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); } resetContactForm(); }
 
@@ -1484,7 +1542,11 @@ function submitContactForm(event) {
     const phone = document.getElementById('contact-phone')?.value || '';
     const message = document.getElementById('contact-message')?.value || '';
     if (name && phone && message) {
-        const waUrl = `https://wa.me/6282299999035?text=${encodeURIComponent(`Halo THE. C DRINKS! Saya ${name} (${phone}).\n\nPesan:\n${message}`)}`;
+        const waMessage = APP_CONFIG.CONTACT_MESSAGE_TEMPLATE
+            .replace('{NAME}', name)
+            .replace('{PHONE}', phone)
+            .replace('{MESSAGE}', message);
+        const waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(waMessage)}`;
         document.getElementById('whatsapp-link').href = waUrl;
         document.getElementById('contact-form-container').classList.add('hidden');
         document.getElementById('contact-success').classList.remove('hidden');
@@ -1569,8 +1631,6 @@ window.getUserLocationWA = getUserLocationWA;
 window.clearLocationWA = clearLocationWA;
 window.resetLocationPermission = resetLocationPermission;
 window.checkoutViaWhatsApp = checkoutViaWhatsApp;
-window.checkoutViaGrabFood = checkoutViaGrabFood;
-window.checkoutViaShopeeFood = checkoutViaShopeeFood;
 window.checkoutViaStorePickup = checkoutViaStorePickup;
 window.openStoreModal = openStoreModal;
 window.closeStoreModal = closeStoreModal;
