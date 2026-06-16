@@ -1449,77 +1449,74 @@ function downloadReceipt() {
         return;
     }
     
-    // Create a new receipt element with proper styling
+    // Create a new receipt element with clean text-only design
     const receiptWrapper = document.createElement('div');
     receiptWrapper.className = 'fixed top-0 left-0 w-screen h-screen z-[100] flex items-center justify-center bg-[#111111]/80 backdrop-blur-sm';
     receiptWrapper.id = 'receipt-print-wrapper';
     
     const receiptCard = document.createElement('div');
-    receiptCard.className = 'bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-neutral-200';
+    receiptCard.className = 'bg-white p-6 max-w-sm w-full mx-4 shadow-2xl';
     receiptCard.id = 'receipt-print-card';
     receiptCard.style.width = '360px';
     receiptCard.style.maxWidth = '360px';
+    receiptCard.style.fontFamily = "'Courier New', monospace";
     
-    // Build receipt content
-    let toppingsText = '';
+    // Build receipt content - clean text only
+    const orderTypeText = receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0 
+        ? 'DELIVERY' 
+        : 'PICKUP';
+    
     const itemsHtml = receiptData.items.map((item, idx) => {
         let toppings = '';
-        if (item.toppings.boba) toppings += ' +Boba';
-        if (item.toppings.creamCheese) toppings += ' +Cream Cheese';
-        const tempIcon = item.temperature === 'PANAS' ? '🔥' : '❄️';
+        if (item.toppings.boba) toppings += ' +BOBA';
+        if (item.toppings.creamCheese) toppings += ' +CREAMCHS';
+        const tempIcon = item.temperature === 'PANAS' ? 'HOT' : 'COLD';
         const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
-        return `<div class="flex justify-between text-[10px] py-0.5 border-b border-dashed border-neutral-100">
-            <span>${idx+1}. ${item.quantity}x ${item.product.name} ${tempIcon} ${item.size === 'B' ? 'B' : 'K'}${toppings}</span>
-            <span class="font-mono">Rp ${itemTotal.toLocaleString()}</span>
+        const sizeLabel = item.size === 'B' ? 'L' : 'R';
+        return `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:1px dashed #e5e5e5;">
+            <span>${idx+1}. ${item.quantity}x ${item.product.name} ${tempIcon} ${sizeLabel}${toppings}</span>
+            <span style="font-weight:bold;">Rp${itemTotal.toLocaleString()}</span>
         </div>`;
     }).join('');
     
-    const orderTypeText = receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0 
-        ? `📦 Delivery (${receiptData.distance} km)` 
-        : '🏪 Ambil Sendiri';
-    
     receiptCard.innerHTML = `
-        <div class="text-center border-b-2 border-dashed border-neutral-200 pb-4 mb-3">
-            <div class="flex items-center justify-center gap-2 mb-1">
-                <div class="w-8 h-8 rounded-full bg-[#111111] flex items-center justify-center text-white font-bold text-xs">C</div>
-                <span class="font-extrabold text-sm tracking-widest">THE. C DRINKS</span>
-            </div>
-            <p class="text-[8px] text-neutral-400 font-mono tracking-wider">${receiptData.receiptId}</p>
-            <p class="text-[8px] text-neutral-400">${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })} ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
-            <div class="mt-1.5 inline-block bg-neutral-100 px-3 py-0.5 rounded-full text-[8px] font-bold">${orderTypeText}</div>
+        <div style="text-align:center;border-bottom:2px dashed #d1d5db;padding-bottom:12px;margin-bottom:10px;">
+            <div style="font-size:16px;font-weight:900;letter-spacing:4px;color:#111111;">THE. C DRINKS</div>
+            <div style="font-size:8px;color:#9ca3af;letter-spacing:1px;margin-top:2px;">${receiptData.receiptId}</div>
+            <div style="font-size:8px;color:#9ca3af;">${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })} ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</div>
+            <div style="font-size:8px;color:#6b7280;margin-top:4px;font-weight:bold;">${orderTypeText}</div>
+            <div style="font-size:8px;color:#6b7280;margin-top:2px;">${receiptData.customerName}</div>
         </div>
         
-        <div class="space-y-0.5 mb-3 max-h-[200px] overflow-y-auto">
+        <div style="margin-bottom:12px;">
             ${itemsHtml}
         </div>
         
-        <div class="border-t-2 border-dashed border-neutral-200 pt-3 space-y-1">
-            <div class="flex justify-between text-[9px]">
-                <span class="text-neutral-500">Subtotal</span>
-                <span class="font-mono">Rp ${receiptData.subtotal?.toLocaleString() || 0}</span>
+        <div style="border-top:2px dashed #d1d5db;padding-top:10px;">
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#6b7280;">
+                <span>SUBTOTAL</span>
+                <span>Rp${receiptData.subtotal?.toLocaleString() || 0}</span>
             </div>
-            <div class="flex justify-between text-[9px]">
-                <span class="text-neutral-500">Biaya Layanan</span>
-                <span class="font-mono">Rp ${receiptData.serviceFee?.toLocaleString() || 0}</span>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#6b7280;">
+                <span>BIAYA LAYANAN</span>
+                <span>Rp${receiptData.serviceFee?.toLocaleString() || 0}</span>
             </div>
             ${receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0 ? `
-            <div class="flex justify-between text-[9px]">
-                <span class="text-neutral-500">Ongkir (${receiptData.distance} km)</span>
-                <span class="font-mono">Rp ${receiptData.deliveryFee?.toLocaleString()}</span>
+            <div style="display:flex;justify-content:space-between;font-size:10px;color:#6b7280;">
+                <span>ONGKIR (${receiptData.distance} KM)</span>
+                <span>Rp${receiptData.deliveryFee?.toLocaleString()}</span>
             </div>
             ` : ''}
-            <div class="flex justify-between border-t-2 border-dashed border-neutral-200 pt-2 mt-1 text-sm font-extrabold">
+            <div style="display:flex;justify-content:space-between;border-top:2px dashed #d1d5db;padding-top:8px;margin-top:6px;font-size:14px;font-weight:900;">
                 <span>TOTAL</span>
-                <span class="font-mono text-[#E11D48]">Rp ${receiptData.total?.toLocaleString() || 0}</span>
+                <span style="color:#E11D48;">Rp${receiptData.total?.toLocaleString() || 0}</span>
             </div>
         </div>
         
-        <div class="border-t-2 border-dashed border-neutral-200 mt-4 pt-3 text-center">
-            <p class="text-[8px] text-neutral-400 font-medium">${receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0 ? '📱 Pesanan akan segera diproses' : '🏪 Tunjukkan struk ini ke kasir'}</p>
-            <p class="text-[7px] text-neutral-300 mt-1">Terima kasih telah memesan di THE. C DRINKS</p>
-            <div class="mt-2 flex items-center justify-center gap-2 text-[6px] text-neutral-300 font-mono">
-                <span>${APP_CONFIG.STORE_ADDRESS}</span>
-            </div>
+        <div style="border-top:2px dashed #d1d5db;margin-top:12px;padding-top:10px;text-align:center;">
+            <div style="font-size:8px;color:#9ca3af;">${receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0 ? 'PESANAN AKAN SEGERA DIPROSES' : 'TUNJUKKAN STRUK INI KE KASIR'}</div>
+            <div style="font-size:7px;color:#d1d5db;margin-top:4px;">TERIMA KASIH ATAS PESANAN ANDA</div>
+            <div style="font-size:6px;color:#e5e5e5;margin-top:4px;">${APP_CONFIG.STORE_ADDRESS}</div>
         </div>
     `;
     
@@ -1536,7 +1533,10 @@ function downloadReceipt() {
                 height: el.scrollHeight,
                 useCORS: true,
                 logging: false,
-                backgroundColor: '#ffffff'
+                backgroundColor: '#ffffff',
+                onclone: function(document) {
+                    // Ensure all elements are rendered properly
+                }
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Struk-${receiptData?.receiptId || 'THE-C'}.png`;
