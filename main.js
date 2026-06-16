@@ -1104,13 +1104,10 @@ function confirmPayment() {
         return;
     }
 
-    // SIMPAN DATA SEBELUM MODAL DITUTUP
     const checkoutData = { ...pendingCheckoutData };
 
-    if (checkoutData.type === 'whatsapp') {
-        closePaymentModal();
-        showPaymentConfirmModal(checkoutData);
-    } else {
+    // Jika ini adalah metode pickup, langsung proses
+    if (checkoutData.type === 'pickup') {
         closePaymentModal();
         processCheckout(
             checkoutData.type,
@@ -1118,8 +1115,14 @@ function confirmPayment() {
             checkoutData.deliveryFee,
             checkoutData.distance
         );
-        
         showNotification('✅ Pesanan berhasil diproses!', 'success');
+        return;
+    }
+
+    // Untuk WhatsApp delivery, lanjut ke upload bukti
+    if (checkoutData.type === 'whatsapp') {
+        closePaymentModal();
+        showPaymentConfirmModal(checkoutData);
     }
 }
 
@@ -1407,14 +1410,17 @@ async function checkoutViaWhatsApp() {
 }
 
 // ==================== CHECKOUT VIA STORE PICKUP ====================
-function checkoutViaStorePickup() { 
-    if (cartItems.length === 0) return; 
-    const customerName = document.getElementById('pickup-name')?.value || 'Pelanggan'; 
+function checkoutViaStorePickup() {
+    if (cartItems.length === 0) return;
+    
+    const customerName = document.getElementById('pickup-name')?.value || 'Pelanggan';
     store.setState({ pickupName: customerName });
+    
     const serviceFee = getServiceFee();
     const subtotal = getSubtotal();
     const total = subtotal + serviceFee;
     
+    // Build items list for WhatsApp
     const itemsText = cartItems.map((item, idx) => {
         const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
         let toppingsText = '';
@@ -1424,24 +1430,37 @@ function checkoutViaStorePickup() {
         return `${idx+1}. *${item.product.name}* (${item.size === 'L' ? 'Large' : 'Normal'}, ${tempIcon}${toppingsText ? ', ' + toppingsText : ''}) x${item.quantity} - Rp ${itemTotal.toLocaleString()}`;
     }).join('\n');
     
-    const msg = APP_CONFIG.WHATSAPP_MESSAGE_TEMPLATE
-        .replace('{ITEMS}', itemsText)
-        .replace('{SHIPPING_INFO}', 'Ambil Sendiri di Toko (GRATIS)')
-        .replace('{SERVICE_FEE}', serviceFee.toLocaleString())
-        .replace('{SUBTOTAL}', subtotal.toLocaleString())
-        .replace('{TOTAL}', total.toLocaleString())
-        .replace('{CUSTOMER_NAME}', customerName)
-        .replace('{METHOD}', 'Ambil di Toko (Bayar di Tempat / Online)');
-    
-    const checkoutData = {
-        type: 'pickup',
-        customerName: customerName,
-        deliveryFee: 0,
-        distance: 0,
-        total: total,
-        waMessage: msg
-    };
-    showPaymentModal(checkoutData);
+    // Build WhatsApp message
+    const msg = `Halo THE. C DRINKS! 🥤✨
+
+Saya ingin memesan untuk *DIAMBIL SENDIRI*:
+
+${itemsText}
+
+Biaya Layanan: Rp ${serviceFee.toLocaleString()}
+Subtotal: Rp ${subtotal.toLocaleString()}
+Total: Rp ${total.toLocaleString()}
+
+Nama: ${customerName}
+Metode: Ambil Sendiri di Toko (Bayar di Tempat)
+
+Saya akan datang ke toko untuk mengambil pesanan. Terima kasih!`;
+
+    // Send message via WhatsApp API (using send-message, not send-image)
+    sendWhatsAppMessage(APP_CONFIG.STORE_PHONE_NUMBER, msg)
+        .then(result => {
+            if (result && result.status) {
+                showNotification('✅ Pesanan berhasil dikirim!', 'success');
+                // Process checkout
+                processCheckout('pickup', customerName, 0, 0);
+            } else {
+                showNotification('⚠️ Gagal mengirim pesanan', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error sending pickup order:', error);
+            showNotification('❌ Error mengirim pesanan', 'error');
+        });
 }
 
 // ==================== PROCESS CHECKOUT ====================
@@ -1449,6 +1468,7 @@ function processCheckout(type, customerName, deliveryFee, distance) {
     const subtotal = getSubtotal();
     const serviceFee = getServiceFee();
     const total = subtotal + deliveryFee + serviceFee;
+    
     receiptData = { 
         items: cartItems.map(item => ({ 
             ...item, 
@@ -1464,23 +1484,35 @@ function processCheckout(type, customerName, deliveryFee, distance) {
         receiptId: `TC-${type.toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`
     };
     store.setState({ receiptData: receiptData });
+    
+    // Close modals
     closePaymentModal();
     closeCheckoutModal();
+    
+    // Show receipt
     showReceipt();
+    
+    // Clear cart
     cartItems = [];
     store.setState({ cartItems: [] });
     updateCartUI();
     closeCartDrawer();
+    
+    // Reset fields
     const distanceInput = document.getElementById('delivery-distance');
     const feeDisplay = document.getElementById('delivery-fee-display');
     const statusEl = document.getElementById('location-status-wa');
     const resetBtn = document.getElementById('reset-permission-btn');
+    const addressInput = document.getElementById('customer-address');
+    
     if (distanceInput) distanceInput.value = '';
+    if (addressInput) addressInput.value = '';
     if (feeDisplay) feeDisplay.classList.add('hidden');
     if (statusEl) statusEl.classList.add('hidden');
     if (resetBtn) resetBtn.classList.add('hidden');
+    
     userLocation = null;
-    store.setState({ userLocation: null });
+    store.setState({ userLocation: null, customerAddress: '' });
 }
 
 function showReceipt() {
