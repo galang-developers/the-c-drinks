@@ -1470,10 +1470,10 @@ function downloadReceipt() {
         let toppings = '';
         if (item.toppings.boba) toppings += ' +BOBA';
         if (item.toppings.creamCheese) toppings += ' +CREAMCHS';
-        const tempIcon = item.temperature === 'PANAS' ? 'HOT' : 'COLD';
+        const tempIcon = item.temperature === 'PANAS' ? 'HOT' : 'ICE';
         const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
         const sizeLabel = item.size === 'L' ? 'L' : 'N';
-        return `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:1px dashed #e5e5e5;">
+        return `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;">
             <span>${idx+1}. ${item.quantity}x ${item.product.name} ${tempIcon} ${sizeLabel}${toppings}</span>
             <span style="font-weight:bold;">Rp${itemTotal.toLocaleString()}</span>
         </div>`;
