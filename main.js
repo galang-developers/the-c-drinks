@@ -44,22 +44,22 @@ const APP_CONFIG = {
     
     // Default Menu Data
     DEFAULT_PRODUCTS: [
-        { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": "./cokelat-hazelnut.jpeg", "accentColor": "#A67C52", "priceN": 13000, "priceL": 16000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-chocolate-strawberry", "name": "Chocolate Strawberry", "description": "Perpaduan sempurna antara cokelat premium dan stroberi segar yang manis dan menyegarkan.", "category": "chocolate", "image": "./cokelat-strawberry.jpeg", "accentColor": "#E11D48", "priceN": 12000, "priceL": 15000, "isBestSeller": false, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-chocolate-coffee", "name": "Chocolate Coffee", "description": "Kombinasi nikmat antara cokelat pekat dan espresso Arabika yang kuat dan beraroma.", "category": "chocolate", "image": "./cokelat-kopi.jpeg", "accentColor": "#6F4E37", "priceN": 15000, "priceL": 18000, "isBestSeller": false, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-matcha-latte", "name": "Matcha Latte", "description": "Bubuk matcha Jepang premium Uji diseduh dengan susu segar organik yang lembut.", "category": "tea", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "priceN": 12000, "priceL": 15000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-thai-tea", "name": "Thai Tea", "description": "Teh Thailand asli dengan rasa khas yang creamy dan manis, disajikan dengan susu kental manis.", "category": "tea", "image": "./tea-thai.jpeg", "accentColor": "#D97706", "priceN": 12000, "priceL": 15000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-lemon-tea", "name": "Lemon Tea", "description": "Kesegaran teh hitam dengan perasan lemon asli dan madu hutan alami.", "category": "tea", "image": "./tea-lemon.jpeg", "accentColor": "#EAB308", "priceN": 10000, "priceL": 13000, "isBestSeller": false, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-solo-wasgitel", "name": "Solo Wasgitel", "description": "Minuman khas Solo dengan rasa wasgitel yang unik dan menyegarkan.", "category": "tea", "image": "./tea-solo-wasgitel.jpeg", "accentColor": "#8B5E3C", "priceN": 7000, "priceL": 7000, "isBestSeller": false, "onlySizeL": true, "noToppings": true },
-        { "id": "prod-americano", "name": "Americano", "description": "Espresso otentik dari biji kopi Arabika pilihan, disajikan dengan air pegunungan dingin yang segar.", "category": "coffee", "image": "./coffe-americano.jpeg", "accentColor": "#6F4E37", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-cappucino", "name": "Cappucino", "description": "Perpaduan sempurna antara espresso, susu panas, dan busa susu yang lembut.", "category": "coffee", "image": "./coffe-cappucino.jpeg", "accentColor": "#A67C52", "priceN": 12000, "priceL": 15000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-latte", "name": "Latte", "description": "Espresso dengan susu steamed yang creamy, menghasilkan rasa yang halus dan lembut.", "category": "coffee", "image": "./coffe-late.jpeg", "accentColor": "#8B5E3C", "priceN": 12000, "priceL": 15000, "isBestSeller": false, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-brown-sugar-latte", "name": "Brown Sugar Latte", "description": "Caramel gula merah Okinawa berpadu indah dengan espresso dan susu segar premium.", "category": "coffee", "image": "./coffe-late-brown-sugar.jpeg", "accentColor": "#4A2C2A", "priceN": 15000, "priceL": 18000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-strawberry", "name": "Strawberry", "description": "Puree stroberi segar organik dipadukan dengan es batu serut.", "category": "fruit", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-mango", "name": "Mango", "description": "Kesegaran puree mangga alami yang manis dan menyegarkan, cocok untuk cuaca panas.", "category": "fruit", "image": "./fruit-manggo.jpeg", "accentColor": "#F59E0B", "priceN": 10000, "priceL": 13000, "isBestSeller": false, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-taro", "name": "Taro Milk Tea", "description": "Minuman taro creamy dengan aroma khas dan rasa manis alami yang lembut di lidah.", "category": "cake", "image": "./taro.jpeg", "accentColor": "#9B59B6", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
-        { "id": "prod-red-velvet", "name": "Red Velvet Latte", "description": "Perpaduan sempurna antara red velvet cake dan susu segar, menghasilkan rasa yang manis dan elegan.", "category": "cake", "image": "./red-velvet.jpeg", "accentColor": "#E74C3C", "priceN": 12000, "priceL": 15000, "isBestSeller": false, "onlySizeL": false, "noToppings": false }
+        { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": "./cokelat-hazelnut.jpeg", "accentColor": "#A67C52", "priceN": 13000, "priceL": 16000, "isBestSeller": true, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-chocolate-strawberry", "name": "Chocolate Strawberry", "description": "Perpaduan sempurna antara cokelat premium dan stroberi segar yang manis dan menyegarkan.", "category": "chocolate", "image": "./cokelat-strawberry.jpeg", "accentColor": "#E11D48", "priceN": 12000, "priceL": 15000, "isBestSeller": false, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-chocolate-coffee", "name": "Chocolate Coffee", "description": "Kombinasi nikmat antara cokelat pekat dan espresso Arabika yang kuat dan beraroma.", "category": "chocolate", "image": "./cokelat-kopi.jpeg", "accentColor": "#6F4E37", "priceN": 15000, "priceL": 18000, "isBestSeller": false, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-matcha-latte", "name": "Matcha Latte", "description": "Bubuk matcha Jepang premium Uji diseduh dengan susu segar organik yang lembut.", "category": "tea", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "priceN": 12000, "priceL": 15000, "isBestSeller": true, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-thai-tea", "name": "Thai Tea", "description": "Teh Thailand asli dengan rasa khas yang creamy dan manis, disajikan dengan susu kental manis.", "category": "tea", "image": "./tea-thai.jpeg", "accentColor": "#D97706", "priceN": 12000, "priceL": 15000, "isBestSeller": true, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-lemon-tea", "name": "Lemon Tea", "description": "Kesegaran teh hitam dengan perasan lemon asli dan madu hutan alami.", "category": "tea", "image": "./tea-lemon.jpeg", "accentColor": "#EAB308", "priceN": 10000, "priceL": 13000, "isBestSeller": false, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-solo-wasgitel", "name": "Solo Wasgitel", "description": "Minuman khas Solo dengan rasa wasgitel yang unik dan menyegarkan.", "category": "tea", "image": "./tea-solo-wasgitel.jpeg", "accentColor": "#8B5E3C", "priceN": 7000, "priceL": 7000, "isBestSeller": false, "onlySizeL": true, "onlySizeN": false, "noToppings": true, "bobaSoldOut": true, "creamCheeseSoldOut": true },
+        { "id": "prod-americano", "name": "Americano", "description": "Espresso otentik dari biji kopi Arabika pilihan, disajikan dengan air pegunungan dingin yang segar.", "category": "coffee", "image": "./coffe-americano.jpeg", "accentColor": "#6F4E37", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-cappucino", "name": "Cappucino", "description": "Perpaduan sempurna antara espresso, susu panas, dan busa susu yang lembut.", "category": "coffee", "image": "./coffe-cappucino.jpeg", "accentColor": "#A67C52", "priceN": 12000, "priceL": 15000, "isBestSeller": true, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-latte", "name": "Latte", "description": "Espresso dengan susu steamed yang creamy, menghasilkan rasa yang halus dan lembut.", "category": "coffee", "image": "./coffe-late.jpeg", "accentColor": "#8B5E3C", "priceN": 12000, "priceL": 15000, "isBestSeller": false, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-brown-sugar-latte", "name": "Brown Sugar Latte", "description": "Caramel gula merah Okinawa berpadu indah dengan espresso dan susu segar premium.", "category": "coffee", "image": "./coffe-late-brown-sugar.jpeg", "accentColor": "#4A2C2A", "priceN": 15000, "priceL": 18000, "isBestSeller": true, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-strawberry", "name": "Strawberry", "description": "Puree stroberi segar organik dipadukan dengan es batu serut.", "category": "fruit", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-mango", "name": "Mango", "description": "Kesegaran puree mangga alami yang manis dan menyegarkan, cocok untuk cuaca panas.", "category": "fruit", "image": "./fruit-manggo.jpeg", "accentColor": "#F59E0B", "priceN": 10000, "priceL": 13000, "isBestSeller": false, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-taro", "name": "Taro Milk Tea", "description": "Minuman taro creamy dengan aroma khas dan rasa manis alami yang lembut di lidah.", "category": "cake", "image": "./taro.jpeg", "accentColor": "#9B59B6", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false },
+        { "id": "prod-red-velvet", "name": "Red Velvet Latte", "description": "Perpaduan sempurna antara red velvet cake dan susu segar, menghasilkan rasa yang manis dan elegan.", "category": "cake", "image": "./red-velvet.jpeg", "accentColor": "#E74C3C", "priceN": 12000, "priceL": 15000, "isBestSeller": false, "onlySizeL": false, "onlySizeN": false, "noToppings": false, "bobaSoldOut": false, "creamCheeseSoldOut": false }
     ],
     
     DEFAULT_CAMPAIGNS: [
@@ -113,7 +113,6 @@ const createStore = (initialState) => {
     const listeners = [];
     const STORAGE_KEY = 'thecdrinks_store';
     
-    // Load persisted state
     const persisted = localStorage.getItem(STORAGE_KEY);
     if (persisted) {
         try {
@@ -147,7 +146,6 @@ const createStore = (initialState) => {
     return { getState, setState, subscribe };
 };
 
-// Initialize store
 const store = createStore({
     cartItems: [],
     receiptData: null,
@@ -276,7 +274,6 @@ let productTemp = {};
 let currentFormType = null;
 let currentEditId = null;
 
-// Payment variables
 let pendingPaymentData = null;
 let uploadedProofFile = null;
 
@@ -361,19 +358,31 @@ function updateDeliveryFee() {
 // ==================== PRODUCT FUNCTIONS ====================
 function getProductPrice(product, size) {
     if (product.id === "prod-solo-wasgitel") return product.priceL;
+    if (product.onlySizeN) return product.priceN;
+    if (product.onlySizeL) return product.priceL;
     return size === 'L' ? product.priceL : product.priceN;
 }
 
 function getToppingPrice(toppings, productId) {
-    if (productId === "prod-solo-wasgitel") return 0;
+    const product = productsData.find(p => p.id === productId);
+    if (!product) return 0;
+    if (product.noToppings) return 0;
     let total = 0;
-    if (toppings.boba) total += 3000;
-    if (toppings.creamCheese) total += 5000;
+    if (toppings.boba && !product.bobaSoldOut) total += 3000;
+    if (toppings.creamCheese && !product.creamCheeseSoldOut) total += 5000;
     return total;
 }
 
-// ==================== GEOLOCATION WITH REVERSE GEOCODING ====================
-// Fungsi untuk mendapatkan alamat lengkap dari koordinat menggunakan Nominatim (OpenStreetMap)
+function isToppingAvailable(productId, toppingType) {
+    const product = productsData.find(p => p.id === productId);
+    if (!product) return false;
+    if (product.noToppings) return false;
+    if (toppingType === 'boba' && product.bobaSoldOut) return false;
+    if (toppingType === 'creamCheese' && product.creamCheeseSoldOut) return false;
+    return true;
+}
+
+// ==================== GEOLOCATION FUNCTIONS ====================
 async function getAddressFromCoords(lat, lng) {
     try {
         const response = await fetch(
@@ -409,22 +418,18 @@ async function getAddressFromCoords(lat, lng) {
     }
 }
 
-// Fungsi untuk mendapatkan link Google Maps
 function getGoogleMapsLink(lat, lng) {
     return `https://www.google.com/maps?q=${lat},${lng}`;
 }
 
-// Fungsi untuk mendapatkan link OpenStreetMap
 function getOpenStreetMapLink(lat, lng) {
     return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=15`;
 }
 
-// Fungsi untuk mendapatkan link Waze
 function getWazeLink(lat, lng) {
     return `https://www.waze.com/ul?ll=${lat},${lng}&navigate=yes`;
 }
 
-// ==================== UPDATE GEOLOCATION FUNCTIONS ====================
 async function getUserLocationWA() {
     const statusEl = document.getElementById('location-status-wa');
     const resetBtn = document.getElementById('reset-permission-btn');
@@ -432,7 +437,6 @@ async function getUserLocationWA() {
     const addressInput = document.getElementById('customer-address');
     
     if (!addressInput) {
-        // Create address input if not exists
         const addressContainer = document.querySelector('.border-emerald-200.rounded-xl .mt-1');
         if (addressContainer) {
             const input = document.createElement('input');
@@ -461,7 +465,6 @@ async function getUserLocationWA() {
     
     if (resetBtn) resetBtn.classList.add('hidden');
     
-    // Clear previous address
     if (addressInput) addressInput.value = '';
     
     navigator.geolocation.getCurrentPosition(
@@ -472,7 +475,6 @@ async function getUserLocationWA() {
             userLocation = { lat, lng };
             store.setState({ userLocation: userLocation });
             
-            // Hitung jarak ke toko
             const distance = calculateDistance(
                 APP_CONFIG.STORE_LOCATION.lat,
                 APP_CONFIG.STORE_LOCATION.lng,
@@ -484,16 +486,12 @@ async function getUserLocationWA() {
                 distanceInput.value = distance.toFixed(1);
             }
             
-            // Update delivery fee
             updateDeliveryFee();
             
-            // Dapatkan alamat lengkap dari koordinat
             const addressInfo = await getAddressFromCoords(lat, lng);
             
-            // Tampilkan alamat di input
             if (addressInput && addressInfo) {
                 addressInput.value = addressInfo.fullAddress;
-                // Store address for WhatsApp message
                 store.setState({ customerAddress: addressInfo.fullAddress });
             } else if (addressInput) {
                 addressInput.value = `Lokasi: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
@@ -630,7 +628,6 @@ async function loadData() {
     renderInstagramPosts();
     updateStoreInfo();
     
-    // Restore cart from store
     const storeState = store.getState();
     if (storeState.cartItems && storeState.cartItems.length > 0) {
         cartItems = storeState.cartItems;
@@ -687,9 +684,15 @@ function renderProductsByCategory(categoryId) {
 
 function setProductSize(productId, size) {
     const product = productsData.find(p => p.id === productId);
-    if (product && product.onlySizeL) size = 'L';
+    if (!product) return;
+    
+    // Jika onlySizeL atau onlySizeN aktif, batasi ukuran
+    if (product.onlySizeL) size = 'L';
+    if (product.onlySizeN) size = 'N';
+    
     productSizes[productId] = size;
     store.setState({ productSizes: productSizes });
+    
     document.querySelectorAll(`.size-btn-${productId}`).forEach(btn => {
         const btnSize = btn.getAttribute('data-size');
         if (btnSize === size) {
@@ -729,13 +732,17 @@ function addToCart(productId, size, temperature, toppings) {
     
     let finalSize = size;
     let finalToppings = { ...toppings };
-    if (product.onlySizeL) {
-        finalSize = 'L';
-        finalToppings = { boba: false, creamCheese: false };
-    }
+    
+    // Batasi ukuran berdasarkan setting
+    if (product.onlySizeL) finalSize = 'L';
+    if (product.onlySizeN) finalSize = 'N';
+    
+    // Batasi topping berdasarkan setting
     if (product.noToppings) {
         finalToppings = { boba: false, creamCheese: false };
     }
+    if (product.bobaSoldOut) finalToppings.boba = false;
+    if (product.creamCheeseSoldOut) finalToppings.creamCheese = false;
     
     const itemId = `${productId}-${finalSize}-${temperature}-${finalToppings.boba ? 'boba' : ''}-${finalToppings.creamCheese ? 'creamcheese' : ''}`;
     const price = getProductPrice(product, finalSize);
@@ -772,11 +779,20 @@ function addToCartFromCard(productId, size) {
     const product = productsData.find(p => p.id === productId);
     const temperature = productTemp[productId] || 'DINGIN';
     let finalSize = size;
-    if (product && product.onlySizeL) finalSize = 'L';
+    
+    if (product) {
+        if (product.onlySizeL) finalSize = 'L';
+        if (product.onlySizeN) finalSize = 'N';
+    }
+    
     let bobaChecked = false, creamCheeseChecked = false;
-    if (!product || !product.noToppings) {
+    if (product && !product.noToppings) {
         bobaChecked = document.getElementById(`topping-boba-${productId}`)?.checked || false;
         creamCheeseChecked = document.getElementById(`topping-creamcheese-${productId}`)?.checked || false;
+        
+        // Jika topping habis, force unchecked
+        if (product.bobaSoldOut) bobaChecked = false;
+        if (product.creamCheeseSoldOut) creamCheeseChecked = false;
     }
     addToCart(productId, finalSize, temperature, { boba: bobaChecked, creamCheese: creamCheeseChecked });
 }
@@ -794,15 +810,20 @@ function renderProducts(products) {
     });
     
     container.innerHTML = products.map(product => {
-        let defaultSize = 'L';
-        if (!product.onlySizeL) defaultSize = productSizes[product.id] || 'N';
+        let defaultSize = 'N';
+        if (product.onlySizeL) defaultSize = 'L';
+        if (product.onlySizeN) defaultSize = 'N';
+        if (!product.onlySizeL && !product.onlySizeN) defaultSize = productSizes[product.id] || 'N';
+        
         const activeSize = defaultSize;
         const price = getProductPrice(product, activeSize);
-        const isNActive = (activeSize === 'N' && !product.onlySizeL);
-        const isLActive = (activeSize === 'L');
-        const showSizeOptions = !product.onlySizeL;
+        const isNActive = (activeSize === 'N' && !product.onlySizeL && !product.onlySizeN) || (product.onlySizeN);
+        const isLActive = (activeSize === 'L' && !product.onlySizeL && !product.onlySizeN) || (product.onlySizeL);
+        const showSizeOptions = !product.onlySizeL && !product.onlySizeN;
         const showToppings = !product.noToppings;
         const currentTemp = productTemp[product.id] || 'DINGIN';
+        const bobaAvailable = !product.bobaSoldOut;
+        const creamCheeseAvailable = !product.creamCheeseSoldOut;
         
         const hotButtonClass = currentTemp === 'PANAS' ? 'bg-[#111111] text-white border-[#111111]' : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50';
         const coldButtonClass = currentTemp === 'DINGIN' ? 'bg-[#111111] text-white border-[#111111]' : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50';
@@ -811,7 +832,11 @@ function renderProducts(products) {
             <div>
                 <div class="product-image-container relative w-full aspect-square bg-[#FBFBFB] rounded-[18px] mb-4 flex items-center justify-center overflow-hidden">
                     ${product.isBestSeller ? '<span class="absolute top-2.5 left-2.5 z-20 bg-neutral-900 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Terlaris</span>' : ''}
-                    ${product.onlySizeL ? '<span class="absolute top-2.5 right-2.5 z-20 bg-amber-600 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Only Size L</span>' : ''}
+                    ${product.onlySizeL ? '<span class="absolute top-2.5 right-2.5 z-20 bg-amber-600 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Only L</span>' : ''}
+                    ${product.onlySizeN ? '<span class="absolute top-2.5 right-2.5 z-20 bg-blue-600 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Only N</span>' : ''}
+                    ${product.noToppings ? '<span class="absolute bottom-2.5 left-2.5 z-20 bg-neutral-700 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">No Topping</span>' : ''}
+                    ${product.bobaSoldOut ? '<span class="absolute bottom-2.5 left-2.5 z-20 bg-red-600 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Boba Habis</span>' : ''}
+                    ${product.creamCheeseSoldOut ? '<span class="absolute bottom-2.5 right-2.5 z-20 bg-red-600 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Cream Cheese Habis</span>' : ''}
                     <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x800/1a1a1a/white?text=Image'">
                 </div>
                 <div class="text-left px-1">
@@ -828,7 +853,7 @@ function renderProducts(products) {
                     </div>
                     ` : `
                     <div class="flex items-center space-x-0.5 bg-neutral-50 rounded-full p-0.5 border">
-                        <button class="px-2 py-1 rounded-full text-[9px] font-extrabold bg-[#111111] text-white shadow-sm">L Only</button>
+                        <button class="px-2 py-1 rounded-full text-[9px] font-extrabold bg-[#111111] text-white shadow-sm">${product.onlySizeL ? 'L Only' : 'N Only'}</button>
                     </div>
                     `}
                     <div class="text-right font-mono font-bold text-[11px]">Rp ${price.toLocaleString('id-ID')}</div>
@@ -839,13 +864,13 @@ function renderProducts(products) {
                 </div>
                 ${showToppings ? `
                 <div class="flex flex-wrap gap-2 mt-1">
-                    <label class="flex items-center gap-1 text-[8px] font-medium text-neutral-600 bg-neutral-50 px-2 py-1 rounded-full cursor-pointer hover:bg-neutral-100 transition-colors">
-                        <input type="checkbox" id="topping-boba-${product.id}" class="w-3 h-3 accent-[#111111]">
-                        <span>⚫️ Boba +3k</span>
+                    <label class="flex items-center gap-1 text-[8px] font-medium ${bobaAvailable ? 'text-neutral-600 bg-neutral-50 hover:bg-neutral-100' : 'text-neutral-400 bg-neutral-100 cursor-not-allowed'} px-2 py-1 rounded-full transition-colors">
+                        <input type="checkbox" id="topping-boba-${product.id}" class="w-3 h-3 accent-[#111111]" ${bobaAvailable ? '' : 'disabled'}>
+                        <span>⚫️ Boba +3k ${!bobaAvailable ? '(Habis)' : ''}</span>
                     </label>
-                    <label class="flex items-center gap-1 text-[8px] font-medium text-neutral-600 bg-neutral-50 px-2 py-1 rounded-full cursor-pointer hover:bg-neutral-100 transition-colors">
-                        <input type="checkbox" id="topping-creamcheese-${product.id}" class="w-3 h-3 accent-[#111111]">
-                        <span>🧀 Cream Cheese +5k</span>
+                    <label class="flex items-center gap-1 text-[8px] font-medium ${creamCheeseAvailable ? 'text-neutral-600 bg-neutral-50 hover:bg-neutral-100' : 'text-neutral-400 bg-neutral-100 cursor-not-allowed'} px-2 py-1 rounded-full transition-colors">
+                        <input type="checkbox" id="topping-creamcheese-${product.id}" class="w-3 h-3 accent-[#111111]" ${creamCheeseAvailable ? '' : 'disabled'}>
+                        <span>🧀 Cream Cheese +5k ${!creamCheeseAvailable ? '(Habis)' : ''}</span>
                     </label>
                 </div>
                 ` : `
@@ -1106,7 +1131,6 @@ function confirmPayment() {
 
     const checkoutData = { ...pendingCheckoutData };
 
-    // Jika ini adalah metode pickup, langsung proses
     if (checkoutData.type === 'pickup') {
         closePaymentModal();
         processCheckout(
@@ -1119,14 +1143,13 @@ function confirmPayment() {
         return;
     }
 
-    // Untuk WhatsApp delivery, lanjut ke upload bukti
     if (checkoutData.type === 'whatsapp') {
         closePaymentModal();
         showPaymentConfirmModal(checkoutData);
     }
 }
 
-// ==================== PAYMENT CONFIRMATION MODAL (UPLOAD BUKTI) ====================
+// ==================== PAYMENT CONFIRMATION MODAL ====================
 function showPaymentConfirmModal(checkoutData) {
     console.log('=== PAYMENT CONFIRM MODAL ===');
     console.log('Data diterima:', checkoutData);
@@ -1158,7 +1181,6 @@ function showPaymentConfirmModal(checkoutData) {
     const fileInput = document.getElementById('payment-proof');
     if (fileInput) fileInput.value = '';
     
-    // Re-attach event listeners to send buttons
     setTimeout(() => {
         attachSendButtonListeners();
     }, 100);
@@ -1216,11 +1238,9 @@ function removeUploadedFile() {
     if (uploadArea) uploadArea.classList.remove('hidden');
 }
 
-// ==================== ATTACH SEND BUTTON LISTENERS ====================
 function attachSendButtonListeners() {
     console.log('Attaching send button listeners...');
     
-    // Send With Proof button
     const sendWithProofBtn = document.getElementById('send-with-proof');
     if (sendWithProofBtn) {
         const newBtn = sendWithProofBtn.cloneNode(true);
@@ -1231,7 +1251,6 @@ function attachSendButtonListeners() {
         console.warn('❌ send-with-proof button not found!');
     }
     
-    // Send Without Proof button
     const sendWithoutProofBtn = document.getElementById('send-without-proof');
     if (sendWithoutProofBtn) {
         const newBtn = sendWithoutProofBtn.cloneNode(true);
@@ -1243,7 +1262,6 @@ function attachSendButtonListeners() {
     }
 }
 
-// ==================== SEND WITH PROOF ====================
 async function sendWithProof() {
     console.log('sendWithProof called');
     
@@ -1300,7 +1318,6 @@ async function sendWithProof() {
     store.setState({ pendingPaymentData: null, uploadedProofFile: null });
 }
 
-// ==================== SEND WITHOUT PROOF ====================
 async function sendWithoutProof() {
     console.log('sendWithoutProof called');
     
@@ -1349,7 +1366,6 @@ async function sendWithoutProof() {
     store.setState({ pendingPaymentData: null });
 }
 
-// ==================== CHECKOUT VIA WHATSAPP ====================
 async function checkoutViaWhatsApp() {
     if (cartItems.length === 0) return;
     const customerName = document.getElementById('customer-name')?.value || 'Pelanggan';
@@ -1409,7 +1425,6 @@ async function checkoutViaWhatsApp() {
     showPaymentModal(checkoutData);
 }
 
-// ==================== CHECKOUT VIA STORE PICKUP ====================
 function checkoutViaStorePickup() {
     if (cartItems.length === 0) return;
     
@@ -1420,7 +1435,6 @@ function checkoutViaStorePickup() {
     const subtotal = getSubtotal();
     const total = subtotal + serviceFee;
     
-    // Build items list for WhatsApp
     const itemsText = cartItems.map((item, idx) => {
         const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
         let toppingsText = '';
@@ -1430,7 +1444,6 @@ function checkoutViaStorePickup() {
         return `${idx+1}. *${item.product.name}* (${item.size === 'L' ? 'Large' : 'Normal'}, ${tempIcon}${toppingsText ? ', ' + toppingsText : ''}) x${item.quantity} - Rp ${itemTotal.toLocaleString()}`;
     }).join('\n');
     
-    // Build WhatsApp message
     const msg = `Halo THE. C DRINKS! 🥤✨
 
 Saya ingin memesan untuk *DIAMBIL SENDIRI*:
@@ -1446,12 +1459,10 @@ Metode: Ambil Sendiri di Toko (Bayar di Tempat)
 
 Saya akan datang ke toko untuk mengambil pesanan. Terima kasih!`;
 
-    // Send message via WhatsApp API (using send-message, not send-image)
     sendWhatsAppMessage(APP_CONFIG.STORE_PHONE_NUMBER, msg)
         .then(result => {
             if (result && result.status) {
                 showNotification('✅ Pesanan berhasil dikirim!', 'success');
-                // Process checkout
                 processCheckout('pickup', customerName, 0, 0);
             } else {
                 showNotification('⚠️ Gagal mengirim pesanan', 'error');
@@ -1463,7 +1474,6 @@ Saya akan datang ke toko untuk mengambil pesanan. Terima kasih!`;
         });
 }
 
-// ==================== PROCESS CHECKOUT ====================
 function processCheckout(type, customerName, deliveryFee, distance) {
     const subtotal = getSubtotal();
     const serviceFee = getServiceFee();
@@ -1485,20 +1495,16 @@ function processCheckout(type, customerName, deliveryFee, distance) {
     };
     store.setState({ receiptData: receiptData });
     
-    // Close modals
     closePaymentModal();
     closeCheckoutModal();
     
-    // Show receipt
     showReceipt();
     
-    // Clear cart
     cartItems = [];
     store.setState({ cartItems: [] });
     updateCartUI();
     closeCartDrawer();
     
-    // Reset fields
     const distanceInput = document.getElementById('delivery-distance');
     const feeDisplay = document.getElementById('delivery-fee-display');
     const statusEl = document.getElementById('location-status-wa');
@@ -1598,14 +1604,12 @@ function closeReceiptModal() {
     store.setState({ receiptData: null });
 }
 
-// ==================== RECEIPT FUNCTIONS ====================
 function downloadReceipt() {
     if (!receiptData) {
         showNotification('⚠️ Tidak ada data struk untuk dicetak!', 'error');
         return;
     }
     
-    // Create a new receipt element with clean text-only design
     const receiptWrapper = document.createElement('div');
     receiptWrapper.className = 'fixed top-0 left-0 w-screen h-screen z-[100] flex items-center justify-center bg-[#111111]/80 backdrop-blur-sm';
     receiptWrapper.id = 'receipt-print-wrapper';
@@ -1617,7 +1621,6 @@ function downloadReceipt() {
     receiptCard.style.maxWidth = '360px';
     receiptCard.style.fontFamily = "'Courier New', monospace";
     
-    // Build receipt content - clean text only
     const orderTypeText = receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0 
         ? 'DELIVERY' 
         : 'PICKUP';
@@ -1679,7 +1682,6 @@ function downloadReceipt() {
     receiptWrapper.appendChild(receiptCard);
     document.body.appendChild(receiptWrapper);
     
-    // Use html2canvas on the new element
     setTimeout(() => {
         const el = document.getElementById('receipt-print-card');
         if (el && typeof html2canvas !== 'undefined') {
@@ -1689,17 +1691,13 @@ function downloadReceipt() {
                 height: el.scrollHeight,
                 useCORS: true,
                 logging: false,
-                backgroundColor: '#ffffff',
-                onclone: function(document) {
-                    // Ensure all elements are rendered properly
-                }
+                backgroundColor: '#ffffff'
             }).then(canvas => {
                 const link = document.createElement('a');
                 link.download = `Struk-${receiptData?.receiptId || 'THE-C'}.png`;
                 link.href = canvas.toDataURL('image/png', 1.0);
                 link.click();
                 
-                // Remove the temporary wrapper
                 const wrapper = document.getElementById('receipt-print-wrapper');
                 if (wrapper) wrapper.remove();
             }).catch(error => {
@@ -1780,18 +1778,29 @@ function refreshAdminLists() {
 function renderAdminProducts() {
     const container = document.getElementById('admin-products-list');
     if (!container) return;
-    container.innerHTML = productsData.map(product => `
+    container.innerHTML = productsData.map(product => {
+        let statusBadges = [];
+        if (product.isBestSeller) statusBadges.push('⭐ Best Seller');
+        if (product.onlySizeL) statusBadges.push('📏 Only L');
+        if (product.onlySizeN) statusBadges.push('📏 Only N');
+        if (product.noToppings) statusBadges.push('🚫 No Topping');
+        if (product.bobaSoldOut) statusBadges.push('⚫ Boba Habis');
+        if (product.creamCheeseSoldOut) statusBadges.push('🧀 Cream Cheese Habis');
+        
+        return `
         <div class="bg-neutral-50 rounded-xl p-3 flex justify-between items-center">
             <div class="flex-1">
                 <div class="font-bold text-xs">${product.name}</div>
                 <div class="text-[9px] text-neutral-500">${product.category} | Rp ${product.priceN.toLocaleString()} (N) / Rp ${product.priceL.toLocaleString()} (L)</div>
+                ${statusBadges.length ? `<div class="flex flex-wrap gap-1 mt-1">${statusBadges.map(b => `<span class="text-[7px] bg-neutral-200 px-1.5 py-0.5 rounded">${b}</span>`).join('')}</div>` : ''}
             </div>
             <div class="flex gap-1">
                 <button onclick="editProduct('${product.id}')" class="px-2 py-1 bg-blue-500 text-white rounded text-[9px]">Edit</button>
                 <button onclick="deleteProduct('${product.id}')" class="px-2 py-1 bg-red-500 text-white rounded text-[9px]">Hapus</button>
             </div>
         </div>
-    `).join('');
+        `;
+    }).join('');
 }
 
 function renderAdminCampaigns() {
@@ -1878,9 +1887,16 @@ function showAddProductForm() {
         <input type="text" id="form-image" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" value="./default.jpeg">
         <input type="number" id="form-priceN" placeholder="Harga Normal (Rp)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="number" id="form-priceL" placeholder="Harga Large (Rp)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-bestSeller"> Best Seller</label>
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-onlySizeL"> Only Size L</label>
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-noToppings"> No Toppings</label>
+        
+        <div class="grid grid-cols-2 gap-2 mb-2">
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-bestSeller"> ⭐ Best Seller</label>
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-onlySizeL"> 📏 Only Size L</label>
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-onlySizeN"> 📏 Only Size N</label>
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-noToppings"> 🚫 No Topping</label>
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-bobaSoldOut"> ⚫ Boba Habis</label>
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-creamCheeseSoldOut"> 🧀 Cream Cheese Habis</label>
+        </div>
+        
         <input type="text" id="form-accentColor" placeholder="Warna Aksen (contoh: #4A2C2A)" class="w-full px-3 py-2 text-xs border rounded-lg">
     `;
     document.getElementById('form-modal').classList.remove('hidden');
@@ -1900,9 +1916,16 @@ function editProduct(id) {
         <input type="text" id="form-image" value="${product.image}" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="number" id="form-priceN" value="${product.priceN}" placeholder="Harga Normal" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="number" id="form-priceL" value="${product.priceL}" placeholder="Harga Large" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-bestSeller" ${product.isBestSeller ? 'checked' : ''}> Best Seller</label>
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-onlySizeL" ${product.onlySizeL ? 'checked' : ''}> Only Size L</label>
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-noToppings" ${product.noToppings ? 'checked' : ''}> No Toppings</label>
+        
+        <div class="grid grid-cols-2 gap-2 mb-2">
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-bestSeller" ${product.isBestSeller ? 'checked' : ''}> ⭐ Best Seller</label>
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-onlySizeL" ${product.onlySizeL ? 'checked' : ''}> 📏 Only Size L</label>
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-onlySizeN" ${product.onlySizeN ? 'checked' : ''}> 📏 Only Size N</label>
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-noToppings" ${product.noToppings ? 'checked' : ''}> 🚫 No Topping</label>
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-bobaSoldOut" ${product.bobaSoldOut ? 'checked' : ''}> ⚫ Boba Habis</label>
+            <label class="flex items-center gap-2 text-[10px] font-medium"><input type="checkbox" id="form-creamCheeseSoldOut" ${product.creamCheeseSoldOut ? 'checked' : ''}> 🧀 Cream Cheese Habis</label>
+        </div>
+        
         <input type="text" id="form-accentColor" value="${product.accentColor || '#4A2C2A'}" placeholder="Warna Aksen" class="w-full px-3 py-2 text-xs border rounded-lg">
     `;
     document.getElementById('form-modal').classList.remove('hidden');
@@ -2088,7 +2111,10 @@ async function submitFormData() {
             priceL: parseInt(document.getElementById('form-priceL').value) || 0,
             isBestSeller: document.getElementById('form-bestSeller')?.checked || false,
             onlySizeL: document.getElementById('form-onlySizeL')?.checked || false,
+            onlySizeN: document.getElementById('form-onlySizeN')?.checked || false,
             noToppings: document.getElementById('form-noToppings')?.checked || false,
+            bobaSoldOut: document.getElementById('form-bobaSoldOut')?.checked || false,
+            creamCheeseSoldOut: document.getElementById('form-creamCheeseSoldOut')?.checked || false,
             accentColor: document.getElementById('form-accentColor').value || '#4A2C2A'
         };
         
@@ -2479,13 +2505,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     const closePaymentModalBtn = document.getElementById('close-payment-modal');
     if (closePaymentModalBtn) closePaymentModalBtn.addEventListener('click', closePaymentModal);
     
-    // Attach send button listeners
     attachSendButtonListeners();
-    
-    // Setup file upload handlers
     setupFileUpload();
     
-    // Subscribe to store changes
     store.subscribe((state) => {
         console.log('🔄 Store updated:', state);
     });
