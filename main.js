@@ -105,8 +105,7 @@ Pesan:
 {MESSAGE}`
 };
 
-// ==================== ZUSTAND STORE ====================
-// Simple Zustand-like store with localStorage persistence
+// ==================== ZUSTAND-STORE WITH PERSISTENCE ====================
 const createStore = (initialState) => {
     let state = initialState;
     const listeners = [];
@@ -125,7 +124,6 @@ const createStore = (initialState) => {
     
     const setState = (newState) => {
         state = { ...state, ...newState };
-        // Persist to localStorage
         try {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         } catch (e) {
@@ -188,9 +186,7 @@ async function sendWhatsAppMessage(number, message) {
 
 async function sendWhatsAppImage(number, imageData, caption = '') {
     try {
-        // Determine if image is base64 or File
         if (imageData instanceof File || imageData instanceof Blob) {
-            // If it's a File or Blob object, use FormData
             const formData = new FormData();
             formData.append('sessionName', APP_CONFIG.WHATSAPP_SESSION_NAME);
             formData.append('number', number);
@@ -205,9 +201,7 @@ async function sendWhatsAppImage(number, imageData, caption = '') {
             console.log('WhatsApp Image API Response (FormData):', result);
             return result;
         } else if (typeof imageData === 'string') {
-            // If it's a base64 string or URL
             if (imageData.startsWith('data:image')) {
-                // Base64 - send as JSON
                 const response = await fetch(`${APP_CONFIG.WHATSAPP_API_URL}/send-image`, {
                     method: 'POST',
                     headers: {
@@ -224,7 +218,6 @@ async function sendWhatsAppImage(number, imageData, caption = '') {
                 console.log('WhatsApp Image API Response (Base64):', result);
                 return result;
             } else {
-                // URL - use GET
                 const response = await fetch(`${APP_CONFIG.WHATSAPP_API_URL}/send-image?sessionName=${APP_CONFIG.WHATSAPP_SESSION_NAME}&number=${number}&image=${encodeURIComponent(imageData)}&caption=${encodeURIComponent(caption)}`, {
                     method: 'GET'
                 });
@@ -244,11 +237,9 @@ async function sendOrderViaAPI(number, message, proofImage = null) {
         let result;
         
         if (proofImage) {
-            // Send with image
             const caption = `📋 *PESANAN BARU*\n\n${message}`;
             result = await sendWhatsAppImage(number, proofImage, caption);
         } else {
-            // Send without image
             result = await sendWhatsAppMessage(number, `📋 *PESANAN BARU*\n\n${message}`);
         }
         
@@ -283,7 +274,7 @@ let productTemp = {};
 let currentFormType = null;
 let currentEditId = null;
 
-// Payment variables - using store
+// Payment variables
 let pendingPaymentData = null;
 let uploadedProofFile = null;
 
@@ -343,7 +334,6 @@ function updateDeliveryFee() {
     if (distanceInput) {
         distance = parseFloat(distanceInput.value);
         if (isNaN(distance)) distance = 0;
-        // Persist to store
         store.setState({ deliveryDistance: distance });
     }
     const fee = calculateDeliveryFee(distance);
@@ -886,7 +876,6 @@ function openCheckoutModal() {
         const feeDisplay = document.getElementById('delivery-fee-display');
         const resetBtn = document.getElementById('reset-permission-btn');
         
-        // Restore from store
         const storeState = store.getState();
         if (storeState.customerName) {
             const nameInput = document.getElementById('customer-name');
@@ -989,28 +978,48 @@ function selectPaymentMethod(method) {
 }
 
 function confirmPayment() {
-    if (!pendingCheckoutData) return;
+    console.log('confirmPayment called');
+    console.log('pendingCheckoutData:', pendingCheckoutData);
+    
+    if (!pendingCheckoutData) {
+        showNotification('⚠️ Data checkout tidak ditemukan!', 'error');
+        return;
+    }
+    
     closePaymentModal();
     showPaymentConfirmModal(pendingCheckoutData);
 }
 
 // ==================== PAYMENT CONFIRMATION MODAL (UPLOAD BUKTI) ====================
 function showPaymentConfirmModal(checkoutData) {
+    console.log('showPaymentConfirmModal called with data:', checkoutData);
+    
     pendingPaymentData = checkoutData;
     store.setState({ pendingPaymentData: checkoutData });
+    
+    console.log('pendingPaymentData set to:', pendingPaymentData);
+    
     const modal = document.getElementById('payment-confirm-modal');
     if (modal) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
+    
     uploadedProofFile = null;
     store.setState({ uploadedProofFile: null });
+    
     const previewDiv = document.getElementById('upload-preview');
     const uploadArea = document.getElementById('upload-area');
     if (previewDiv) previewDiv.classList.add('hidden');
     if (uploadArea) uploadArea.classList.remove('hidden');
+    
     const fileInput = document.getElementById('payment-proof');
     if (fileInput) fileInput.value = '';
+    
+    // Re-attach event listeners to send buttons
+    setTimeout(() => {
+        attachSendButtonListeners();
+    }, 100);
 }
 
 function closePaymentConfirmModal() {
@@ -1065,39 +1074,140 @@ function removeUploadedFile() {
     if (uploadArea) uploadArea.classList.remove('hidden');
 }
 
-// ==================== SEND ORDER VIA WHATSAPP API ====================
-async function sendOrderViaAPI(number, message, proofImage = null) {
-    try {
-        let result;
-        
-        if (proofImage) {
-            // Send with image - convert File to base64 if needed
-            let imageData = proofImage;
-            if (proofImage instanceof File) {
-                // Convert File to base64
-                imageData = await fileToBase64(proofImage);
-            }
-            const caption = `📋 *PESANAN BARU*\n\n${message}`;
-            result = await sendWhatsAppImage(number, imageData, caption);
-        } else {
-            // Send without image
-            result = await sendWhatsAppMessage(number, `📋 *PESANAN BARU*\n\n${message}`);
-        }
-        
-        return result;
-    } catch (error) {
-        console.error('Error sending order via API:', error);
-        throw error;
+// ==================== ATTACH SEND BUTTON LISTENERS ====================
+function attachSendButtonListeners() {
+    console.log('Attaching send button listeners...');
+    
+    // Send With Proof button
+    const sendWithProofBtn = document.getElementById('send-with-proof');
+    if (sendWithProofBtn) {
+        // Remove existing listeners by cloning
+        const newBtn = sendWithProofBtn.cloneNode(true);
+        sendWithProofBtn.parentNode.replaceChild(newBtn, sendWithProofBtn);
+        newBtn.addEventListener('click', sendWithProof);
+        console.log('✅ send-with-proof button attached');
+    } else {
+        console.warn('❌ send-with-proof button not found!');
+    }
+    
+    // Send Without Proof button
+    const sendWithoutProofBtn = document.getElementById('send-without-proof');
+    if (sendWithoutProofBtn) {
+        const newBtn = sendWithoutProofBtn.cloneNode(true);
+        sendWithoutProofBtn.parentNode.replaceChild(newBtn, sendWithoutProofBtn);
+        newBtn.addEventListener('click', sendWithoutProof);
+        console.log('✅ send-without-proof button attached');
+    } else {
+        console.warn('❌ send-without-proof button not found!');
     }
 }
 
-function fileToBase64(file) {
-    return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = error => reject(error);
-    });
+// ==================== SEND WITH PROOF (FIXED) ====================
+async function sendWithProof() {
+    console.log('sendWithProof called');
+    
+    // Ambil data dari store terlebih dahulu
+    const storeState = store.getState();
+    console.log('Store state:', storeState);
+    
+    // Gunakan data dari store jika pendingPaymentData null
+    let paymentData = pendingPaymentData || storeState.pendingPaymentData;
+    let proofFile = uploadedProofFile || storeState.uploadedProofFile;
+    
+    console.log('paymentData:', paymentData);
+    console.log('proofFile:', proofFile);
+    
+    if (!paymentData) {
+        showNotification('⚠️ Data pesanan tidak ditemukan! Silakan ulangi proses pemesanan.', 'error');
+        closePaymentConfirmModal();
+        setTimeout(() => openCheckoutModal(), 1000);
+        return;
+    }
+    
+    if (!proofFile) {
+        showNotification('⚠️ Silakan upload bukti transfer terlebih dahulu!', 'error');
+        return;
+    }
+    
+    try {
+        const number = APP_CONFIG.STORE_PHONE_NUMBER;
+        const message = paymentData.waMessage;
+        
+        showNotification('⏳ Mengirim pesanan dengan bukti transfer...', 'info');
+        
+        const result = await sendOrderViaAPI(number, message, proofFile);
+        
+        if (result && result.status) {
+            showNotification('✅ Pesanan berhasil dikirim dengan bukti transfer!', 'success');
+            
+            processCheckout(
+                paymentData.type, 
+                paymentData.customerName, 
+                paymentData.deliveryFee, 
+                paymentData.distance
+            );
+        } else {
+            showNotification('⚠️ Gagal mengirim pesanan. Coba lagi.', 'error');
+            console.error('API Error:', result);
+        }
+    } catch (error) {
+        console.error('Error sending with proof:', error);
+        showNotification('❌ Error mengirim pesanan: ' + error.message, 'error');
+    }
+    
+    closePaymentConfirmModal();
+    pendingPaymentData = null;
+    uploadedProofFile = null;
+    store.setState({ pendingPaymentData: null, uploadedProofFile: null });
+}
+
+// ==================== SEND WITHOUT PROOF (FIXED) ====================
+async function sendWithoutProof() {
+    console.log('sendWithoutProof called');
+    
+    const storeState = store.getState();
+    console.log('Store state:', storeState);
+    
+    let paymentData = pendingPaymentData || storeState.pendingPaymentData;
+    
+    console.log('paymentData:', paymentData);
+    
+    if (!paymentData) {
+        showNotification('⚠️ Data pesanan tidak ditemukan! Silakan ulangi proses pemesanan.', 'error');
+        closePaymentConfirmModal();
+        setTimeout(() => openCheckoutModal(), 1000);
+        return;
+    }
+    
+    try {
+        const number = APP_CONFIG.STORE_PHONE_NUMBER;
+        const message = paymentData.waMessage;
+        
+        showNotification('⏳ Mengirim pesanan tanpa bukti transfer...', 'info');
+        
+        const result = await sendOrderViaAPI(number, message, null);
+        
+        if (result && result.status) {
+            showNotification('✅ Pesanan berhasil dikirim!', 'success');
+            
+            processCheckout(
+                paymentData.type, 
+                paymentData.customerName, 
+                paymentData.deliveryFee, 
+                paymentData.distance
+            );
+        } else {
+            showNotification('⚠️ Gagal mengirim pesanan. Coba lagi.', 'error');
+            console.error('API Error:', result);
+        }
+    } catch (error) {
+        console.error('Error sending without proof:', error);
+        showNotification('❌ Error mengirim pesanan: ' + error.message, 'error');
+    }
+    
+    closePaymentConfirmModal();
+    pendingPaymentData = null;
+    store.setState({ pendingPaymentData: null });
 }
 
 // ==================== CHECKOUT VIA WHATSAPP ====================
@@ -1190,99 +1300,6 @@ function checkoutViaStorePickup() {
         waMessage: msg
     };
     showPaymentModal(checkoutData);
-}
-
-// ==================== SEND WITH PROOF (UPDATED) ====================
-async function sendWithProof() {
-    console.log('sendWithProof called');
-    console.log('pendingPaymentData:', pendingPaymentData);
-    console.log('uploadedProofFile:', uploadedProofFile);
-    
-    if (!pendingPaymentData) {
-        showNotification('⚠️ Data pesanan tidak ditemukan!', 'error');
-        return;
-    }
-    
-    if (!uploadedProofFile) {
-        showNotification('⚠️ Silakan upload bukti transfer terlebih dahulu!', 'error');
-        return;
-    }
-    
-    try {
-        const number = APP_CONFIG.STORE_PHONE_NUMBER;
-        const message = pendingPaymentData.waMessage;
-        const proofFile = uploadedProofFile;
-        
-        showNotification('⏳ Mengirim pesanan dengan bukti transfer...', 'info');
-        
-        // Send via WhatsApp API
-        const result = await sendOrderViaAPI(number, message, proofFile);
-        
-        if (result && result.status) {
-            showNotification('✅ Pesanan berhasil dikirim dengan bukti transfer!', 'success');
-            
-            // Process checkout
-            processCheckout(
-                pendingPaymentData.type, 
-                pendingPaymentData.customerName, 
-                pendingPaymentData.deliveryFee, 
-                pendingPaymentData.distance
-            );
-        } else {
-            showNotification('⚠️ Gagal mengirim pesanan. Coba lagi.', 'error');
-            console.error('API Error:', result);
-        }
-    } catch (error) {
-        console.error('Error sending with proof:', error);
-        showNotification('❌ Error mengirim pesanan: ' + error.message, 'error');
-    }
-    
-    // Close modal
-    closePaymentConfirmModal();
-    pendingPaymentData = null;
-}
-
-// ==================== SEND WITHOUT PROOF (UPDATED) ====================
-async function sendWithoutProof() {
-    console.log('sendWithoutProof called');
-    console.log('pendingPaymentData:', pendingPaymentData);
-    
-    if (!pendingPaymentData) {
-        showNotification('⚠️ Data pesanan tidak ditemukan!', 'error');
-        return;
-    }
-    
-    try {
-        const number = APP_CONFIG.STORE_PHONE_NUMBER;
-        const message = pendingPaymentData.waMessage;
-        
-        showNotification('⏳ Mengirim pesanan tanpa bukti transfer...', 'info');
-        
-        // Send via WhatsApp API
-        const result = await sendOrderViaAPI(number, message, null);
-        
-        if (result && result.status) {
-            showNotification('✅ Pesanan berhasil dikirim!', 'success');
-            
-            // Process checkout
-            processCheckout(
-                pendingPaymentData.type, 
-                pendingPaymentData.customerName, 
-                pendingPaymentData.deliveryFee, 
-                pendingPaymentData.distance
-            );
-        } else {
-            showNotification('⚠️ Gagal mengirim pesanan. Coba lagi.', 'error');
-            console.error('API Error:', result);
-        }
-    } catch (error) {
-        console.error('Error sending without proof:', error);
-        showNotification('❌ Error mengirim pesanan: ' + error.message, 'error');
-    }
-    
-    // Close modal
-    closePaymentConfirmModal();
-    pendingPaymentData = null;
 }
 
 // ==================== PROCESS CHECKOUT ====================
@@ -2054,7 +2071,6 @@ function submitContactForm(event) {
             .replace('{PHONE}', phone)
             .replace('{MESSAGE}', message);
         
-        // Send via WhatsApp API
         sendWhatsAppMessage(APP_CONFIG.STORE_PHONE_NUMBER, `📞 *PESAN DARI PELANGGAN*\n\n${waMessage}`)
             .then(result => {
                 if (result && result.status) {
@@ -2171,24 +2187,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const closePaymentModalBtn = document.getElementById('close-payment-modal');
     if (closePaymentModalBtn) closePaymentModalBtn.addEventListener('click', closePaymentModal);
     
-    // ==================== FIX: Attach event listeners to send buttons ====================
-    const sendWithProofBtn = document.getElementById('send-with-proof');
-    if (sendWithProofBtn) {
-        console.log('✅ send-with-proof button found');
-        sendWithProofBtn.addEventListener('click', sendWithProof);
-    } else {
-        console.warn('❌ send-with-proof button not found!');
-    }
-    
-    const sendWithoutProofBtn = document.querySelector('button[onclick="sendWithoutProof()"]');
-    if (sendWithoutProofBtn) {
-        console.log('✅ send-without-proof button found');
-        // Remove inline onclick and use addEventListener
-        sendWithoutProofBtn.removeAttribute('onclick');
-        sendWithoutProofBtn.addEventListener('click', sendWithoutProof);
-    } else {
-        console.warn('❌ send-without-proof button not found!');
-    }
+    // Attach send button listeners
+    attachSendButtonListeners();
     
     // Setup file upload handlers
     setupFileUpload();
@@ -2202,7 +2202,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 // ==================== GLOBAL EXPOSURE ====================
-// Expose all functions to window for inline onclick
 window.updateDeliveryFee = updateDeliveryFee;
 window.getUserLocationWA = getUserLocationWA;
 window.clearLocationWA = clearLocationWA;
@@ -2264,3 +2263,4 @@ window.sendWhatsAppMessage = sendWhatsAppMessage;
 window.sendWhatsAppImage = sendWhatsAppImage;
 window.sendOrderViaAPI = sendOrderViaAPI;
 window.fileToBase64 = fileToBase64;
+window.attachSendButtonListeners = attachSendButtonListeners;
