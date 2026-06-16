@@ -7,21 +7,40 @@ const APP_CONFIG = {
     JSONBIN_BIN_ID: '6a282856f5f4af5e29d26758',
     
     // Admin Panel Configuration
-    ADMIN_PASSWORD: 'thecadmin2026', // Password: "thecadmin2026"
+    ADMIN_PASSWORD: 'thecadmin2026',
     DATA_VERSION: '2.0',
     
     // Store Contact Information
-    STORE_PHONE_NUMBER: '6281288862602', // Nomor WhatsApp toko (tanpa 0 di depan)
+    STORE_PHONE_NUMBER: '6281288862602',
     STORE_NAME: 'THE. C DRINKS',
     STORE_ADDRESS: 'Jl. Diponegoro, Kotakulon, Kec. Bondowoso, Kab. Bondowoso, Jawa Timur 68213',
     STORE_LOCATION: { lat: -7.9108787, lng: 113.8193598 },
     
     // Delivery Fee Configuration
-    DELIVERY_FLAT_RATE_KM: 3,      // 1-3 km flat rate
-    DELIVERY_FLAT_FEE: 5000,       // Flat fee untuk 1-3 km = Rp5.000
-    DELIVERY_EXTRA_PER_KM: 2000,   // Per km berikutnya = Rp2.000
+    DELIVERY_FLAT_RATE_KM: 3,
+    DELIVERY_FLAT_FEE: 5000,
+    DELIVERY_EXTRA_PER_KM: 2000,
     
-    // Default Menu Data (akan diinject jika bin kosong)
+    // Service Fee Configuration
+    SERVICE_FEE: 1000,
+    
+    // Payment Methods
+    PAYMENT_METHODS: {
+        QRIS: {
+            name: 'QRIS',
+            qrImage: './qris.jpeg',
+            instructions: 'Scan QR Code menggunakan aplikasi mobile banking atau e-wallet yang mendukung QRIS'
+        },
+        BCA: {
+            name: 'Transfer Bank BCA',
+            accountNumber: '1234567890',
+            accountName: 'THE. C DRINKS',
+            bank: 'BCA',
+            instructions: 'Transfer ke rekening BCA atas nama THE. C DRINKS'
+        }
+    },
+    
+    // Default Menu Data
     DEFAULT_PRODUCTS: [
         { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
         { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": "./cokelat-hazelnut.jpeg", "accentColor": "#A67C52", "priceK": 13000, "priceB": 16000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
@@ -62,18 +81,21 @@ const APP_CONFIG = {
         { "id": "post-6", "image": "https://placehold.co/600x600/252525/white?text=Instagram+6", "likes": "2,740", "comments": "88", "caption": "Arsitektur minimalis yang elegan. Outlet Jl. Premium Rasa kami kini resmi dibuka.", "type": "photo" }
     ],
     
-    // WhatsApp Message Templates
     WHATSAPP_MESSAGE_TEMPLATE: `Halo THE. C DRINKS! 🥤✨
 
 Saya ingin memesan:
 {ITEMS}
 
 {SHIPPING_INFO}
+Biaya Layanan: Rp {SERVICE_FEE}
 Subtotal: Rp {SUBTOTAL}
 Total: Rp {TOTAL}
 
 Nama: {CUSTOMER_NAME}
-Metode: {METHOD}`,
+Metode: {METHOD}
+Alamat: Akan saya share via WhatsApp
+
+Mohon informasi total pembayaran dan instruksi pembayaran. Terima kasih!`,
 
     CONTACT_MESSAGE_TEMPLATE: `Halo THE. C DRINKS! Saya {NAME} ({PHONE}).
 
@@ -81,7 +103,6 @@ Pesan:
 {MESSAGE}`
 };
 
-// Hashed password untuk admin panel
 const HASHED_ADMIN_PASSWORD = CryptoJS.SHA256(APP_CONFIG.ADMIN_PASSWORD).toString();
 let isAdminAuthenticated = false;
 
@@ -91,7 +112,6 @@ let campaignsData = [];
 let testimonialsData = [];
 let instagramPostsData = [];
 
-// State
 let cartItems = [];
 let receiptData = null;
 let activeCategory = 'all';
@@ -101,7 +121,11 @@ let productTemp = {};
 let currentFormType = null;
 let currentEditId = null;
 
-// ==================== HASHED PASSWORD FUNCTIONS ====================
+// Payment variables
+let pendingPaymentData = null;
+let uploadedProofFile = null;
+
+// ==================== HELPER FUNCTIONS ====================
 function hashPassword(password) {
     return CryptoJS.SHA256(password).toString();
 }
@@ -112,281 +136,8 @@ function checkExistingAuth() {
     }
 }
 
-function openAdminPanel() {
-    if (isAdminAuthenticated) {
-        showAdminPanel();
-    } else {
-        showPasswordModal();
-    }
-}
-
-function showPasswordModal() {
-    document.getElementById('admin-password-modal').classList.remove('hidden');
-    document.getElementById('admin-password-modal').classList.add('flex');
-    document.getElementById('admin-password-input').value = '';
-    document.getElementById('admin-password-input').focus();
-}
-
-function closePasswordModal() {
-    document.getElementById('admin-password-modal').classList.add('hidden');
-    document.getElementById('admin-password-modal').classList.remove('flex');
-}
-
-function verifyAdminPassword() {
-    const enteredPassword = document.getElementById('admin-password-input').value;
-    const hashedEntered = hashPassword(enteredPassword);
-    
-    if (hashedEntered === HASHED_ADMIN_PASSWORD) {
-        isAdminAuthenticated = true;
-        closePasswordModal();
-        showAdminPanel();
-        sessionStorage.setItem('adminAuth', 'true');
-    } else {
-        alert('Password salah! Akses ditolak.');
-        document.getElementById('admin-password-input').value = '';
-        document.getElementById('admin-password-input').focus();
-        const modal = document.getElementById('admin-password-modal');
-        modal.classList.add('animate-shake');
-        setTimeout(() => modal.classList.remove('animate-shake'), 500);
-    }
-}
-
-function showAdminPanel() {
-    document.getElementById('admin-modal').classList.remove('hidden');
-    document.getElementById('admin-modal').classList.add('flex');
-    refreshAdminLists();
-}
-
-function closeAdminPanel() {
-    document.getElementById('admin-modal').classList.add('hidden');
-    document.getElementById('admin-modal').classList.remove('flex');
-}
-
-function adminLogout() {
-    isAdminAuthenticated = false;
-    sessionStorage.removeItem('adminAuth');
-    closeAdminPanel();
-    showNotification('Anda telah logout dari panel admin', 'info');
-}
-
-// ==================== DATA MIGRATION FUNCTIONS ====================
-async function migrateNewProducts() {
-    const existingIds = productsData.map(p => p.id);
-    const newProducts = APP_CONFIG.DEFAULT_PRODUCTS.filter(p => !existingIds.includes(p.id));
-    
-    if (newProducts.length > 0) {
-        console.log(`🆕 Menemukan ${newProducts.length} produk baru yang belum ada:`, newProducts.map(p => p.name));
-        
-        const shouldAdd = confirm(`Terdapat ${newProducts.length} menu baru:\n${newProducts.map(p => `- ${p.name}`).join('\n')}\n\nApakah Anda ingin menambahkannya ke database?`);
-        
-        if (shouldAdd) {
-            productsData.push(...newProducts);
-            await saveProducts();
-            showNotification(`${newProducts.length} produk baru berhasil ditambahkan!`, 'success');
-            renderProductsByCategory(activeCategory);
-            renderAdminProducts();
-            return true;
-        } else {
-            showNotification('Produk baru tidak ditambahkan', 'info');
-            return false;
-        }
-    }
-    return false;
-}
-
-async function migrateNewCampaigns() {
-    const existingIds = campaignsData.map(c => c.id);
-    const newCampaigns = APP_CONFIG.DEFAULT_CAMPAIGNS.filter(c => !existingIds.includes(c.id));
-    
-    if (newCampaigns.length > 0) {
-        console.log(`🆕 Menemukan ${newCampaigns.length} campaign baru`);
-        const shouldAdd = confirm(`Terdapat ${newCampaigns.length} campaign baru.\nApakah Anda ingin menambahkannya ke database?`);
-        if (shouldAdd) {
-            campaignsData.push(...newCampaigns);
-            await saveCampaigns();
-            renderCampaigns();
-            renderAdminCampaigns();
-            return true;
-        }
-    }
-    return false;
-}
-
-async function runMigrations() {
-    const savedVersion = localStorage.getItem('thec_data_version');
-    
-    if (savedVersion !== APP_CONFIG.DATA_VERSION) {
-        console.log(`📦 Migrasi data dari versi ${savedVersion || 'unknown'} ke ${APP_CONFIG.DATA_VERSION}`);
-        
-        const productsAdded = await migrateNewProducts();
-        const campaignsAdded = await migrateNewCampaigns();
-        
-        if (productsAdded || campaignsAdded) {
-            localStorage.setItem('thec_data_version', APP_CONFIG.DATA_VERSION);
-            showNotification('Database berhasil diperbarui!', 'success');
-        } else {
-            localStorage.setItem('thec_data_version', APP_CONFIG.DATA_VERSION);
-        }
-    }
-}
-
-// ==================== API FUNCTIONS ====================
-async function loadDataFromAPI() {
-    try {
-        console.log('🔄 Loading data from JSONBin...');
-        const response = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.JSONBIN_BIN_ID}/latest`, {
-            headers: { 'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY }
-        });
-        
-        if (response.ok) {
-            const data = await response.json();
-            const record = data.record;
-            console.log('📦 Data from JSONBin:', record);
-            
-            if (record && record.products && record.products.length > 0) {
-                productsData = record.products;
-                campaignsData = record.campaigns || APP_CONFIG.DEFAULT_CAMPAIGNS;
-                testimonialsData = record.testimonials || APP_CONFIG.DEFAULT_TESTIMONIALS;
-                instagramPostsData = record.instagram || APP_CONFIG.DEFAULT_INSTAGRAM;
-                console.log('✅ Data loaded successfully from JSONBin');
-                
-                await runMigrations();
-                
-            } else {
-                console.log('⚠️ Bin kosong, mengisi dengan data default...');
-                productsData = APP_CONFIG.DEFAULT_PRODUCTS;
-                campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
-                testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
-                instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
-                await saveAllDataToAPI();
-                localStorage.setItem('thec_data_version', APP_CONFIG.DATA_VERSION);
-                console.log('✅ Data default berhasil di-inject ke JSONBin!');
-            }
-        } else {
-            console.error('❌ API response error:', response.status);
-            await createOrUpdateBinWithDefaultData();
-            localStorage.setItem('thec_data_version', APP_CONFIG.DATA_VERSION);
-        }
-    } catch (error) {
-        console.error('❌ Error loading data:', error);
-        productsData = APP_CONFIG.DEFAULT_PRODUCTS;
-        campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
-        testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
-        instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
-        
-        try {
-            await saveAllDataToAPI();
-            localStorage.setItem('thec_data_version', APP_CONFIG.DATA_VERSION);
-            console.log('✅ Data default berhasil disimpan ke JSONBin setelah error');
-        } catch(e) {
-            console.error('❌ Gagal menyimpan data default:', e);
-            showNotification('Gagal terhubung ke database, menggunakan data lokal', 'error');
-        }
-    }
-}
-
-async function createOrUpdateBinWithDefaultData() {
-    const defaultData = {
-        products: APP_CONFIG.DEFAULT_PRODUCTS,
-        campaigns: APP_CONFIG.DEFAULT_CAMPAIGNS,
-        testimonials: APP_CONFIG.DEFAULT_TESTIMONIALS,
-        instagram: APP_CONFIG.DEFAULT_INSTAGRAM,
-        lastUpdated: new Date().toISOString()
-    };
-    
-    try {
-        const updateResponse = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.JSONBIN_BIN_ID}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY
-            },
-            body: JSON.stringify(defaultData)
-        });
-        
-        if (updateResponse.ok) {
-            console.log('✅ Bin updated with default data');
-            productsData = APP_CONFIG.DEFAULT_PRODUCTS;
-            campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
-            testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
-            instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
-            showNotification('Database berhasil diinisialisasi!', 'success');
-        } else {
-            console.log('🆕 Creating new bin...');
-            const createResponse = await fetch('https://api.jsonbin.io/v3/b', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY
-                },
-                body: JSON.stringify(defaultData)
-            });
-            
-            if (createResponse.ok) {
-                const newBin = await createResponse.json();
-                console.log('✅ New bin created with ID:', newBin.id);
-                showNotification(`Bin baru berhasil dibuat! ID: ${newBin.id}`, 'success');
-                productsData = APP_CONFIG.DEFAULT_PRODUCTS;
-                campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
-                testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
-                instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
-            } else {
-                console.error('❌ Failed to create bin');
-                showNotification('Gagal membuat database!', 'error');
-            }
-        }
-    } catch (error) {
-        console.error('❌ Error creating/updating bin:', error);
-        showNotification('Error koneksi ke database!', 'error');
-    }
-}
-
-async function saveAllDataToAPI() {
-    const dataToSave = {
-        products: productsData,
-        campaigns: campaignsData,
-        testimonials: testimonialsData,
-        instagram: instagramPostsData,
-        lastUpdated: new Date().toISOString()
-    };
-    
-    try {
-        console.log('💾 Saving data to JSONBin...');
-        const response = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.JSONBIN_BIN_ID}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY
-            },
-            body: JSON.stringify(dataToSave)
-        });
-        
-        if (response.ok) {
-            console.log('✅ Data saved successfully');
-            showNotification('Data berhasil disimpan!', 'success');
-        } else {
-            const errorText = await response.text();
-            console.error('❌ Save failed:', response.status, errorText);
-            showNotification(`Gagal menyimpan: ${response.status}`, 'error');
-        }
-    } catch (error) {
-        console.error('❌ Error saving data:', error);
-        showNotification('Gagal menyimpan data! Cek koneksi internet', 'error');
-    }
-}
-
-async function saveProducts() { await saveAllDataToAPI(); }
-async function saveCampaigns() { await saveAllDataToAPI(); }
-async function saveTestimonials() { await saveAllDataToAPI(); }
-async function saveInstagram() { await saveAllDataToAPI(); }
-
-// ==================== NOTIFICATION ====================
 function showNotification(message, type = 'info') {
-    const colors = {
-        success: 'bg-green-600',
-        error: 'bg-red-600',
-        info: 'bg-[#111111]'
-    };
+    const colors = { success: 'bg-green-600', error: 'bg-red-600', info: 'bg-[#111111]' };
     const notification = document.createElement('div');
     notification.className = `fixed top-20 right-4 z-[100] ${colors[type]} text-white text-xs font-bold py-2 px-4 rounded-lg shadow-lg transition-all duration-300`;
     notification.innerHTML = message;
@@ -397,7 +148,6 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// ==================== CRUD HELPERS ====================
 function generateId(prefix) {
     return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 6)}`;
 }
@@ -405,9 +155,7 @@ function generateId(prefix) {
 // ==================== DELIVERY FEE CALCULATION ====================
 function calculateDeliveryFee(distance) {
     if (isNaN(distance) || distance <= 0) return 0;
-    // 1-3 km flat rate Rp5.000
     if (distance <= APP_CONFIG.DELIVERY_FLAT_RATE_KM) return APP_CONFIG.DELIVERY_FLAT_FEE;
-    // Per km berikutnya Rp2.000
     const extraKm = Math.ceil(distance - APP_CONFIG.DELIVERY_FLAT_RATE_KM);
     return APP_CONFIG.DELIVERY_FLAT_FEE + (extraKm * APP_CONFIG.DELIVERY_EXTRA_PER_KM);
 }
@@ -418,6 +166,10 @@ function getDeliveryFee() {
     const distance = parseFloat(distanceInput.value);
     if (isNaN(distance) || distance <= 0) return 0;
     return calculateDeliveryFee(distance);
+}
+
+function getServiceFee() {
+    return APP_CONFIG.SERVICE_FEE;
 }
 
 function updateDeliveryFee() {
@@ -479,7 +231,6 @@ function getUserLocationWA() {
     if (statusEl) {
         statusEl.textContent = '📍 Mendapatkan lokasi Anda... Mohon izinkan akses lokasi.';
         statusEl.classList.remove('hidden');
-        statusEl.classList.remove('text-red-600', 'text-emerald-600');
         statusEl.classList.add('text-blue-600');
     }
     
@@ -501,10 +252,10 @@ function getUserLocationWA() {
                     const extraKm = Math.ceil(distance - APP_CONFIG.DELIVERY_FLAT_RATE_KM);
                     feeInfo = ` (Ongkir Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()} + ${extraKm}km × Rp${APP_CONFIG.DELIVERY_EXTRA_PER_KM.toLocaleString()} = Rp${fee.toLocaleString()})`;
                 }
-                statusEl.innerHTML = `📍 Jarak ke toko: ${distance.toFixed(1)} km ✅${feeInfo}`;
-                statusEl.classList.remove('text-blue-600', 'text-red-600');
+                statusEl.innerHTML = `📍 Jarak ke toko: ${distance.toFixed(1)} km ✅${feeInfo}\n📌 Silakan share location Anda via WhatsApp`;
+                statusEl.classList.remove('text-blue-600');
                 statusEl.classList.add('text-emerald-600');
-                setTimeout(() => statusEl.classList.add('hidden'), 4000);
+                setTimeout(() => statusEl.classList.add('hidden'), 5000);
             }
             updateDeliveryFee();
             if (resetBtn) resetBtn.classList.add('hidden');
@@ -514,11 +265,11 @@ function getUserLocationWA() {
             let showResetButton = false;
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    errorMessage = '❌ Izin lokasi ditolak. Klik tombol Reset untuk meminta izin kembali.';
+                    errorMessage = '❌ Izin lokasi ditolak. Silakan isi jarak manual atau klik Reset untuk meminta izin kembali.';
                     showResetButton = true;
                     break;
                 case error.POSITION_UNAVAILABLE:
-                    errorMessage = '❌ Informasi lokasi tidak tersedia. Silakan coba lagi atau isi jarak manual.';
+                    errorMessage = '❌ Informasi lokasi tidak tersedia. Silakan isi jarak manual.';
                     showResetButton = false;
                     break;
                 case error.TIMEOUT:
@@ -602,13 +353,6 @@ async function loadData() {
     updateStoreInfo();
 }
 
-function renderProductsByCategory(categoryId) {
-    let filtered = [...productsData];
-    if (categoryId === 'best-seller') filtered = filtered.filter(p => p.isBestSeller);
-    else if (categoryId !== 'all') filtered = filtered.filter(p => p.category === categoryId);
-    renderProducts(filtered);
-}
-
 const categoriesData = [
     { "id": "all", "name": "Semua Koleksi" },
     { "id": "best-seller", "name": "Terlaris" },
@@ -643,11 +387,16 @@ function filterProducts(categoryId) {
     renderProductsByCategory(categoryId);
 }
 
+function renderProductsByCategory(categoryId) {
+    let filtered = [...productsData];
+    if (categoryId === 'best-seller') filtered = filtered.filter(p => p.isBestSeller);
+    else if (categoryId !== 'all') filtered = filtered.filter(p => p.category === categoryId);
+    renderProducts(filtered);
+}
+
 function setProductSize(productId, size) {
     const product = productsData.find(p => p.id === productId);
-    if (product && product.onlySizeB) {
-        size = 'B';
-    }
+    if (product && product.onlySizeB) size = 'B';
     productSizes[productId] = size;
     document.querySelectorAll(`.size-btn-${productId}`).forEach(btn => {
         const btnSize = btn.getAttribute('data-size');
@@ -660,6 +409,25 @@ function setProductSize(productId, size) {
         }
     });
     renderProductsByCategory(activeCategory);
+}
+
+function setProductTemp(productId, temp) {
+    productTemp[productId] = temp;
+    const hotBtn = document.getElementById(`temp-hot-${productId}`);
+    const coldBtn = document.getElementById(`temp-cold-${productId}`);
+    if (hotBtn && coldBtn) {
+        if (temp === 'PANAS') {
+            hotBtn.classList.remove('bg-white', 'text-neutral-600', 'border-neutral-200', 'hover:bg-neutral-50');
+            hotBtn.classList.add('bg-[#111111]', 'text-white', 'border-[#111111]');
+            coldBtn.classList.remove('bg-[#111111]', 'text-white', 'border-[#111111]');
+            coldBtn.classList.add('bg-white', 'text-neutral-600', 'border-neutral-200', 'hover:bg-neutral-50');
+        } else {
+            coldBtn.classList.remove('bg-white', 'text-neutral-600', 'border-neutral-200', 'hover:bg-neutral-50');
+            coldBtn.classList.add('bg-[#111111]', 'text-white', 'border-[#111111]');
+            hotBtn.classList.remove('bg-[#111111]', 'text-white', 'border-[#111111]');
+            hotBtn.classList.add('bg-white', 'text-neutral-600', 'border-neutral-200', 'hover:bg-neutral-50');
+        }
+    }
 }
 
 function addToCart(productId, size, temperature, toppings) {
@@ -686,16 +454,9 @@ function addToCart(productId, size, temperature, toppings) {
         existing.quantity++;
     } else {
         cartItems.push({ 
-            id: itemId, 
-            productId, 
-            product, 
-            size: finalSize, 
-            temperature,
-            toppings: { ...finalToppings },
-            quantity: 1,
-            basePrice: price,
-            toppingPrice: toppingPrice,
-            totalPrice: totalItemPrice
+            id: itemId, productId, product, size: finalSize, temperature,
+            toppings: { ...finalToppings }, quantity: 1,
+            basePrice: price, toppingPrice: toppingPrice, totalPrice: totalItemPrice
         });
     }
     updateCartUI();
@@ -713,6 +474,19 @@ function showAddToCartNotification(productName) {
     }, 2000);
 }
 
+function addToCartFromCard(productId, size) {
+    const product = productsData.find(p => p.id === productId);
+    const temperature = productTemp[productId] || 'DINGIN';
+    let finalSize = size;
+    if (product && product.onlySizeB) finalSize = 'B';
+    let bobaChecked = false, creamCheeseChecked = false;
+    if (!product || !product.noToppings) {
+        bobaChecked = document.getElementById(`topping-boba-${productId}`)?.checked || false;
+        creamCheeseChecked = document.getElementById(`topping-creamcheese-${productId}`)?.checked || false;
+    }
+    addToCart(productId, finalSize, temperature, { boba: bobaChecked, creamCheese: creamCheeseChecked });
+}
+
 function renderProducts(products) {
     const container = document.getElementById('products-grid');
     if (!container) return;
@@ -722,16 +496,12 @@ function renderProducts(products) {
     }
     
     products.forEach(product => {
-        if (productTemp[product.id] === undefined) {
-            productTemp[product.id] = 'DINGIN';
-        }
+        if (productTemp[product.id] === undefined) productTemp[product.id] = 'DINGIN';
     });
     
     container.innerHTML = products.map(product => {
         let defaultSize = 'B';
-        if (!product.onlySizeB) {
-            defaultSize = productSizes[product.id] || 'K';
-        }
+        if (!product.onlySizeB) defaultSize = productSizes[product.id] || 'K';
         const activeSize = defaultSize;
         const price = getProductPrice(product, activeSize);
         const isKActive = (activeSize === 'K' && !product.onlySizeB);
@@ -740,12 +510,8 @@ function renderProducts(products) {
         const showToppings = !product.noToppings;
         const currentTemp = productTemp[product.id] || 'DINGIN';
         
-        const hotButtonClass = currentTemp === 'PANAS' 
-            ? 'bg-[#111111] text-white border-[#111111]' 
-            : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50';
-        const coldButtonClass = currentTemp === 'DINGIN' 
-            ? 'bg-[#111111] text-white border-[#111111]' 
-            : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50';
+        const hotButtonClass = currentTemp === 'PANAS' ? 'bg-[#111111] text-white border-[#111111]' : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50';
+        const coldButtonClass = currentTemp === 'DINGIN' ? 'bg-[#111111] text-white border-[#111111]' : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-50';
         
         return `<div class="product-card group bg-white rounded-[1.75rem] border border-neutral-100 shadow-sm p-3.5 hover:shadow-xl hover:translate-y-[-6px] transition-all duration-300 flex flex-col justify-between">
             <div>
@@ -773,20 +539,18 @@ function renderProducts(products) {
                     `}
                     <div class="text-right font-mono font-bold text-[11px]">Rp ${price.toLocaleString('id-ID')}</div>
                 </div>
-                
                 <div class="flex gap-2 mt-1">
                     <button onclick="setProductTemp('${product.id}', 'PANAS')" id="temp-hot-${product.id}" class="temp-btn-${product.id} flex-1 py-1.5 rounded-lg text-[8px] font-bold transition-all border ${hotButtonClass}">🔥 Panas</button>
                     <button onclick="setProductTemp('${product.id}', 'DINGIN')" id="temp-cold-${product.id}" class="temp-btn-${product.id} flex-1 py-1.5 rounded-lg text-[8px] font-bold transition-all border ${coldButtonClass}">❄️ Dingin</button>
                 </div>
-                
                 ${showToppings ? `
                 <div class="flex flex-wrap gap-2 mt-1">
                     <label class="flex items-center gap-1 text-[8px] font-medium text-neutral-600 bg-neutral-50 px-2 py-1 rounded-full cursor-pointer hover:bg-neutral-100 transition-colors">
-                        <input type="checkbox" id="topping-boba-${product.id}" class="w-3 h-3 accent-[#111111]" onchange="updateToppingSelection('${product.id}')">
+                        <input type="checkbox" id="topping-boba-${product.id}" class="w-3 h-3 accent-[#111111]">
                         <span>⚫️ Boba +3k</span>
                     </label>
                     <label class="flex items-center gap-1 text-[8px] font-medium text-neutral-600 bg-neutral-50 px-2 py-1 rounded-full cursor-pointer hover:bg-neutral-100 transition-colors">
-                        <input type="checkbox" id="topping-creamcheese-${product.id}" class="w-3 h-3 accent-[#111111]" onchange="updateToppingSelection('${product.id}')">
+                        <input type="checkbox" id="topping-creamcheese-${product.id}" class="w-3 h-3 accent-[#111111]">
                         <span>🧀 Cream Cheese +5k</span>
                     </label>
                 </div>
@@ -795,7 +559,6 @@ function renderProducts(products) {
                     <span class="text-[8px] font-medium text-neutral-400 bg-neutral-50 px-2 py-1 rounded-full">🚫 Tanpa Topping</span>
                 </div>
                 `}
-                
                 <button onclick="addToCartFromCard('${product.id}', '${activeSize}')" class="w-full rounded-full flex items-center justify-center gap-1 text-[9px] font-extrabold py-2 bg-[#111111] hover:bg-neutral-800 text-white transition-all mt-1">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4Z"/><path d="M3 6h18"/><path d="M16 10a4 4 0 0 1-8 0"/></svg>
                     <span>Pesan Sekarang</span>
@@ -803,50 +566,6 @@ function renderProducts(products) {
             </div>
         </div>`;
     }).join('');
-}
-
-function updateToppingSelection(productId) {}
-
-function setProductTemp(productId, temp) {
-    productTemp[productId] = temp;
-    
-    const hotBtn = document.getElementById(`temp-hot-${productId}`);
-    const coldBtn = document.getElementById(`temp-cold-${productId}`);
-    
-    if (hotBtn && coldBtn) {
-        if (temp === 'PANAS') {
-            hotBtn.classList.remove('bg-white', 'text-neutral-600', 'border-neutral-200', 'hover:bg-neutral-50');
-            hotBtn.classList.add('bg-[#111111]', 'text-white', 'border-[#111111]');
-            
-            coldBtn.classList.remove('bg-[#111111]', 'text-white', 'border-[#111111]');
-            coldBtn.classList.add('bg-white', 'text-neutral-600', 'border-neutral-200', 'hover:bg-neutral-50');
-        } else {
-            coldBtn.classList.remove('bg-white', 'text-neutral-600', 'border-neutral-200', 'hover:bg-neutral-50');
-            coldBtn.classList.add('bg-[#111111]', 'text-white', 'border-[#111111]');
-            
-            hotBtn.classList.remove('bg-[#111111]', 'text-white', 'border-[#111111]');
-            hotBtn.classList.add('bg-white', 'text-neutral-600', 'border-neutral-200', 'hover:bg-neutral-50');
-        }
-    }
-}
-
-function addToCartFromCard(productId, size) {
-    const product = productsData.find(p => p.id === productId);
-    const temperature = productTemp[productId] || 'DINGIN';
-    
-    let finalSize = size;
-    if (product && product.onlySizeB) finalSize = 'B';
-    
-    let bobaChecked = false;
-    let creamCheeseChecked = false;
-    
-    if (!product || !product.noToppings) {
-        bobaChecked = document.getElementById(`topping-boba-${productId}`)?.checked || false;
-        creamCheeseChecked = document.getElementById(`topping-creamcheese-${productId}`)?.checked || false;
-    }
-    
-    const toppings = { boba: bobaChecked, creamCheese: creamCheeseChecked };
-    addToCart(productId, finalSize, temperature, toppings);
 }
 
 function renderCampaigns() {
@@ -858,21 +577,20 @@ function renderCampaigns() {
 function renderTestimonials() {
     const container = document.getElementById('testimonials-grid');
     if (!container) return;
-    container.innerHTML = testimonialsData.map(test => `<div class="bg-white rounded-3xl border border-neutral-100 shadow-xs hover:shadow-xl transition-all p-6 flex flex-col justify-between"><div><div class="bg-[#F8F8F8] rounded-2xl p-4 mb-6 flex items-center gap-2"><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white -rotate-6"><img src="${test.productImage}" class="w-full h-full object-cover"></div><div class="aspect-[3/4] w-[35%] rounded-xl overflow-hidden shadow-md border bg-white z-10 scale-105"><img src="${test.productImage}" class="w-full h-full object-cover"></div><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white rotate-6"><img src="${test.productImage}" class="w-full h-full object-cover"></div></div><div class="flex items-center gap-1 mb-4">${'<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="#F59E0B" stroke="#F59E0B" class="w-3.5 h-3.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>'.repeat(test.ratingValue)}</div><h3 class="text-sm font-extrabold text-[#111111] mb-3">"${test.reviewTitle}"</h3><p class="text-neutral-500 text-xs leading-relaxed mb-6">${test.reviewText}</p></div><div class="border-t border-neutral-100 pt-4"><div class="flex justify-between"><div><h4 class="font-bold text-neutral-900 text-xs">${test.customerName}</h4><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${test.city}</span></div><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${test.date}</span></div></div></div>`).join('');
+    container.innerHTML = testimonialsData.map(test => `<div class="bg-white rounded-3xl border border-neutral-100 shadow-xs hover:shadow-xl transition-all p-6 flex flex-col justify-between"><div><div class="bg-[#F8F8F8] rounded-2xl p-4 mb-6 flex items-center gap-2"><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white -rotate-6"><img src="${test.productImage}" class="w-full h-full object-cover"></div><div class="aspect-[3/4] w-[35%] rounded-xl overflow-hidden shadow-md border bg-white z-10 scale-105"><img src="${test.productImage}" class="w-full h-full object-cover"></div><div class="aspect-[3/4] w-[30%] rounded-xl overflow-hidden shadow-xs border bg-white rotate-6"><img src="${test.productImage}" class="w-full h-full object-cover"></div></div><div class="flex items-center gap-1 mb-4">${'⭐'.repeat(test.ratingValue)}</div><h3 class="text-sm font-extrabold text-[#111111] mb-3">"${test.reviewTitle}"</h3><p class="text-neutral-500 text-xs leading-relaxed mb-6">${test.reviewText}</p></div><div class="border-t border-neutral-100 pt-4"><div class="flex justify-between"><div><h4 class="font-bold text-neutral-900 text-xs">${test.customerName}</h4><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>${test.city}</span></div><span class="text-[10px] text-neutral-400 flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>${test.date}</span></div></div></div>`).join('');
 }
 
 function renderInstagramPosts() {
     const container = document.getElementById('instagram-grid');
     if (!container) return;
-    container.innerHTML = instagramPostsData.map(post => `<button onclick="openLightbox('${post.id}')" class="group relative aspect-square rounded-2xl overflow-hidden shadow-xs border cursor-pointer"><img src="${post.image}" class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"><div class="absolute inset-0 bg-[#111111]/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity"><div class="flex items-center space-x-6"><span class="flex items-center gap-1 font-mono text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>${post.likes}</span><span class="flex items-center gap-1 font-mono text-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="white" stroke="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>${post.comments}</span></div><span class="absolute bottom-4 left-4 right-4 text-[10px] text-zinc-100 italic truncate">${post.caption}</span></div></button>`).join('');
+    container.innerHTML = instagramPostsData.map(post => `<button onclick="openLightbox('${post.id}')" class="group relative aspect-square rounded-2xl overflow-hidden shadow-xs border cursor-pointer"><img src="${post.image}" class="w-full h-full object-cover transition-all duration-500 group-hover:scale-105"><div class="absolute inset-0 bg-[#111111]/40 opacity-0 group-hover:opacity-100 flex flex-col items-center justify-center text-white transition-opacity"><div class="flex items-center space-x-6"><span class="flex items-center gap-1 font-mono text-sm">❤️ ${post.likes}</span><span class="flex items-center gap-1 font-mono text-sm">💬 ${post.comments}</span></div><span class="absolute bottom-4 left-4 right-4 text-[10px] text-zinc-100 italic truncate">${post.caption}</span></div></button>`).join('');
     window.instagramPostsData = instagramPostsData;
 }
 
 // ==================== CART FUNCTIONS ====================
 function getSubtotal() {
     return cartItems.reduce((sum, item) => {
-        const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
-        return sum + itemTotal;
+        return sum + ((item.basePrice + item.toppingPrice) * item.quantity);
     }, 0);
 }
 
@@ -918,20 +636,24 @@ function renderCartItems() {
 function updateCartTotals() {
     const subtotal = getSubtotal();
     const deliveryFee = getDeliveryFee();
-    const total = subtotal + deliveryFee;
+    const serviceFee = getServiceFee();
+    const total = subtotal + deliveryFee + serviceFee;
     
     const subtotalEl = document.getElementById('cart-subtotal');
     const taxEl = document.getElementById('cart-tax');
     const totalEl = document.getElementById('cart-total');
     const checkoutTotal = document.getElementById('checkout-total');
+    const paymentAmount = document.getElementById('payment-amount');
     
     if (subtotalEl) subtotalEl.textContent = `Rp ${subtotal.toLocaleString()}`;
     if (taxEl) taxEl.textContent = deliveryFee > 0 ? `Rp ${deliveryFee.toLocaleString()}` : 'Rp 0';
     if (totalEl) totalEl.textContent = `Rp ${total.toLocaleString()}`;
     if (checkoutTotal) checkoutTotal.textContent = `Rp ${total.toLocaleString()}`;
+    if (paymentAmount) paymentAmount.textContent = `Rp ${total.toLocaleString()}`;
     
     window.cartSubtotal = subtotal;
     window.cartDeliveryFee = deliveryFee;
+    window.cartServiceFee = serviceFee;
     window.cartTotal = total;
 }
 
@@ -967,13 +689,195 @@ function openCheckoutModal() {
         if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
     }
 }
+
 function closeCheckoutModal() { const modal = document.getElementById('checkout-modal'); if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); } }
+
+// ==================== PAYMENT MODAL ====================
+let pendingCheckoutData = null;
+
+function showPaymentModal(checkoutData) {
+    pendingCheckoutData = checkoutData;
+    const modal = document.getElementById('payment-modal');
+    if (modal) {
+        updateCartTotals();
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+}
+
+function closePaymentModal() {
+    const modal = document.getElementById('payment-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+    // Reset payment details
+    const paymentDetails = document.getElementById('payment-details');
+    if (paymentDetails) {
+        paymentDetails.classList.add('hidden');
+        paymentDetails.innerHTML = '';
+    }
+    pendingCheckoutData = null;
+}
+
+function selectPaymentMethod(method) {
+    if (!pendingCheckoutData) return;
+    
+    const paymentInfo = APP_CONFIG.PAYMENT_METHODS[method];
+    if (!paymentInfo) return;
+    
+    const paymentDetails = document.getElementById('payment-details');
+    if (!paymentDetails) return;
+    
+    paymentDetails.classList.remove('hidden');
+    
+    if (method === 'QRIS') {
+        paymentDetails.innerHTML = `
+            <div class="text-center">
+                <img src="${paymentInfo.qrImage}" alt="QRIS Code" class="w-48 h-48 mx-auto mb-3 border rounded-lg" onerror="this.src='https://placehold.co/400x400/111111/white?text=QRIS'">
+                <p class="text-[10px] text-neutral-600 mb-2">${paymentInfo.instructions}</p>
+                <p class="text-[8px] text-neutral-400">Scan QR Code di atas untuk melakukan pembayaran</p>
+            </div>
+        `;
+    } else if (method === 'BCA') {
+        paymentDetails.innerHTML = `
+            <div class="space-y-2 text-center">
+                <div class="bg-neutral-100 rounded-lg p-3">
+                    <p class="text-[9px] text-neutral-500 mb-1">Bank</p>
+                    <p class="font-bold text-xs">${paymentInfo.bank}</p>
+                </div>
+                <div class="bg-neutral-100 rounded-lg p-3">
+                    <p class="text-[9px] text-neutral-500 mb-1">Nomor Rekening</p>
+                    <p class="font-bold text-xs font-mono">${paymentInfo.accountNumber}</p>
+                </div>
+                <div class="bg-neutral-100 rounded-lg p-3">
+                    <p class="text-[9px] text-neutral-500 mb-1">Atas Nama</p>
+                    <p class="font-bold text-xs">${paymentInfo.accountName}</p>
+                </div>
+                <p class="text-[10px] text-neutral-600 mt-3">${paymentInfo.instructions}</p>
+            </div>
+        `;
+    }
+}
+
+function confirmPayment() {
+    if (!pendingCheckoutData) return;
+    
+    // Close payment modal first
+    closePaymentModal();
+    
+    // Show payment confirmation modal for upload bukti
+    showPaymentConfirmModal(pendingCheckoutData);
+}
+
+// ==================== PAYMENT CONFIRMATION MODAL (UPLOAD BUKTI) ====================
+function showPaymentConfirmModal(checkoutData) {
+    pendingPaymentData = checkoutData;
+    const modal = document.getElementById('payment-confirm-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+    // Reset upload state
+    uploadedProofFile = null;
+    const previewDiv = document.getElementById('upload-preview');
+    const uploadArea = document.getElementById('upload-area');
+    if (previewDiv) previewDiv.classList.add('hidden');
+    if (uploadArea) uploadArea.classList.remove('hidden');
+    const fileInput = document.getElementById('payment-proof');
+    if (fileInput) fileInput.value = '';
+}
+
+function closePaymentConfirmModal() {
+    const modal = document.getElementById('payment-confirm-modal');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+    pendingPaymentData = null;
+    uploadedProofFile = null;
+}
+
+function setupFileUpload() {
+    const uploadArea = document.getElementById('upload-area');
+    const fileInput = document.getElementById('payment-proof');
+    
+    if (uploadArea && fileInput) {
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files[0]) {
+                uploadedProofFile = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = function(ev) {
+                    const previewImg = document.getElementById('preview-image');
+                    if (previewImg) {
+                        previewImg.src = ev.target.result;
+                    }
+                    const previewDiv = document.getElementById('upload-preview');
+                    const uploadAreaDiv = document.getElementById('upload-area');
+                    if (previewDiv) previewDiv.classList.remove('hidden');
+                    if (uploadAreaDiv) uploadAreaDiv.classList.add('hidden');
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    }
+}
+
+function removeUploadedFile() {
+    uploadedProofFile = null;
+    const fileInput = document.getElementById('payment-proof');
+    if (fileInput) fileInput.value = '';
+    const previewDiv = document.getElementById('upload-preview');
+    const uploadArea = document.getElementById('upload-area');
+    if (previewDiv) previewDiv.classList.add('hidden');
+    if (uploadArea) uploadArea.classList.remove('hidden');
+}
+
+async function sendWithProof() {
+    if (!pendingPaymentData) return;
+    
+    let waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(pendingPaymentData.waMessage)}`;
+    
+    // If there's a proof image, we need to handle it differently
+    // WhatsApp doesn't support direct image upload via URL, so we'll add a note
+    if (uploadedProofFile) {
+        const proofNote = `\n\n📸 *Bukti Transfer Terlampir*: (Silakan kirim gambar bukti transfer secara terpisah ke chat ini)\n`;
+        waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(pendingPaymentData.waMessage + proofNote)}`;
+    }
+    
+    // Open WhatsApp
+    window.open(waUrl, '_blank');
+    
+    // Process checkout
+    processCheckout(pendingPaymentData.type, pendingPaymentData.customerName, pendingPaymentData.deliveryFee, pendingPaymentData.distance);
+    
+    // Close modal
+    closePaymentConfirmModal();
+    pendingPaymentData = null;
+}
+
+function sendWithoutProof() {
+    if (!pendingPaymentData) return;
+    
+    const waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(pendingPaymentData.waMessage)}`;
+    window.open(waUrl, '_blank');
+    
+    processCheckout(pendingPaymentData.type, pendingPaymentData.customerName, pendingPaymentData.deliveryFee, pendingPaymentData.distance);
+    
+    closePaymentConfirmModal();
+    pendingPaymentData = null;
+}
 
 function checkoutViaWhatsApp() {
     if (cartItems.length === 0) return;
     const customerName = document.getElementById('customer-name')?.value || 'Pelanggan';
     const distance = parseFloat(document.getElementById('delivery-distance')?.value) || 0;
     const deliveryFee = calculateDeliveryFee(distance);
+    const serviceFee = getServiceFee();
     
     const itemsText = cartItems.map((item, idx) => {
         const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
@@ -985,7 +889,7 @@ function checkoutViaWhatsApp() {
     }).join('\n');
     
     const subtotal = getSubtotal();
-    const total = subtotal + deliveryFee;
+    const total = subtotal + deliveryFee + serviceFee;
     
     let feeText = '';
     if (deliveryFee > 0) {
@@ -995,31 +899,83 @@ function checkoutViaWhatsApp() {
             const extraKm = Math.ceil(distance - APP_CONFIG.DELIVERY_FLAT_RATE_KM);
             feeText = `Ongkir (${distance} km): Rp ${deliveryFee.toLocaleString()} (Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()} + ${extraKm} km × Rp${APP_CONFIG.DELIVERY_EXTRA_PER_KM.toLocaleString()})`;
         }
-    } else feeText = 'Ongkir: GRATIS (Ambil Sendiri)';
+    } else {
+        feeText = `Ongkir: GRATIS (Ambil Sendiri)`;
+    }
     
     const msg = APP_CONFIG.WHATSAPP_MESSAGE_TEMPLATE
         .replace('{ITEMS}', itemsText)
         .replace('{SHIPPING_INFO}', feeText)
+        .replace('{SERVICE_FEE}', serviceFee.toLocaleString())
         .replace('{SUBTOTAL}', subtotal.toLocaleString())
         .replace('{TOTAL}', total.toLocaleString())
         .replace('{CUSTOMER_NAME}', customerName)
-        .replace('{METHOD}', deliveryFee > 0 ? 'WhatsApp Delivery' : 'Ambil di Toko');
+        .replace('{METHOD}', 'WhatsApp Delivery');
     
-    const waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(msg)}`;
-    window.open(waUrl, '_blank');
-    processCheckout('whatsapp', customerName, deliveryFee, distance);
+    const checkoutData = {
+        type: 'whatsapp',
+        customerName: customerName,
+        deliveryFee: deliveryFee,
+        distance: distance,
+        total: total,
+        waMessage: msg
+    };
+    showPaymentModal(checkoutData);
 }
 
 function checkoutViaStorePickup() { 
     if (cartItems.length === 0) return; 
     const customerName = document.getElementById('pickup-name')?.value || 'Pelanggan'; 
-    processCheckout('pickup', customerName, 0, 0); 
+    const serviceFee = getServiceFee();
+    const subtotal = getSubtotal();
+    const total = subtotal + serviceFee;
+    
+    const itemsText = cartItems.map((item, idx) => {
+        const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
+        let toppingsText = '';
+        if (item.toppings.boba) toppingsText += '+Boba ';
+        if (item.toppings.creamCheese) toppingsText += '+Cream Cheese ';
+        const tempIcon = item.temperature === 'PANAS' ? '🔥 Panas' : '❄️ Dingin';
+        return `${idx+1}. *${item.product.name}* (${item.size === 'B' ? 'Besar' : 'Kecil'}, ${tempIcon}${toppingsText ? ', ' + toppingsText : ''}) x${item.quantity} - Rp ${itemTotal.toLocaleString()}`;
+    }).join('\n');
+    
+    // For store pickup, we can also offer payment methods
+    const msg = APP_CONFIG.WHATSAPP_MESSAGE_TEMPLATE
+        .replace('{ITEMS}', itemsText)
+        .replace('{SHIPPING_INFO}', 'Ambil Sendiri di Toko (GRATIS)')
+        .replace('{SERVICE_FEE}', serviceFee.toLocaleString())
+        .replace('{SUBTOTAL}', subtotal.toLocaleString())
+        .replace('{TOTAL}', total.toLocaleString())
+        .replace('{CUSTOMER_NAME}', customerName)
+        .replace('{METHOD}', 'Ambil di Toko (Bayar di Tempat / Online)');
+    
+    const checkoutData = {
+        type: 'pickup',
+        customerName: customerName,
+        deliveryFee: 0,
+        distance: 0,
+        total: total,
+        waMessage: msg
+    };
+    showPaymentModal(checkoutData);
 }
 
 function processCheckout(type, customerName, deliveryFee, distance) {
     const subtotal = getSubtotal();
-    const total = subtotal + deliveryFee;
-    receiptData = { items: [...cartItems], orderType: type, customerName, distance, deliveryFee, receiptId: `TC-${type.toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`, subtotal, total };
+    const serviceFee = getServiceFee();
+    const total = subtotal + deliveryFee + serviceFee;
+    receiptData = { 
+        items: [...cartItems], 
+        orderType: type, 
+        customerName, 
+        distance, 
+        deliveryFee,
+        serviceFee,
+        subtotal, 
+        total,
+        receiptId: `TC-${type.toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`
+    };
+    closePaymentModal();
     closeCheckoutModal();
     showReceipt();
     cartItems = [];
@@ -1037,44 +993,63 @@ function processCheckout(type, customerName, deliveryFee, distance) {
 }
 
 function showReceipt() {
-    document.getElementById('receipt-id').textContent = `ID RESI: ${receiptData.receiptId}`;
+    const receiptIdEl = document.getElementById('receipt-id');
     const badge = document.getElementById('receipt-badge');
-    if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) { 
-        badge.textContent = `WhatsApp Delivery (Ongkir Rp${receiptData.deliveryFee.toLocaleString()})`; 
-        badge.className = 'text-[9px] bg-emerald-100 text-[#128C7E] font-bold px-2 py-0.5 rounded-full mb-2 inline-block'; 
-    } else { 
-        badge.textContent = 'Ambil di Toko (GRATIS)'; 
-        badge.className = 'text-[9px] bg-neutral-100 text-[#111111] font-extrabold px-2 py-0.5 rounded-full mb-2 inline-block'; 
-    }
+    const receiptItems = document.getElementById('receipt-items');
+    const receiptSubtotal = document.getElementById('receipt-subtotal');
+    const receiptServiceFee = document.getElementById('receipt-service-fee');
+    const receiptDeliveryFee = document.getElementById('receipt-delivery-fee');
+    const receiptTotal = document.getElementById('receipt-total');
+    const receiptMessage = document.getElementById('receipt-message');
     
-    document.getElementById('receipt-items').innerHTML = receiptData.items.map(item => {
-        const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
-        let toppingsText = '';
-        if (item.toppings.boba) toppingsText += '+Boba ';
-        if (item.toppings.creamCheese) toppingsText += '+Cream Cheese ';
-        const tempIcon = item.temperature === 'PANAS' ? '🔥' : '❄️';
-        return `<div class="flex justify-between text-[10px]"><span>${item.quantity}x ${item.product.name} (${item.size === 'B' ? 'B' : 'K'}, ${tempIcon} ${toppingsText})</span><span>Rp ${itemTotal.toLocaleString()}</span></div>`;
-    }).join('');
+    if (receiptIdEl) receiptIdEl.textContent = `ID RESI: ${receiptData.receiptId}`;
     
-    document.getElementById('receipt-subtotal').textContent = `Rp ${receiptData.subtotal?.toLocaleString() || 0}`;
-    const serviceFeeEl = document.getElementById('receipt-service-fee');
-    if (serviceFeeEl) {
-        if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) {
-            serviceFeeEl.innerHTML = `<span>Biaya Ongkir (${receiptData.distance} km)</span><span>Rp ${receiptData.deliveryFee?.toLocaleString()}</span>`;
-        } else if (receiptData.orderType === 'whatsapp') {
-            serviceFeeEl.innerHTML = '<span>Biaya Ongkir</span><span class="text-green-600">GRATIS (Ambil Sendiri)</span>';
-        } else {
-            serviceFeeEl.innerHTML = '<span>Biaya Ongkir</span><span class="text-green-600">GRATIS</span>';
+    if (badge) {
+        if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) { 
+            badge.textContent = `WhatsApp Delivery (Ongkir Rp${receiptData.deliveryFee.toLocaleString()})`; 
+            badge.className = 'text-[9px] bg-emerald-100 text-[#128C7E] font-bold px-2 py-0.5 rounded-full mb-2 inline-block'; 
+        } else { 
+            badge.textContent = 'Ambil di Toko (GRATIS)'; 
+            badge.className = 'text-[9px] bg-neutral-100 text-[#111111] font-extrabold px-2 py-0.5 rounded-full mb-2 inline-block'; 
         }
     }
-    document.getElementById('receipt-total').textContent = `Rp ${receiptData.total?.toLocaleString() || 0}`;
+    
+    if (receiptItems) {
+        receiptItems.innerHTML = receiptData.items.map(item => {
+            const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
+            let toppingsText = '';
+            if (item.toppings.boba) toppingsText += '+Boba ';
+            if (item.toppings.creamCheese) toppingsText += '+Cream Cheese ';
+            const tempIcon = item.temperature === 'PANAS' ? '🔥' : '❄️';
+            return `<div class="flex justify-between text-[10px]"><span>${item.quantity}x ${item.product.name} (${item.size === 'B' ? 'B' : 'K'}, ${tempIcon} ${toppingsText})</span><span>Rp ${itemTotal.toLocaleString()}</span></div>`;
+        }).join('');
+    }
+    
+    if (receiptSubtotal) receiptSubtotal.textContent = `Rp ${receiptData.subtotal?.toLocaleString() || 0}`;
+    if (receiptServiceFee) receiptServiceFee.innerHTML = `<span>Biaya Layanan</span><span>Rp ${receiptData.serviceFee?.toLocaleString() || 0}</span>`;
+    
+    if (receiptDeliveryFee) {
+        if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) {
+            receiptDeliveryFee.innerHTML = `<span>Biaya Ongkir (${receiptData.distance} km)</span><span>Rp ${receiptData.deliveryFee?.toLocaleString()}</span>`;
+            receiptDeliveryFee.classList.remove('hidden');
+        } else if (receiptData.orderType === 'whatsapp') {
+            receiptDeliveryFee.innerHTML = '<span>Biaya Ongkir</span><span class="text-green-600">GRATIS (Ambil Sendiri)</span>';
+            receiptDeliveryFee.classList.remove('hidden');
+        } else {
+            receiptDeliveryFee.classList.add('hidden');
+        }
+    }
+    
+    if (receiptTotal) receiptTotal.textContent = `Rp ${receiptData.total?.toLocaleString() || 0}`;
+    
     let message = '';
     if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) {
         message = `Pesanan akan segera diproses dan dikirim dengan ongkir Rp${receiptData.deliveryFee.toLocaleString()}. Terima kasih!`;
     } else {
         message = `Tunjukkan struk digital atas nama <strong>${receiptData.customerName}</strong> ke kasir.`;
     }
-    document.getElementById('receipt-message').innerHTML = message;
+    if (receiptMessage) receiptMessage.innerHTML = message;
+    
     const modal = document.getElementById('receipt-modal');
     if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
 }
@@ -1083,6 +1058,60 @@ function closeReceiptModal() { const modal = document.getElementById('receipt-mo
 function downloadReceipt() { const el = document.getElementById('receipt-card'); if (el && typeof html2canvas !== 'undefined') { html2canvas(el, { scale: 2.5 }).then(c => { const a = document.createElement('a'); a.download = `Struk-${receiptData?.receiptId || 'THE-C'}.png`; a.href = c.toDataURL(); a.click(); }).catch(console.error); } closeReceiptModal(); }
 
 // ==================== ADMIN PANEL FUNCTIONS ====================
+function openAdminPanel() {
+    if (isAdminAuthenticated) {
+        showAdminPanel();
+    } else {
+        showPasswordModal();
+    }
+}
+
+function showPasswordModal() {
+    document.getElementById('admin-password-modal').classList.remove('hidden');
+    document.getElementById('admin-password-modal').classList.add('flex');
+    document.getElementById('admin-password-input').value = '';
+    document.getElementById('admin-password-input').focus();
+}
+
+function closePasswordModal() {
+    document.getElementById('admin-password-modal').classList.add('hidden');
+    document.getElementById('admin-password-modal').classList.remove('flex');
+}
+
+function verifyAdminPassword() {
+    const enteredPassword = document.getElementById('admin-password-input').value;
+    const hashedEntered = hashPassword(enteredPassword);
+    
+    if (hashedEntered === HASHED_ADMIN_PASSWORD) {
+        isAdminAuthenticated = true;
+        closePasswordModal();
+        showAdminPanel();
+        sessionStorage.setItem('adminAuth', 'true');
+    } else {
+        alert('Password salah! Akses ditolak.');
+        document.getElementById('admin-password-input').value = '';
+        document.getElementById('admin-password-input').focus();
+    }
+}
+
+function showAdminPanel() {
+    document.getElementById('admin-modal').classList.remove('hidden');
+    document.getElementById('admin-modal').classList.add('flex');
+    refreshAdminLists();
+}
+
+function closeAdminPanel() {
+    document.getElementById('admin-modal').classList.add('hidden');
+    document.getElementById('admin-modal').classList.remove('flex');
+}
+
+function adminLogout() {
+    isAdminAuthenticated = false;
+    sessionStorage.removeItem('adminAuth');
+    closeAdminPanel();
+    showNotification('Anda telah logout dari panel admin', 'info');
+}
+
 function refreshAdminLists() {
     renderAdminProducts();
     renderAdminCampaigns();
@@ -1415,9 +1444,7 @@ async function submitFormData() {
         renderProductsByCategory(activeCategory);
         renderAdminProducts();
         showNotification(currentEditId ? 'Produk berhasil diupdate!' : 'Produk berhasil ditambahkan!', 'success');
-    }
-    
-    else if (currentFormType === 'campaign') {
+    } else if (currentFormType === 'campaign') {
         const newCampaign = {
             id: currentEditId || generateId('campaign'),
             title: document.getElementById('form-title-camp').value,
@@ -1439,9 +1466,7 @@ async function submitFormData() {
         renderCampaigns();
         renderAdminCampaigns();
         showNotification(currentEditId ? 'Promo berhasil diupdate!' : 'Promo berhasil ditambahkan!', 'success');
-    }
-    
-    else if (currentFormType === 'testimonial') {
+    } else if (currentFormType === 'testimonial') {
         const newTestimonial = {
             id: currentEditId || generateId('test'),
             customerName: document.getElementById('form-name-test').value,
@@ -1463,9 +1488,7 @@ async function submitFormData() {
         renderTestimonials();
         renderAdminTestimonials();
         showNotification(currentEditId ? 'Testimoni berhasil diupdate!' : 'Testimoni berhasil ditambahkan!', 'success');
-    }
-    
-    else if (currentFormType === 'instagram') {
+    } else if (currentFormType === 'instagram') {
         const newPost = {
             id: currentEditId || generateId('post'),
             image: document.getElementById('form-image-ig').value,
@@ -1490,6 +1513,134 @@ async function submitFormData() {
     closeFormModal();
 }
 
+// ==================== API FUNCTIONS ====================
+async function loadDataFromAPI() {
+    try {
+        console.log('🔄 Loading data from JSONBin...');
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.JSONBIN_BIN_ID}/latest`, {
+            headers: { 'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            const record = data.record;
+            
+            if (record && record.products && record.products.length > 0) {
+                productsData = record.products;
+                campaignsData = record.campaigns || APP_CONFIG.DEFAULT_CAMPAIGNS;
+                testimonialsData = record.testimonials || APP_CONFIG.DEFAULT_TESTIMONIALS;
+                instagramPostsData = record.instagram || APP_CONFIG.DEFAULT_INSTAGRAM;
+                console.log('✅ Data loaded successfully from JSONBin');
+            } else {
+                console.log('⚠️ Bin kosong, mengisi dengan data default...');
+                productsData = APP_CONFIG.DEFAULT_PRODUCTS;
+                campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
+                testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
+                instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
+                await saveAllDataToAPI();
+            }
+        } else {
+            console.error('❌ API response error:', response.status);
+            await createOrUpdateBinWithDefaultData();
+        }
+    } catch (error) {
+        console.error('❌ Error loading data:', error);
+        productsData = APP_CONFIG.DEFAULT_PRODUCTS;
+        campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
+        testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
+        instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
+    }
+}
+
+async function createOrUpdateBinWithDefaultData() {
+    const defaultData = {
+        products: APP_CONFIG.DEFAULT_PRODUCTS,
+        campaigns: APP_CONFIG.DEFAULT_CAMPAIGNS,
+        testimonials: APP_CONFIG.DEFAULT_TESTIMONIALS,
+        instagram: APP_CONFIG.DEFAULT_INSTAGRAM,
+        lastUpdated: new Date().toISOString()
+    };
+    
+    try {
+        const updateResponse = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.JSONBIN_BIN_ID}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY
+            },
+            body: JSON.stringify(defaultData)
+        });
+        
+        if (updateResponse.ok) {
+            console.log('✅ Bin updated with default data');
+            productsData = APP_CONFIG.DEFAULT_PRODUCTS;
+            campaignsData = APP_CONFIG.DEFAULT_CAMPAIGNS;
+            testimonialsData = APP_CONFIG.DEFAULT_TESTIMONIALS;
+            instagramPostsData = APP_CONFIG.DEFAULT_INSTAGRAM;
+            showNotification('Database berhasil diinisialisasi!', 'success');
+        } else {
+            console.log('🆕 Creating new bin...');
+            const createResponse = await fetch('https://api.jsonbin.io/v3/b', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY
+                },
+                body: JSON.stringify(defaultData)
+            });
+            
+            if (createResponse.ok) {
+                const newBin = await createResponse.json();
+                console.log('✅ New bin created with ID:', newBin.id);
+                showNotification(`Bin baru berhasil dibuat! ID: ${newBin.id}`, 'success');
+            } else {
+                console.error('❌ Failed to create bin');
+                showNotification('Gagal membuat database!', 'error');
+            }
+        }
+    } catch (error) {
+        console.error('❌ Error creating/updating bin:', error);
+        showNotification('Error koneksi ke database!', 'error');
+    }
+}
+
+async function saveAllDataToAPI() {
+    const dataToSave = {
+        products: productsData,
+        campaigns: campaignsData,
+        testimonials: testimonialsData,
+        instagram: instagramPostsData,
+        lastUpdated: new Date().toISOString()
+    };
+    
+    try {
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${APP_CONFIG.JSONBIN_BIN_ID}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Access-Key': APP_CONFIG.JSONBIN_ACCESS_KEY
+            },
+            body: JSON.stringify(dataToSave)
+        });
+        
+        if (response.ok) {
+            console.log('✅ Data saved successfully');
+            showNotification('Data berhasil disimpan!', 'success');
+        } else {
+            console.error('❌ Save failed:', response.status);
+            showNotification(`Gagal menyimpan: ${response.status}`, 'error');
+        }
+    } catch (error) {
+        console.error('❌ Error saving data:', error);
+        showNotification('Gagal menyimpan data! Cek koneksi internet', 'error');
+    }
+}
+
+async function saveProducts() { await saveAllDataToAPI(); }
+async function saveCampaigns() { await saveAllDataToAPI(); }
+async function saveTestimonials() { await saveAllDataToAPI(); }
+async function saveInstagram() { await saveAllDataToAPI(); }
+
 // ==================== MODAL FUNCTIONS ====================
 const storeData = {
     "id": "store-bondowoso", "name": "The. C Drinks, Diponegoro, Bondowoso", 
@@ -1510,6 +1661,7 @@ function setStoreTab(tab) {
     const contactTabIndicator = document.getElementById('contact-tab-indicator');
     const storesContent = document.getElementById('stores-tab-content');
     const contactContent = document.getElementById('contact-tab-content');
+    
     if (tab === 'stores') {
         if (storesTabBtn) { storesTabBtn.classList.add('text-[#111111]'); storesTabBtn.classList.remove('text-neutral-400'); }
         if (contactTabBtn) { contactTabBtn.classList.add('text-neutral-400'); contactTabBtn.classList.remove('text-[#111111]'); }
@@ -1529,11 +1681,17 @@ function setStoreTab(tab) {
 }
 
 function updateStoreInfo() {
-    document.getElementById('store-name').textContent = storeData.name;
-    document.getElementById('store-address').textContent = storeData.address;
-    document.getElementById('store-phone').textContent = storeData.phone;
-    document.getElementById('store-hours').textContent = storeData.hours;
-    document.getElementById('store-maps-url').href = storeData.mapsUrl;
+    const nameEl = document.getElementById('store-name');
+    const addressEl = document.getElementById('store-address');
+    const phoneEl = document.getElementById('store-phone');
+    const hoursEl = document.getElementById('store-hours');
+    const mapsUrlEl = document.getElementById('store-maps-url');
+    
+    if (nameEl) nameEl.textContent = storeData.name;
+    if (addressEl) addressEl.textContent = storeData.address;
+    if (phoneEl) phoneEl.textContent = storeData.phone;
+    if (hoursEl) hoursEl.textContent = storeData.hours;
+    if (mapsUrlEl) mapsUrlEl.href = storeData.mapsUrl;
 }
 
 function submitContactForm(event) {
@@ -1547,9 +1705,12 @@ function submitContactForm(event) {
             .replace('{PHONE}', phone)
             .replace('{MESSAGE}', message);
         const waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(waMessage)}`;
-        document.getElementById('whatsapp-link').href = waUrl;
-        document.getElementById('contact-form-container').classList.add('hidden');
-        document.getElementById('contact-success').classList.remove('hidden');
+        const linkEl = document.getElementById('whatsapp-link');
+        if (linkEl) linkEl.href = waUrl;
+        const formContainer = document.getElementById('contact-form-container');
+        const successContainer = document.getElementById('contact-success');
+        if (formContainer) formContainer.classList.add('hidden');
+        if (successContainer) successContainer.classList.remove('hidden');
         window.open(waUrl, '_blank');
     }
 }
@@ -1570,17 +1731,21 @@ function resetContactForm() {
 function openLightbox(id) {
     const post = instagramPostsData.find(x => x.id === id);
     if (post) {
-        document.getElementById('lightbox-img').src = post.image;
+        const imgEl = document.getElementById('lightbox-img');
         const likesSpan = document.getElementById('lightbox-likes');
-        if (likesSpan) likesSpan.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg><span>${post.likes}</span>`;
         const commentsSpan = document.getElementById('lightbox-comments');
-        if (commentsSpan) commentsSpan.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${post.comments}</span>`;
         const captionEl = document.getElementById('lightbox-caption');
+        
+        if (imgEl) imgEl.src = post.image;
+        if (likesSpan) likesSpan.innerHTML = `❤️ ${post.likes}`;
+        if (commentsSpan) commentsSpan.innerHTML = `💬 ${post.comments}`;
         if (captionEl) captionEl.textContent = post.caption;
+        
         const modal = document.getElementById('lightbox-modal');
         if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
     }
 }
+
 function closeLightbox() { const modal = document.getElementById('lightbox-modal'); if (modal) { modal.classList.add('hidden'); modal.classList.remove('flex'); } }
 
 // ==================== SCROLL FUNCTIONS ====================
@@ -1598,7 +1763,12 @@ function toggleMobileDrawer() {
         else { drawer.classList.add('hidden'); backdrop.classList.add('hidden'); }
     }
 }
-function closeMobileDrawer() { document.getElementById('mobile-drawer')?.classList.add('hidden'); document.getElementById('mobile-backdrop')?.classList.add('hidden'); }
+
+function closeMobileDrawer() { 
+    document.getElementById('mobile-drawer')?.classList.add('hidden'); 
+    document.getElementById('mobile-backdrop')?.classList.add('hidden'); 
+}
+
 function handleMobileNavClick(callback) { closeMobileDrawer(); setTimeout(callback, 100); }
 
 // ==================== SCROLL EVENT ====================
@@ -1617,12 +1787,29 @@ window.addEventListener('scroll', () => {
 document.addEventListener('DOMContentLoaded', async () => {
     checkExistingAuth();
     await loadData();
+    
     const mobileMenuBtn = document.getElementById('mobile-menu-btn');
     if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleMobileDrawer);
+    
     const cartBtn = document.getElementById('cart-floating-btn');
     if (cartBtn) cartBtn.addEventListener('click', openCartDrawer);
+    
     const distanceInput = document.getElementById('delivery-distance');
     if (distanceInput) distanceInput.addEventListener('input', updateDeliveryFee);
+    
+    const qrisBtn = document.getElementById('pay-qris');
+    const bcaBtn = document.getElementById('pay-bca');
+    if (qrisBtn) qrisBtn.addEventListener('click', () => selectPaymentMethod('QRIS'));
+    if (bcaBtn) bcaBtn.addEventListener('click', () => selectPaymentMethod('BCA'));
+    
+    const confirmPayBtn = document.getElementById('confirm-payment');
+    if (confirmPayBtn) confirmPayBtn.addEventListener('click', confirmPayment);
+    
+    const closePaymentModalBtn = document.getElementById('close-payment-modal');
+    if (closePaymentModalBtn) closePaymentModalBtn.addEventListener('click', closePaymentModal);
+    
+    // Setup file upload handlers
+    setupFileUpload();
 });
 
 // Global functions
@@ -1652,7 +1839,6 @@ window.openCheckoutModal = openCheckoutModal;
 window.filterProducts = filterProducts;
 window.setProductSize = setProductSize;
 window.setProductTemp = setProductTemp;
-window.updateToppingSelection = updateToppingSelection;
 window.addToCartFromCard = addToCartFromCard;
 window.addToCart = addToCart;
 window.removeCartItem = removeCartItem;
@@ -1677,3 +1863,10 @@ window.submitFormData = submitFormData;
 window.closePasswordModal = closePasswordModal;
 window.verifyAdminPassword = verifyAdminPassword;
 window.adminLogout = adminLogout;
+window.selectPaymentMethod = selectPaymentMethod;
+window.confirmPayment = confirmPayment;
+window.closePaymentModal = closePaymentModal;
+window.closePaymentConfirmModal = closePaymentConfirmModal;
+window.removeUploadedFile = removeUploadedFile;
+window.sendWithProof = sendWithProof;
+window.sendWithoutProof = sendWithoutProof;
