@@ -95,9 +95,11 @@ Total: Rp {TOTAL}
 
 Nama: {CUSTOMER_NAME}
 Metode: {METHOD}
-Alamat: Akan saya share via WhatsApp
+Alamat: {ADDRESS}
 
-Mohon informasi total pembayaran dan instruksi pembayaran. Terima kasih!`,
+Mohon informasi total pembayaran dan instruksi pembayaran. Terima kasih!
+
+> Pesan otomatis THE. C DRINKS.`,
 
     CONTACT_MESSAGE_TEMPLATE: `Halo THE. C DRINKS! Saya {NAME} ({PHONE}).
 
@@ -427,8 +429,20 @@ async function getUserLocationWA() {
     const statusEl = document.getElementById('location-status-wa');
     const resetBtn = document.getElementById('reset-permission-btn');
     const distanceInput = document.getElementById('delivery-distance');
-    const addressDisplay = document.getElementById('location-address-display');
-    const addressContent = document.getElementById('location-address-content');
+    const addressInput = document.getElementById('customer-address');
+    
+    if (!addressInput) {
+        // Create address input if not exists
+        const addressContainer = document.querySelector('.border-emerald-200.rounded-xl .mt-1');
+        if (addressContainer) {
+            const input = document.createElement('input');
+            input.type = 'text';
+            input.id = 'customer-address';
+            input.placeholder = 'Alamat lengkap Anda akan muncul di sini';
+            input.className = 'w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500 mb-2';
+            addressContainer.prepend(input);
+        }
+    }
     
     if (!navigator.geolocation) {
         if (statusEl) {
@@ -447,8 +461,8 @@ async function getUserLocationWA() {
     
     if (resetBtn) resetBtn.classList.add('hidden');
     
-    // Sembunyikan address display sebelumnya
-    if (addressDisplay) addressDisplay.classList.add('hidden');
+    // Clear previous address
+    if (addressInput) addressInput.value = '';
     
     navigator.geolocation.getCurrentPosition(
         async function(position) {
@@ -476,55 +490,14 @@ async function getUserLocationWA() {
             // Dapatkan alamat lengkap dari koordinat
             const addressInfo = await getAddressFromCoords(lat, lng);
             
-            // Tampilkan alamat di address display
-            if (addressDisplay && addressContent) {
-                addressDisplay.classList.remove('hidden');
-                
-                let addressHtml = '';
-                if (addressInfo) {
-                    addressHtml = `
-                        <div class="space-y-1">
-                            <div class="font-semibold text-[9px] text-emerald-700">📍 Alamat Detail:</div>
-                            <div class="text-[8px] text-neutral-700 break-words">${addressInfo.fullAddress}</div>
-                            <div class="text-[7px] text-neutral-500">
-                                ${addressInfo.city ? '🏙️ ' + addressInfo.city : ''}
-                                ${addressInfo.province ? '• ' + addressInfo.province : ''}
-                                ${addressInfo.postcode ? '• ' + addressInfo.postcode : ''}
-                            </div>
-                            <div class="flex flex-wrap gap-1 mt-1">
-                                <a href="${getGoogleMapsLink(lat, lng)}" target="_blank" 
-                                   class="text-[7px] bg-blue-600 text-white px-2 py-0.5 rounded hover:bg-blue-700 transition">
-                                    Google Maps
-                                </a>
-                                <a href="${getOpenStreetMapLink(lat, lng)}" target="_blank"
-                                   class="text-[7px] bg-green-600 text-white px-2 py-0.5 rounded hover:bg-green-700 transition">
-                                    OpenStreetMap
-                                </a>
-                                <a href="${getWazeLink(lat, lng)}" target="_blank"
-                                   class="text-[7px] bg-yellow-600 text-white px-2 py-0.5 rounded hover:bg-yellow-700 transition">
-                                    Waze
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    addressHtml = `
-                        <div class="space-y-1">
-                            <div class="text-[8px] text-yellow-700">⚠️ Tidak dapat mengambil alamat detail</div>
-                            <div class="flex flex-wrap gap-1 mt-1">
-                                <a href="${getGoogleMapsLink(lat, lng)}" target="_blank"
-                                   class="text-[7px] bg-blue-600 text-white px-2 py-0.5 rounded hover:bg-blue-700 transition">
-                                    Google Maps
-                                </a>
-                                <a href="${getOpenStreetMapLink(lat, lng)}" target="_blank"
-                                   class="text-[7px] bg-green-600 text-white px-2 py-0.5 rounded hover:bg-green-700 transition">
-                                    OpenStreetMap
-                                </a>
-                            </div>
-                        </div>
-                    `;
-                }
-                addressContent.innerHTML = addressHtml;
+            // Tampilkan alamat di input
+            if (addressInput && addressInfo) {
+                addressInput.value = addressInfo.fullAddress;
+                // Store address for WhatsApp message
+                store.setState({ customerAddress: addressInfo.fullAddress });
+            } else if (addressInput) {
+                addressInput.value = `Lokasi: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
+                store.setState({ customerAddress: `Lokasi: ${lat.toFixed(6)}, ${lng.toFixed(6)}` });
             }
             
             if (statusEl) {
@@ -542,9 +515,6 @@ async function getUserLocationWA() {
                         <div class="font-semibold text-[9px] text-emerald-700">✅ Lokasi ditemukan!</div>
                         <div class="text-[8px] text-neutral-600">Jarak ke toko: ${distance.toFixed(1)} km</div>
                         <div class="text-[8px] font-semibold text-emerald-600">${feeInfo}</div>
-                        <div class="text-[7px] text-neutral-400 mt-1">
-                            📱 Silakan share lokasi Anda via WhatsApp untuk konfirmasi
-                        </div>
                     </div>
                 `;
                 statusEl.className = 'text-emerald-600 text-[8px]';
@@ -602,10 +572,13 @@ function resetLocationPermission() {
     const statusEl = document.getElementById('location-status-wa');
     const resetBtn = document.getElementById('reset-permission-btn');
     const distanceInput = document.getElementById('delivery-distance');
+    const addressInput = document.getElementById('customer-address');
     
     userLocation = null;
     store.setState({ userLocation: null });
     if (distanceInput) distanceInput.value = '';
+    if (addressInput) addressInput.value = '';
+    store.setState({ customerAddress: '' });
     updateDeliveryFee();
     
     if (statusEl) {
@@ -623,13 +596,14 @@ function clearLocationWA() {
     const distanceInput = document.getElementById('delivery-distance');
     const statusEl = document.getElementById('location-status-wa');
     const resetBtn = document.getElementById('reset-permission-btn');
-    const addressDisplay = document.getElementById('location-address-display');
+    const addressInput = document.getElementById('customer-address');
     
     if (distanceInput) distanceInput.value = '';
+    if (addressInput) addressInput.value = '';
     if (statusEl) statusEl.classList.add('hidden');
     if (resetBtn) resetBtn.classList.add('hidden');
-    if (addressDisplay) addressDisplay.classList.add('hidden');
     
+    store.setState({ customerAddress: '' });
     updateDeliveryFee();
 }
 
@@ -1376,7 +1350,11 @@ async function sendWithoutProof() {
 async function checkoutViaWhatsApp() {
     if (cartItems.length === 0) return;
     const customerName = document.getElementById('customer-name')?.value || 'Pelanggan';
+    const customerAddress = document.getElementById('customer-address')?.value || 'Alamat akan dishare via WhatsApp';
+    
     store.setState({ customerName: customerName });
+    store.setState({ customerAddress: customerAddress });
+    
     const distance = parseFloat(document.getElementById('delivery-distance')?.value) || 0;
     store.setState({ deliveryDistance: distance });
     const deliveryFee = calculateDeliveryFee(distance);
@@ -1413,11 +1391,13 @@ async function checkoutViaWhatsApp() {
         .replace('{SUBTOTAL}', subtotal.toLocaleString())
         .replace('{TOTAL}', total.toLocaleString())
         .replace('{CUSTOMER_NAME}', customerName)
-        .replace('{METHOD}', 'WhatsApp Delivery');
+        .replace('{METHOD}', 'WhatsApp Delivery')
+        .replace('{ADDRESS}', customerAddress || 'Akan dishare via WhatsApp');
     
     const checkoutData = {
         type: 'whatsapp',
         customerName: customerName,
+        customerAddress: customerAddress,
         deliveryFee: deliveryFee,
         distance: distance,
         total: total,
