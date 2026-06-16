@@ -1,6 +1,4 @@
 // ==================== GLOBAL KONFIGURASI ====================
-// Semua konfigurasi global ada di sini untuk memudahkan perubahan
-
 const APP_CONFIG = {
     // JSONBin Configuration
     JSONBIN_ACCESS_KEY: '$2a$10$Idssm7MPctlzL/quJlXUyOiFa5bSp2W3ERWxRSLbpJS/QKeUj8kt2',
@@ -15,6 +13,10 @@ const APP_CONFIG = {
     STORE_NAME: 'THE. C DRINKS',
     STORE_ADDRESS: 'Jl. Diponegoro, Kotakulon, Kec. Bondowoso, Kab. Bondowoso, Jawa Timur 68213',
     STORE_LOCATION: { lat: -7.9108787, lng: 113.8193598 },
+    
+    // WhatsApp API Configuration
+    WHATSAPP_API_URL: 'https://baileys-rest-api-production-959c.up.railway.app/api',
+    WHATSAPP_SESSION_NAME: 'testsession',
     
     // Delivery Fee Configuration
     DELIVERY_FLAT_RATE_KM: 3,
@@ -103,8 +105,101 @@ Pesan:
 {MESSAGE}`
 };
 
-const HASHED_ADMIN_PASSWORD = CryptoJS.SHA256(APP_CONFIG.ADMIN_PASSWORD).toString();
-let isAdminAuthenticated = false;
+// ==================== WHATSAPP API FUNCTIONS ====================
+async function sendWhatsAppMessage(number, message) {
+    try {
+        const response = await fetch(`${APP_CONFIG.WHATSAPP_API_URL}/send-message`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                sessionName: APP_CONFIG.WHATSAPP_SESSION_NAME,
+                number: number,
+                message: message
+            })
+        });
+        
+        const result = await response.json();
+        console.log('WhatsApp API Response:', result);
+        return result;
+    } catch (error) {
+        console.error('Error sending WhatsApp message:', error);
+        throw error;
+    }
+}
+
+async function sendWhatsAppImage(number, imageData, caption = '') {
+    try {
+        // Determine if image is base64 or File
+        let formData = new FormData();
+        formData.append('sessionName', APP_CONFIG.WHATSAPP_SESSION_NAME);
+        formData.append('number', number);
+        formData.append('caption', caption);
+        
+        if (imageData instanceof File) {
+            // If it's a File object, append to form data
+            formData.append('image', imageData);
+        } else if (typeof imageData === 'string' && imageData.startsWith('data:image')) {
+            // If it's a base64 string, send it in the body
+            const response = await fetch(`${APP_CONFIG.WHATSAPP_API_URL}/send-image`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    sessionName: APP_CONFIG.WHATSAPP_SESSION_NAME,
+                    number: number,
+                    image: imageData,
+                    caption: caption
+                })
+            });
+            const result = await response.json();
+            console.log('WhatsApp Image API Response:', result);
+            return result;
+        } else {
+            // If it's a URL, use GET method
+            const response = await fetch(`${APP_CONFIG.WHATSAPP_API_URL}/send-image?sessionName=${APP_CONFIG.WHATSAPP_SESSION_NAME}&number=${number}&image=${encodeURIComponent(imageData)}&caption=${encodeURIComponent(caption)}`, {
+                method: 'GET'
+            });
+            const result = await response.json();
+            console.log('WhatsApp Image API Response:', result);
+            return result;
+        }
+        
+        // If using FormData (File upload)
+        const response = await fetch(`${APP_CONFIG.WHATSAPP_API_URL}/send-image`, {
+            method: 'POST',
+            body: formData
+        });
+        const result = await response.json();
+        console.log('WhatsApp Image API Response:', result);
+        return result;
+    } catch (error) {
+        console.error('Error sending WhatsApp image:', error);
+        throw error;
+    }
+}
+
+async function sendOrderViaWhatsApp(number, message, proofImage = null) {
+    try {
+        let result;
+        
+        if (proofImage) {
+            // Send with image
+            const caption = `📋 *PESANAN BARU*\n\n${message}`;
+            result = await sendWhatsAppImage(number, proofImage, caption);
+        } else {
+            // Send without image
+            result = await sendWhatsAppMessage(number, `📋 *PESANAN BARU*\n\n${message}`);
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('Error sending order:', error);
+        throw error;
+    }
+}
 
 // ==================== GLOBAL DATA ====================
 let productsData = [];
@@ -711,7 +806,6 @@ function closePaymentModal() {
         modal.classList.add('hidden');
         modal.classList.remove('flex');
     }
-    // Reset payment details
     const paymentDetails = document.getElementById('payment-details');
     if (paymentDetails) {
         paymentDetails.classList.add('hidden');
@@ -762,11 +856,7 @@ function selectPaymentMethod(method) {
 
 function confirmPayment() {
     if (!pendingCheckoutData) return;
-    
-    // Close payment modal first
     closePaymentModal();
-    
-    // Show payment confirmation modal for upload bukti
     showPaymentConfirmModal(pendingCheckoutData);
 }
 
@@ -778,7 +868,6 @@ function showPaymentConfirmModal(checkoutData) {
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
-    // Reset upload state
     uploadedProofFile = null;
     const previewDiv = document.getElementById('upload-preview');
     const uploadArea = document.getElementById('upload-area');
@@ -837,42 +926,43 @@ function removeUploadedFile() {
     if (uploadArea) uploadArea.classList.remove('hidden');
 }
 
-async function sendWithProof() {
-    if (!pendingPaymentData) return;
-    
-    let waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(pendingPaymentData.waMessage)}`;
-    
-    // If there's a proof image, we need to handle it differently
-    // WhatsApp doesn't support direct image upload via URL, so we'll add a note
-    if (uploadedProofFile) {
-        const proofNote = `\n\n📸 *Bukti Transfer Terlampir*: (Silakan kirim gambar bukti transfer secara terpisah ke chat ini)\n`;
-        waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(pendingPaymentData.waMessage + proofNote)}`;
+// ==================== SEND ORDER VIA WHATSAPP API ====================
+async function sendOrderViaAPI(number, message, proofImage = null) {
+    try {
+        let result;
+        
+        if (proofImage) {
+            // Send with image - convert File to base64 if needed
+            let imageData = proofImage;
+            if (proofImage instanceof File) {
+                // Convert File to base64
+                imageData = await fileToBase64(proofImage);
+            }
+            const caption = `📋 *PESANAN BARU*\n\n${message}`;
+            result = await sendWhatsAppImage(number, imageData, caption);
+        } else {
+            // Send without image
+            result = await sendWhatsAppMessage(number, `📋 *PESANAN BARU*\n\n${message}`);
+        }
+        
+        return result;
+    } catch (error) {
+        console.error('Error sending order via API:', error);
+        throw error;
     }
-    
-    // Open WhatsApp
-    window.open(waUrl, '_blank');
-    
-    // Process checkout
-    processCheckout(pendingPaymentData.type, pendingPaymentData.customerName, pendingPaymentData.deliveryFee, pendingPaymentData.distance);
-    
-    // Close modal
-    closePaymentConfirmModal();
-    pendingPaymentData = null;
 }
 
-function sendWithoutProof() {
-    if (!pendingPaymentData) return;
-    
-    const waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(pendingPaymentData.waMessage)}`;
-    window.open(waUrl, '_blank');
-    
-    processCheckout(pendingPaymentData.type, pendingPaymentData.customerName, pendingPaymentData.deliveryFee, pendingPaymentData.distance);
-    
-    closePaymentConfirmModal();
-    pendingPaymentData = null;
+function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = error => reject(error);
+    });
 }
 
-function checkoutViaWhatsApp() {
+// ==================== CHECKOUT VIA WHATSAPP ====================
+async function checkoutViaWhatsApp() {
     if (cartItems.length === 0) return;
     const customerName = document.getElementById('customer-name')?.value || 'Pelanggan';
     const distance = parseFloat(document.getElementById('delivery-distance')?.value) || 0;
@@ -923,6 +1013,7 @@ function checkoutViaWhatsApp() {
     showPaymentModal(checkoutData);
 }
 
+// ==================== CHECKOUT VIA STORE PICKUP ====================
 function checkoutViaStorePickup() { 
     if (cartItems.length === 0) return; 
     const customerName = document.getElementById('pickup-name')?.value || 'Pelanggan'; 
@@ -939,7 +1030,6 @@ function checkoutViaStorePickup() {
         return `${idx+1}. *${item.product.name}* (${item.size === 'B' ? 'Besar' : 'Kecil'}, ${tempIcon}${toppingsText ? ', ' + toppingsText : ''}) x${item.quantity} - Rp ${itemTotal.toLocaleString()}`;
     }).join('\n');
     
-    // For store pickup, we can also offer payment methods
     const msg = APP_CONFIG.WHATSAPP_MESSAGE_TEMPLATE
         .replace('{ITEMS}', itemsText)
         .replace('{SHIPPING_INFO}', 'Ambil Sendiri di Toko (GRATIS)')
@@ -960,6 +1050,82 @@ function checkoutViaStorePickup() {
     showPaymentModal(checkoutData);
 }
 
+// ==================== SEND WITH PROOF (UPDATED) ====================
+async function sendWithProof() {
+    if (!pendingPaymentData) return;
+    
+    try {
+        const number = APP_CONFIG.STORE_PHONE_NUMBER;
+        const message = pendingPaymentData.waMessage;
+        const proofFile = uploadedProofFile;
+        
+        showNotification('⏳ Mengirim pesanan...', 'info');
+        
+        // Send via WhatsApp API
+        const result = await sendOrderViaAPI(number, message, proofFile);
+        
+        if (result && result.status) {
+            showNotification('✅ Pesanan berhasil dikirim!', 'success');
+            
+            // Process checkout
+            processCheckout(
+                pendingPaymentData.type, 
+                pendingPaymentData.customerName, 
+                pendingPaymentData.deliveryFee, 
+                pendingPaymentData.distance
+            );
+        } else {
+            showNotification('⚠️ Gagal mengirim pesanan. Coba lagi.', 'error');
+            console.error('API Error:', result);
+        }
+    } catch (error) {
+        console.error('Error sending with proof:', error);
+        showNotification('❌ Error mengirim pesanan: ' + error.message, 'error');
+    }
+    
+    // Close modal
+    closePaymentConfirmModal();
+    pendingPaymentData = null;
+}
+
+// ==================== SEND WITHOUT PROOF (UPDATED) ====================
+async function sendWithoutProof() {
+    if (!pendingPaymentData) return;
+    
+    try {
+        const number = APP_CONFIG.STORE_PHONE_NUMBER;
+        const message = pendingPaymentData.waMessage;
+        
+        showNotification('⏳ Mengirim pesanan...', 'info');
+        
+        // Send via WhatsApp API
+        const result = await sendOrderViaAPI(number, message, null);
+        
+        if (result && result.status) {
+            showNotification('✅ Pesanan berhasil dikirim!', 'success');
+            
+            // Process checkout
+            processCheckout(
+                pendingPaymentData.type, 
+                pendingPaymentData.customerName, 
+                pendingPaymentData.deliveryFee, 
+                pendingPaymentData.distance
+            );
+        } else {
+            showNotification('⚠️ Gagal mengirim pesanan. Coba lagi.', 'error');
+            console.error('API Error:', result);
+        }
+    } catch (error) {
+        console.error('Error sending without proof:', error);
+        showNotification('❌ Error mengirim pesanan: ' + error.message, 'error');
+    }
+    
+    // Close modal
+    closePaymentConfirmModal();
+    pendingPaymentData = null;
+}
+
+// ==================== PROCESS CHECKOUT ====================
 function processCheckout(type, customerName, deliveryFee, distance) {
     const subtotal = getSubtotal();
     const serviceFee = getServiceFee();
@@ -1208,311 +1374,6 @@ function setAdminTab(tab) {
     }
 }
 
-// ==================== CRUD OPERATIONS ====================
-function showAddProductForm() {
-    currentFormType = 'product';
-    currentEditId = null;
-    document.getElementById('form-title').textContent = 'Tambah Produk Baru';
-    document.getElementById('form-fields').innerHTML = `
-        <input type="text" id="form-name" placeholder="Nama Produk" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <textarea id="form-desc" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="2"></textarea>
-        <input type="text" id="form-category" placeholder="Kategori (chocolate/tea/cake/coffee/fruit)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-image" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" value="./default.jpeg">
-        <input type="number" id="form-priceK" placeholder="Harga Kecil (Rp)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="number" id="form-priceB" placeholder="Harga Besar (Rp)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-bestSeller"> Best Seller</label>
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-onlySizeB"> Only Size B</label>
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-noToppings"> No Toppings</label>
-        <input type="text" id="form-accentColor" placeholder="Warna Aksen (contoh: #4A2C2A)" class="w-full px-3 py-2 text-xs border rounded-lg">
-    `;
-    document.getElementById('form-modal').classList.remove('hidden');
-    document.getElementById('form-modal').classList.add('flex');
-}
-
-function editProduct(id) {
-    const product = productsData.find(p => p.id === id);
-    if (!product) return;
-    currentFormType = 'product';
-    currentEditId = id;
-    document.getElementById('form-title').textContent = 'Edit Produk';
-    document.getElementById('form-fields').innerHTML = `
-        <input type="text" id="form-name" value="${product.name}" placeholder="Nama Produk" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <textarea id="form-desc" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="2">${product.description}</textarea>
-        <input type="text" id="form-category" value="${product.category}" placeholder="Kategori" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-image" value="${product.image}" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="number" id="form-priceK" value="${product.priceK}" placeholder="Harga Kecil" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="number" id="form-priceB" value="${product.priceB}" placeholder="Harga Besar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-bestSeller" ${product.isBestSeller ? 'checked' : ''}> Best Seller</label>
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-onlySizeB" ${product.onlySizeB ? 'checked' : ''}> Only Size B</label>
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-noToppings" ${product.noToppings ? 'checked' : ''}> No Toppings</label>
-        <input type="text" id="form-accentColor" value="${product.accentColor || '#4A2C2A'}" placeholder="Warna Aksen" class="w-full px-3 py-2 text-xs border rounded-lg">
-    `;
-    document.getElementById('form-modal').classList.remove('hidden');
-    document.getElementById('form-modal').classList.add('flex');
-}
-
-async function deleteProduct(id) {
-    if (confirm('Yakin ingin menghapus produk ini?')) {
-        productsData = productsData.filter(p => p.id !== id);
-        await saveProducts();
-        renderProductsByCategory(activeCategory);
-        renderAdminProducts();
-        showNotification('Produk berhasil dihapus!', 'success');
-    }
-}
-
-function showAddCampaignForm() {
-    currentFormType = 'campaign';
-    currentEditId = null;
-    document.getElementById('form-title').textContent = 'Tambah Promo Baru';
-    document.getElementById('form-fields').innerHTML = `
-        <input type="text" id="form-title-camp" placeholder="Judul Promo" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-subtitle" placeholder="Subtitle" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-badge" placeholder="Badge (Edisi Terbatas/Terlaris)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <textarea id="form-desc-camp" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="3"></textarea>
-        <input type="text" id="form-image-camp" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-highlight" placeholder="Highlight Text" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-accentColor-camp" placeholder="Warna Aksen" class="w-full px-3 py-2 text-xs border rounded-lg">
-    `;
-    document.getElementById('form-modal').classList.remove('hidden');
-    document.getElementById('form-modal').classList.add('flex');
-}
-
-function editCampaign(id) {
-    const campaign = campaignsData.find(c => c.id === id);
-    if (!campaign) return;
-    currentFormType = 'campaign';
-    currentEditId = id;
-    document.getElementById('form-title').textContent = 'Edit Promo';
-    document.getElementById('form-fields').innerHTML = `
-        <input type="text" id="form-title-camp" value="${campaign.title}" placeholder="Judul Promo" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-subtitle" value="${campaign.subTitle}" placeholder="Subtitle" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-badge" value="${campaign.badge}" placeholder="Badge" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <textarea id="form-desc-camp" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="3">${campaign.description}</textarea>
-        <input type="text" id="form-image-camp" value="${campaign.image}" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-highlight" value="${campaign.highlightText}" placeholder="Highlight Text" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-accentColor-camp" value="${campaign.accentColor || '#4A2C2A'}" placeholder="Warna Aksen" class="w-full px-3 py-2 text-xs border rounded-lg">
-    `;
-    document.getElementById('form-modal').classList.remove('hidden');
-    document.getElementById('form-modal').classList.add('flex');
-}
-
-async function deleteCampaign(id) {
-    if (confirm('Yakin ingin menghapus promo ini?')) {
-        campaignsData = campaignsData.filter(c => c.id !== id);
-        await saveCampaigns();
-        renderCampaigns();
-        renderAdminCampaigns();
-        showNotification('Promo berhasil dihapus!', 'success');
-    }
-}
-
-function showAddTestimonialForm() {
-    currentFormType = 'testimonial';
-    currentEditId = null;
-    document.getElementById('form-title').textContent = 'Tambah Testimoni Baru';
-    document.getElementById('form-fields').innerHTML = `
-        <input type="text" id="form-name-test" placeholder="Nama Pelanggan" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-title-test" placeholder="Judul Review" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <textarea id="form-text-test" placeholder="Isi Testimoni" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="3"></textarea>
-        <input type="text" id="form-city" placeholder="Kota" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-date" placeholder="Tanggal" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-image-test" placeholder="URL Gambar Produk" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <select id="form-rating" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-            <option value="5">⭐⭐⭐⭐⭐ (5)</option>
-            <option value="4">⭐⭐⭐⭐ (4)</option>
-            <option value="3">⭐⭐⭐ (3)</option>
-        </select>
-    `;
-    document.getElementById('form-modal').classList.remove('hidden');
-    document.getElementById('form-modal').classList.add('flex');
-}
-
-function editTestimonial(id) {
-    const testimonial = testimonialsData.find(t => t.id === id);
-    if (!testimonial) return;
-    currentFormType = 'testimonial';
-    currentEditId = id;
-    document.getElementById('form-title').textContent = 'Edit Testimoni';
-    document.getElementById('form-fields').innerHTML = `
-        <input type="text" id="form-name-test" value="${testimonial.customerName}" placeholder="Nama Pelanggan" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-title-test" value="${testimonial.reviewTitle}" placeholder="Judul Review" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <textarea id="form-text-test" placeholder="Isi Testimoni" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="3">${testimonial.reviewText}</textarea>
-        <input type="text" id="form-city" value="${testimonial.city}" placeholder="Kota" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-date" value="${testimonial.date}" placeholder="Tanggal" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-image-test" value="${testimonial.productImage}" placeholder="URL Gambar Produk" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <select id="form-rating" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-            <option value="5" ${testimonial.ratingValue === 5 ? 'selected' : ''}>⭐⭐⭐⭐⭐ (5)</option>
-            <option value="4" ${testimonial.ratingValue === 4 ? 'selected' : ''}>⭐⭐⭐⭐ (4)</option>
-            <option value="3" ${testimonial.ratingValue === 3 ? 'selected' : ''}>⭐⭐⭐ (3)</option>
-        </select>
-    `;
-    document.getElementById('form-modal').classList.remove('hidden');
-    document.getElementById('form-modal').classList.add('flex');
-}
-
-async function deleteTestimonial(id) {
-    if (confirm('Yakin ingin menghapus testimoni ini?')) {
-        testimonialsData = testimonialsData.filter(t => t.id !== id);
-        await saveTestimonials();
-        renderTestimonials();
-        renderAdminTestimonials();
-        showNotification('Testimoni berhasil dihapus!', 'success');
-    }
-}
-
-function showAddInstagramForm() {
-    currentFormType = 'instagram';
-    currentEditId = null;
-    document.getElementById('form-title').textContent = 'Tambah Post Instagram';
-    document.getElementById('form-fields').innerHTML = `
-        <input type="text" id="form-image-ig" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-likes" placeholder="Jumlah Likes (contoh: 1,420)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-comments" placeholder="Jumlah Comments" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <textarea id="form-caption-ig" placeholder="Caption" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="2"></textarea>
-        <select id="form-type" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-            <option value="photo">Photo</option>
-            <option value="video">Video</option>
-            <option value="carousel">Carousel</option>
-        </select>
-    `;
-    document.getElementById('form-modal').classList.remove('hidden');
-    document.getElementById('form-modal').classList.add('flex');
-}
-
-function editInstagram(id) {
-    const post = instagramPostsData.find(p => p.id === id);
-    if (!post) return;
-    currentFormType = 'instagram';
-    currentEditId = id;
-    document.getElementById('form-title').textContent = 'Edit Post Instagram';
-    document.getElementById('form-fields').innerHTML = `
-        <input type="text" id="form-image-ig" value="${post.image}" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-likes" value="${post.likes}" placeholder="Jumlah Likes" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="text" id="form-comments" value="${post.comments}" placeholder="Jumlah Comments" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <textarea id="form-caption-ig" placeholder="Caption" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="2">${post.caption}</textarea>
-        <select id="form-type" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-            <option value="photo" ${post.type === 'photo' ? 'selected' : ''}>Photo</option>
-            <option value="video" ${post.type === 'video' ? 'selected' : ''}>Video</option>
-            <option value="carousel" ${post.type === 'carousel' ? 'selected' : ''}>Carousel</option>
-        </select>
-    `;
-    document.getElementById('form-modal').classList.remove('hidden');
-    document.getElementById('form-modal').classList.add('flex');
-}
-
-async function deleteInstagram(id) {
-    if (confirm('Yakin ingin menghapus post ini?')) {
-        instagramPostsData = instagramPostsData.filter(p => p.id !== id);
-        await saveInstagram();
-        renderInstagramPosts();
-        renderAdminInstagram();
-        showNotification('Post berhasil dihapus!', 'success');
-    }
-}
-
-function closeFormModal() {
-    document.getElementById('form-modal').classList.add('hidden');
-    document.getElementById('form-modal').classList.remove('flex');
-    currentFormType = null;
-    currentEditId = null;
-}
-
-async function submitFormData() {
-    if (currentFormType === 'product') {
-        const newProduct = {
-            id: currentEditId || generateId('prod'),
-            name: document.getElementById('form-name').value,
-            description: document.getElementById('form-desc').value,
-            category: document.getElementById('form-category').value,
-            image: document.getElementById('form-image').value || './default.jpeg',
-            priceK: parseInt(document.getElementById('form-priceK').value) || 0,
-            priceB: parseInt(document.getElementById('form-priceB').value) || 0,
-            isBestSeller: document.getElementById('form-bestSeller')?.checked || false,
-            onlySizeB: document.getElementById('form-onlySizeB')?.checked || false,
-            noToppings: document.getElementById('form-noToppings')?.checked || false,
-            accentColor: document.getElementById('form-accentColor').value || '#4A2C2A'
-        };
-        
-        if (currentEditId) {
-            const index = productsData.findIndex(p => p.id === currentEditId);
-            if (index !== -1) productsData[index] = newProduct;
-        } else {
-            productsData.push(newProduct);
-        }
-        await saveProducts();
-        renderProductsByCategory(activeCategory);
-        renderAdminProducts();
-        showNotification(currentEditId ? 'Produk berhasil diupdate!' : 'Produk berhasil ditambahkan!', 'success');
-    } else if (currentFormType === 'campaign') {
-        const newCampaign = {
-            id: currentEditId || generateId('campaign'),
-            title: document.getElementById('form-title-camp').value,
-            subTitle: document.getElementById('form-subtitle').value,
-            badge: document.getElementById('form-badge').value,
-            description: document.getElementById('form-desc-camp').value,
-            image: document.getElementById('form-image-camp').value,
-            highlightText: document.getElementById('form-highlight').value,
-            accentColor: document.getElementById('form-accentColor-camp').value || '#4A2C2A'
-        };
-        
-        if (currentEditId) {
-            const index = campaignsData.findIndex(c => c.id === currentEditId);
-            if (index !== -1) campaignsData[index] = newCampaign;
-        } else {
-            campaignsData.push(newCampaign);
-        }
-        await saveCampaigns();
-        renderCampaigns();
-        renderAdminCampaigns();
-        showNotification(currentEditId ? 'Promo berhasil diupdate!' : 'Promo berhasil ditambahkan!', 'success');
-    } else if (currentFormType === 'testimonial') {
-        const newTestimonial = {
-            id: currentEditId || generateId('test'),
-            customerName: document.getElementById('form-name-test').value,
-            reviewTitle: document.getElementById('form-title-test').value,
-            reviewText: document.getElementById('form-text-test').value,
-            city: document.getElementById('form-city').value,
-            date: document.getElementById('form-date').value,
-            productImage: document.getElementById('form-image-test').value,
-            ratingValue: parseInt(document.getElementById('form-rating').value)
-        };
-        
-        if (currentEditId) {
-            const index = testimonialsData.findIndex(t => t.id === currentEditId);
-            if (index !== -1) testimonialsData[index] = newTestimonial;
-        } else {
-            testimonialsData.push(newTestimonial);
-        }
-        await saveTestimonials();
-        renderTestimonials();
-        renderAdminTestimonials();
-        showNotification(currentEditId ? 'Testimoni berhasil diupdate!' : 'Testimoni berhasil ditambahkan!', 'success');
-    } else if (currentFormType === 'instagram') {
-        const newPost = {
-            id: currentEditId || generateId('post'),
-            image: document.getElementById('form-image-ig').value,
-            likes: document.getElementById('form-likes').value,
-            comments: document.getElementById('form-comments').value,
-            caption: document.getElementById('form-caption-ig').value,
-            type: document.getElementById('form-type').value
-        };
-        
-        if (currentEditId) {
-            const index = instagramPostsData.findIndex(p => p.id === currentEditId);
-            if (index !== -1) instagramPostsData[index] = newPost;
-        } else {
-            instagramPostsData.push(newPost);
-        }
-        await saveInstagram();
-        renderInstagramPosts();
-        renderAdminInstagram();
-        showNotification(currentEditId ? 'Post berhasil diupdate!' : 'Post berhasil ditambahkan!', 'success');
-    }
-    
-    closeFormModal();
-}
-
 // ==================== API FUNCTIONS ====================
 async function loadDataFromAPI() {
     try {
@@ -1704,14 +1565,25 @@ function submitContactForm(event) {
             .replace('{NAME}', name)
             .replace('{PHONE}', phone)
             .replace('{MESSAGE}', message);
-        const waUrl = `https://wa.me/${APP_CONFIG.STORE_PHONE_NUMBER}?text=${encodeURIComponent(waMessage)}`;
-        const linkEl = document.getElementById('whatsapp-link');
-        if (linkEl) linkEl.href = waUrl;
+        
+        // Send via WhatsApp API
+        sendWhatsAppMessage(APP_CONFIG.STORE_PHONE_NUMBER, `📞 *PESAN DARI PELANGGAN*\n\n${waMessage}`)
+            .then(result => {
+                if (result && result.status) {
+                    showNotification('✅ Pesan berhasil dikirim!', 'success');
+                } else {
+                    showNotification('⚠️ Gagal mengirim pesan', 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Error sending contact message:', error);
+                showNotification('❌ Error mengirim pesan', 'error');
+            });
+        
         const formContainer = document.getElementById('contact-form-container');
         const successContainer = document.getElementById('contact-success');
         if (formContainer) formContainer.classList.add('hidden');
         if (successContainer) successContainer.classList.remove('hidden');
-        window.open(waUrl, '_blank');
     }
 }
 
@@ -1870,3 +1742,7 @@ window.closePaymentConfirmModal = closePaymentConfirmModal;
 window.removeUploadedFile = removeUploadedFile;
 window.sendWithProof = sendWithProof;
 window.sendWithoutProof = sendWithoutProof;
+window.sendWhatsAppMessage = sendWhatsAppMessage;
+window.sendWhatsAppImage = sendWhatsAppImage;
+window.sendOrderViaAPI = sendOrderViaAPI;
+window.fileToBase64 = fileToBase64;
