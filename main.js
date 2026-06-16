@@ -1326,7 +1326,10 @@ function processCheckout(type, customerName, deliveryFee, distance) {
     const serviceFee = getServiceFee();
     const total = subtotal + deliveryFee + serviceFee;
     receiptData = { 
-        items: [...cartItems], 
+        items: cartItems.map(item => ({ 
+            ...item, 
+            product: { ...item.product }
+        })),
         orderType: type, 
         customerName, 
         distance, 
@@ -1366,38 +1369,46 @@ function showReceipt() {
     const receiptTotal = document.getElementById('receipt-total');
     const receiptMessage = document.getElementById('receipt-message');
     
+    if (!receiptData) return;
+    
     if (receiptIdEl) receiptIdEl.textContent = `ID RESI: ${receiptData.receiptId}`;
     
     if (badge) {
-        if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) { 
-            badge.textContent = `WhatsApp Delivery (Ongkir Rp${receiptData.deliveryFee.toLocaleString()})`; 
-            badge.className = 'text-[9px] bg-emerald-100 text-[#128C7E] font-bold px-2 py-0.5 rounded-full mb-2 inline-block'; 
-        } else { 
-            badge.textContent = 'Ambil di Toko (GRATIS)'; 
-            badge.className = 'text-[9px] bg-neutral-100 text-[#111111] font-extrabold px-2 py-0.5 rounded-full mb-2 inline-block'; 
+        if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) {
+            badge.textContent = `📦 WhatsApp Delivery (Rp${receiptData.deliveryFee.toLocaleString()})`;
+            badge.className = 'text-[9px] bg-emerald-100 text-[#128C7E] font-bold px-2 py-0.5 rounded-full mb-2 inline-block';
+        } else {
+            badge.textContent = '🏪 Ambil Sendiri (GRATIS)';
+            badge.className = 'text-[9px] bg-neutral-100 text-[#111111] font-extrabold px-2 py-0.5 rounded-full mb-2 inline-block';
         }
     }
     
     if (receiptItems) {
-        receiptItems.innerHTML = receiptData.items.map(item => {
+        receiptItems.innerHTML = receiptData.items.map((item, idx) => {
             const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
             let toppingsText = '';
-            if (item.toppings.boba) toppingsText += '+Boba ';
-            if (item.toppings.creamCheese) toppingsText += '+Cream Cheese ';
+            if (item.toppings.boba) toppingsText += ' +Boba';
+            if (item.toppings.creamCheese) toppingsText += ' +Cream Cheese';
             const tempIcon = item.temperature === 'PANAS' ? '🔥' : '❄️';
-            return `<div class="flex justify-between text-[10px]"><span>${item.quantity}x ${item.product.name} (${item.size === 'B' ? 'B' : 'K'}, ${tempIcon} ${toppingsText})</span><span>Rp ${itemTotal.toLocaleString()}</span></div>`;
+            return `<div class="flex justify-between text-[10px] py-0.5 border-b border-dashed border-neutral-100">
+                <span>${idx+1}. ${item.quantity}x ${item.product.name} ${tempIcon} ${item.size === 'B' ? 'B' : 'K'}${toppingsText}</span>
+                <span class="font-mono">Rp ${itemTotal.toLocaleString()}</span>
+            </div>`;
         }).join('');
     }
     
     if (receiptSubtotal) receiptSubtotal.textContent = `Rp ${receiptData.subtotal?.toLocaleString() || 0}`;
-    if (receiptServiceFee) receiptServiceFee.innerHTML = `<span>Biaya Layanan</span><span>Rp ${receiptData.serviceFee?.toLocaleString() || 0}</span>`;
+    if (receiptServiceFee) {
+        receiptServiceFee.innerHTML = `<span>Biaya Layanan</span><span>Rp ${receiptData.serviceFee?.toLocaleString() || 0}</span>`;
+        receiptServiceFee.classList.remove('hidden');
+    }
     
     if (receiptDeliveryFee) {
         if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) {
             receiptDeliveryFee.innerHTML = `<span>Biaya Ongkir (${receiptData.distance} km)</span><span>Rp ${receiptData.deliveryFee?.toLocaleString()}</span>`;
             receiptDeliveryFee.classList.remove('hidden');
         } else if (receiptData.orderType === 'whatsapp') {
-            receiptDeliveryFee.innerHTML = '<span>Biaya Ongkir</span><span class="text-green-600">GRATIS (Ambil Sendiri)</span>';
+            receiptDeliveryFee.innerHTML = '<span>Biaya Ongkir</span><span class="text-green-600">GRATIS</span>';
             receiptDeliveryFee.classList.remove('hidden');
         } else {
             receiptDeliveryFee.classList.add('hidden');
@@ -1408,14 +1419,17 @@ function showReceipt() {
     
     let message = '';
     if (receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0) {
-        message = `Pesanan akan segera diproses dan dikirim dengan ongkir Rp${receiptData.deliveryFee.toLocaleString()}. Terima kasih!`;
+        message = `📱 Pesanan akan segera diproses dan dikirim dengan ongkir Rp${receiptData.deliveryFee.toLocaleString()}.<br>Terima kasih atas kepercayaan Anda!`;
     } else {
-        message = `Tunjukkan struk digital atas nama <strong>${receiptData.customerName}</strong> ke kasir.`;
+        message = `🏪 Tunjukkan struk digital atas nama <strong>${receiptData.customerName}</strong> ke kasir.<br>Terima kasih telah memesan!`;
     }
     if (receiptMessage) receiptMessage.innerHTML = message;
     
     const modal = document.getElementById('receipt-modal');
-    if (modal) { modal.classList.remove('hidden'); modal.classList.add('flex'); }
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
 }
 
 function closeReceiptModal() { 
@@ -1428,42 +1442,121 @@ function closeReceiptModal() {
     store.setState({ receiptData: null });
 }
 
-function downloadReceipt() { 
-    const el = document.getElementById('receipt-card'); 
-    if (el && typeof html2canvas !== 'undefined') { 
-        const rect = el.getBoundingClientRect();
-        const originalWidth = rect.width;
-        const originalHeight = rect.height;
+// ==================== RECEIPT FUNCTIONS ====================
+function downloadReceipt() {
+    if (!receiptData) {
+        showNotification('⚠️ Tidak ada data struk untuk dicetak!', 'error');
+        return;
+    }
+    
+    // Create a new receipt element with proper styling
+    const receiptWrapper = document.createElement('div');
+    receiptWrapper.className = 'fixed top-0 left-0 w-screen h-screen z-[100] flex items-center justify-center bg-[#111111]/80 backdrop-blur-sm';
+    receiptWrapper.id = 'receipt-print-wrapper';
+    
+    const receiptCard = document.createElement('div');
+    receiptCard.className = 'bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl border border-neutral-200';
+    receiptCard.id = 'receipt-print-card';
+    receiptCard.style.width = '360px';
+    receiptCard.style.maxWidth = '360px';
+    
+    // Build receipt content
+    let toppingsText = '';
+    const itemsHtml = receiptData.items.map((item, idx) => {
+        let toppings = '';
+        if (item.toppings.boba) toppings += ' +Boba';
+        if (item.toppings.creamCheese) toppings += ' +Cream Cheese';
+        const tempIcon = item.temperature === 'PANAS' ? '🔥' : '❄️';
+        const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
+        return `<div class="flex justify-between text-[10px] py-0.5 border-b border-dashed border-neutral-100">
+            <span>${idx+1}. ${item.quantity}x ${item.product.name} ${tempIcon} ${item.size === 'B' ? 'B' : 'K'}${toppings}</span>
+            <span class="font-mono">Rp ${itemTotal.toLocaleString()}</span>
+        </div>`;
+    }).join('');
+    
+    const orderTypeText = receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0 
+        ? `📦 Delivery (${receiptData.distance} km)` 
+        : '🏪 Ambil Sendiri';
+    
+    receiptCard.innerHTML = `
+        <div class="text-center border-b-2 border-dashed border-neutral-200 pb-4 mb-3">
+            <div class="flex items-center justify-center gap-2 mb-1">
+                <div class="w-8 h-8 rounded-full bg-[#111111] flex items-center justify-center text-white font-bold text-xs">C</div>
+                <span class="font-extrabold text-sm tracking-widest">THE. C DRINKS</span>
+            </div>
+            <p class="text-[8px] text-neutral-400 font-mono tracking-wider">${receiptData.receiptId}</p>
+            <p class="text-[8px] text-neutral-400">${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })} ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</p>
+            <div class="mt-1.5 inline-block bg-neutral-100 px-3 py-0.5 rounded-full text-[8px] font-bold">${orderTypeText}</div>
+        </div>
         
-        const maxDimension = 1200;
-        const minDimension = 800;
+        <div class="space-y-0.5 mb-3 max-h-[200px] overflow-y-auto">
+            ${itemsHtml}
+        </div>
         
-        let scaleX = maxDimension / originalWidth;
-        let scaleY = maxDimension / originalHeight;
+        <div class="border-t-2 border-dashed border-neutral-200 pt-3 space-y-1">
+            <div class="flex justify-between text-[9px]">
+                <span class="text-neutral-500">Subtotal</span>
+                <span class="font-mono">Rp ${receiptData.subtotal?.toLocaleString() || 0}</span>
+            </div>
+            <div class="flex justify-between text-[9px]">
+                <span class="text-neutral-500">Biaya Layanan</span>
+                <span class="font-mono">Rp ${receiptData.serviceFee?.toLocaleString() || 0}</span>
+            </div>
+            ${receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0 ? `
+            <div class="flex justify-between text-[9px]">
+                <span class="text-neutral-500">Ongkir (${receiptData.distance} km)</span>
+                <span class="font-mono">Rp ${receiptData.deliveryFee?.toLocaleString()}</span>
+            </div>
+            ` : ''}
+            <div class="flex justify-between border-t-2 border-dashed border-neutral-200 pt-2 mt-1 text-sm font-extrabold">
+                <span>TOTAL</span>
+                <span class="font-mono text-[#E11D48]">Rp ${receiptData.total?.toLocaleString() || 0}</span>
+            </div>
+        </div>
         
-        let scale = Math.min(scaleX, scaleY);
-        
-        scale = Math.max(scale, 1);
-        
-        scale = Math.min(scale, 3);
-        
-        console.log(`Dimensi asli: ${originalWidth}x${originalHeight}, Skala: ${scale}`);
-        
-        html2canvas(el, { 
-            scale: scale,
-            width: originalWidth,
-            height: originalHeight,
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#ffffff'
-        }).then(canvas => { 
-            const a = document.createElement('a'); 
-            a.download = `Struk-${receiptData?.receiptId || 'THE-C'}.png`; 
-            a.href = canvas.toDataURL('image/png', 1.0); 
-            a.click(); 
-        }).catch(console.error); 
-    } 
-    closeReceiptModal(); 
+        <div class="border-t-2 border-dashed border-neutral-200 mt-4 pt-3 text-center">
+            <p class="text-[8px] text-neutral-400 font-medium">${receiptData.orderType === 'whatsapp' && receiptData.deliveryFee > 0 ? '📱 Pesanan akan segera diproses' : '🏪 Tunjukkan struk ini ke kasir'}</p>
+            <p class="text-[7px] text-neutral-300 mt-1">Terima kasih telah memesan di THE. C DRINKS</p>
+            <div class="mt-2 flex items-center justify-center gap-2 text-[6px] text-neutral-300 font-mono">
+                <span>${APP_CONFIG.STORE_ADDRESS}</span>
+            </div>
+        </div>
+    `;
+    
+    receiptWrapper.appendChild(receiptCard);
+    document.body.appendChild(receiptWrapper);
+    
+    // Use html2canvas on the new element
+    setTimeout(() => {
+        const el = document.getElementById('receipt-print-card');
+        if (el && typeof html2canvas !== 'undefined') {
+            html2canvas(el, {
+                scale: 2.5,
+                width: 360,
+                height: el.scrollHeight,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `Struk-${receiptData?.receiptId || 'THE-C'}.png`;
+                link.href = canvas.toDataURL('image/png', 1.0);
+                link.click();
+                
+                // Remove the temporary wrapper
+                const wrapper = document.getElementById('receipt-print-wrapper');
+                if (wrapper) wrapper.remove();
+            }).catch(error => {
+                console.error('Error generating receipt:', error);
+                showNotification('❌ Gagal mencetak struk', 'error');
+                const wrapper = document.getElementById('receipt-print-wrapper');
+                if (wrapper) wrapper.remove();
+            });
+        } else {
+            const wrapper = document.getElementById('receipt-print-wrapper');
+            if (wrapper) wrapper.remove();
+        }
+    }, 300);
 }
 
 // ==================== ADMIN PANEL FUNCTIONS ====================
