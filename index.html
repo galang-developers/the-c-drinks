@@ -279,7 +279,8 @@
                             <span class="text-[7px] bg-emerald-600 text-white px-1.5 py-0.5 rounded-full">Utama</span>
                         </div>
                         <div class="mt-1 space-y-2">
-                            <input type="text" id="customer-name" placeholder="Nama lengkap Anda" class="w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500">
+                            <input type="text" id="customer-name" placeholder="Nama lengkap Anda" class="w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500 mb-2">
+                            <input type="text" id="customer-address" placeholder="Alamat lengkap Anda (akan terisi otomatis)" class="w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500 mb-2">
                             <div class="text-[9px] text-neutral-500 bg-neutral-100 p-2 rounded-lg">
                                 <p class="font-semibold mb-1">📍 Informasi Alamat:</p>
                                 <p class="text-[8px]">Klik "Ambil Lokasi Saya" untuk menghitung ongkir otomatis, lalu share location Anda via WhatsApp</p>
@@ -298,12 +299,6 @@
                                 <button type="button" onclick="clearLocationWA()" class="text-[9px] text-red-500 hover:text-red-600 px-2">Hapus</button>
                             </div>
                             <div id="delivery-fee-display" class="text-[9px] font-semibold text-emerald-700 hidden"></div>
-                            <!-- TAMBAHKAN INI DI BAWAHNYA -->
-                            <div id="location-address-display" class="mt-2 hidden">
-                                <div id="location-address-content" class="bg-white/80 rounded-lg p-2 border border-emerald-200 text-left">
-                                    <!-- Address akan ditampilkan di sini oleh JavaScript -->
-                                </div>
-                            </div>
                             <button onclick="checkoutViaWhatsApp()" class="w-full bg-[#128C7E] hover:bg-[#075E54] text-white font-bold py-2 rounded-lg text-[10px] flex items-center justify-center gap-1 mt-1 transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Lanjut ke Pembayaran
                             </button>
