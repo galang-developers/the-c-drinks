@@ -1431,10 +1431,35 @@ function closeReceiptModal() {
 function downloadReceipt() { 
     const el = document.getElementById('receipt-card'); 
     if (el && typeof html2canvas !== 'undefined') { 
-        html2canvas(el, { scale: 2.5 }).then(c => { 
+        const rect = el.getBoundingClientRect();
+        const originalWidth = rect.width;
+        const originalHeight = rect.height;
+        
+        const maxDimension = 1200;
+        const minDimension = 800;
+        
+        let scaleX = maxDimension / originalWidth;
+        let scaleY = maxDimension / originalHeight;
+        
+        let scale = Math.min(scaleX, scaleY);
+        
+        scale = Math.max(scale, 1);
+        
+        scale = Math.min(scale, 3);
+        
+        console.log(`Dimensi asli: ${originalWidth}x${originalHeight}, Skala: ${scale}`);
+        
+        html2canvas(el, { 
+            scale: scale,
+            width: originalWidth,
+            height: originalHeight,
+            useCORS: true,
+            logging: false,
+            backgroundColor: '#ffffff'
+        }).then(canvas => { 
             const a = document.createElement('a'); 
             a.download = `Struk-${receiptData?.receiptId || 'THE-C'}.png`; 
-            a.href = c.toDataURL(); 
+            a.href = canvas.toDataURL('image/png', 1.0); 
             a.click(); 
         }).catch(console.error); 
     } 
