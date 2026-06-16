@@ -16,7 +16,7 @@ const APP_CONFIG = {
     
     // WhatsApp API Configuration
     WHATSAPP_API_URL: 'https://baileys-rest-api-production-959c.up.railway.app/api',
-    WHATSAPP_SESSION_NAME: 'thecdrinks_session',
+    WHATSAPP_SESSION_NAME: 'testsession',
     
     // Delivery Fee Configuration
     DELIVERY_FLAT_RATE_KM: 3,
@@ -985,27 +985,35 @@ function confirmPayment() {
         showNotification('⚠️ Data checkout tidak ditemukan!', 'error');
         return;
     }
-    
-    // Hanya tampilkan payment confirm modal untuk WhatsApp Delivery
-    if (pendingCheckoutData.type === 'whatsapp') {
+
+    // SIMPAN DATA SEBELUM MODAL DITUTUP
+    const checkoutData = { ...pendingCheckoutData };
+
+    if (checkoutData.type === 'whatsapp') {
         closePaymentModal();
-        showPaymentConfirmModal(pendingCheckoutData);
+        showPaymentConfirmModal(checkoutData);
     } else {
-        // Untuk Ambil di Toko, langsung proses checkout
         closePaymentModal();
         processCheckout(
-            pendingCheckoutData.type,
-            pendingCheckoutData.customerName,
-            pendingCheckoutData.deliveryFee,
-            pendingCheckoutData.distance
+            checkoutData.type,
+            checkoutData.customerName,
+            checkoutData.deliveryFee,
+            checkoutData.distance
         );
+        
         showNotification('✅ Pesanan berhasil diproses!', 'success');
     }
 }
 
 // ==================== PAYMENT CONFIRMATION MODAL (UPLOAD BUKTI) ====================
 function showPaymentConfirmModal(checkoutData) {
-    console.log('showPaymentConfirmModal called with data:', checkoutData);
+    console.log('=== PAYMENT CONFIRM MODAL ===');
+    console.log('Data diterima:', checkoutData);
+
+    if (!checkoutData) {
+        console.error('ERROR: checkoutData kosong!');
+        return;
+    }
     
     pendingPaymentData = checkoutData;
     store.setState({ pendingPaymentData: checkoutData });
