@@ -44,22 +44,22 @@ const APP_CONFIG = {
     
     // Default Menu Data
     DEFAULT_PRODUCTS: [
-        { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": "./cokelat-hazelnut.jpeg", "accentColor": "#A67C52", "priceK": 13000, "priceB": 16000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-chocolate-strawberry", "name": "Chocolate Strawberry", "description": "Perpaduan sempurna antara cokelat premium dan stroberi segar yang manis dan menyegarkan.", "category": "chocolate", "image": "./cokelat-strawberry.jpeg", "accentColor": "#E11D48", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-chocolate-coffee", "name": "Chocolate Coffee", "description": "Kombinasi nikmat antara cokelat pekat dan espresso Arabika yang kuat dan beraroma.", "category": "chocolate", "image": "./cokelat-kopi.jpeg", "accentColor": "#6F4E37", "priceK": 15000, "priceB": 18000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-matcha-latte", "name": "Matcha Latte", "description": "Bubuk matcha Jepang premium Uji diseduh dengan susu segar organik yang lembut.", "category": "tea", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-thai-tea", "name": "Thai Tea", "description": "Teh Thailand asli dengan rasa khas yang creamy dan manis, disajikan dengan susu kental manis.", "category": "tea", "image": "./tea-thai.jpeg", "accentColor": "#D97706", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-lemon-tea", "name": "Lemon Tea", "description": "Kesegaran teh hitam dengan perasan lemon asli dan madu hutan alami.", "category": "tea", "image": "./tea-lemon.jpeg", "accentColor": "#EAB308", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-solo-wasgitel", "name": "Solo Wasgitel", "description": "Minuman khas Solo dengan rasa wasgitel yang unik dan menyegarkan.", "category": "tea", "image": "./tea-solo-wasgitel.jpeg", "accentColor": "#8B5E3C", "priceK": 7000, "priceB": 7000, "isBestSeller": false, "onlySizeB": true, "noToppings": true },
-        { "id": "prod-americano", "name": "Americano", "description": "Espresso otentik dari biji kopi Arabika pilihan, disajikan dengan air pegunungan dingin yang segar.", "category": "coffee", "image": "./coffe-americano.jpeg", "accentColor": "#6F4E37", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-cappucino", "name": "Cappucino", "description": "Perpaduan sempurna antara espresso, susu panas, dan busa susu yang lembut.", "category": "coffee", "image": "./coffe-cappucino.jpeg", "accentColor": "#A67C52", "priceK": 12000, "priceB": 15000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-latte", "name": "Latte", "description": "Espresso dengan susu steamed yang creamy, menghasilkan rasa yang halus dan lembut.", "category": "coffee", "image": "./coffe-late.jpeg", "accentColor": "#8B5E3C", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-brown-sugar-latte", "name": "Brown Sugar Latte", "description": "Caramel gula merah Okinawa berpadu indah dengan espresso dan susu segar premium.", "category": "coffee", "image": "./coffe-late-brown-sugar.jpeg", "accentColor": "#4A2C2A", "priceK": 15000, "priceB": 18000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-strawberry", "name": "Strawberry", "description": "Puree stroberi segar organik dipadukan dengan es batu serut.", "category": "fruit", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-mango", "name": "Mango", "description": "Kesegaran puree mangga alami yang manis dan menyegarkan, cocok untuk cuaca panas.", "category": "fruit", "image": "./fruit-manggo.jpeg", "accentColor": "#F59E0B", "priceK": 10000, "priceB": 13000, "isBestSeller": false, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-taro", "name": "Taro Milk Tea", "description": "Minuman taro creamy dengan aroma khas dan rasa manis alami yang lembut di lidah.", "category": "cake", "image": "./taro.jpeg", "accentColor": "#9B59B6", "priceK": 10000, "priceB": 13000, "isBestSeller": true, "onlySizeB": false, "noToppings": false },
-        { "id": "prod-red-velvet", "name": "Red Velvet Latte", "description": "Perpaduan sempurna antara red velvet cake dan susu segar, menghasilkan rasa yang manis dan elegan.", "category": "cake", "image": "./red-velvet.jpeg", "accentColor": "#E74C3C", "priceK": 12000, "priceB": 15000, "isBestSeller": false, "onlySizeB": false, "noToppings": false }
+        { "id": "prod-chocolate-original", "name": "Chocolate Original", "description": "Cokelat premium pekat berpadu sempurna dengan susu segar organik yang creamy.", "category": "chocolate", "image": "./cokelat-original.jpeg", "accentColor": "#4A2C2A", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-chocolate-hazelnut", "name": "Chocolate Hazelnut", "description": "Cokelat premium pekat dikombinasikan dengan sirup hazelnut panggang dan susu dingin berkualitas.", "category": "chocolate", "image": "./cokelat-hazelnut.jpeg", "accentColor": "#A67C52", "priceN": 13000, "priceL": 16000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-chocolate-strawberry", "name": "Chocolate Strawberry", "description": "Perpaduan sempurna antara cokelat premium dan stroberi segar yang manis dan menyegarkan.", "category": "chocolate", "image": "./cokelat-strawberry.jpeg", "accentColor": "#E11D48", "priceN": 12000, "priceL": 15000, "isBestSeller": false, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-chocolate-coffee", "name": "Chocolate Coffee", "description": "Kombinasi nikmat antara cokelat pekat dan espresso Arabika yang kuat dan beraroma.", "category": "chocolate", "image": "./cokelat-kopi.jpeg", "accentColor": "#6F4E37", "priceN": 15000, "priceL": 18000, "isBestSeller": false, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-matcha-latte", "name": "Matcha Latte", "description": "Bubuk matcha Jepang premium Uji diseduh dengan susu segar organik yang lembut.", "category": "tea", "image": "./tea-matcha.jpeg", "accentColor": "#6B8E23", "priceN": 12000, "priceL": 15000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-thai-tea", "name": "Thai Tea", "description": "Teh Thailand asli dengan rasa khas yang creamy dan manis, disajikan dengan susu kental manis.", "category": "tea", "image": "./tea-thai.jpeg", "accentColor": "#D97706", "priceN": 12000, "priceL": 15000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-lemon-tea", "name": "Lemon Tea", "description": "Kesegaran teh hitam dengan perasan lemon asli dan madu hutan alami.", "category": "tea", "image": "./tea-lemon.jpeg", "accentColor": "#EAB308", "priceN": 10000, "priceL": 13000, "isBestSeller": false, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-solo-wasgitel", "name": "Solo Wasgitel", "description": "Minuman khas Solo dengan rasa wasgitel yang unik dan menyegarkan.", "category": "tea", "image": "./tea-solo-wasgitel.jpeg", "accentColor": "#8B5E3C", "priceN": 7000, "priceL": 7000, "isBestSeller": false, "onlySizeL": true, "noToppings": true },
+        { "id": "prod-americano", "name": "Americano", "description": "Espresso otentik dari biji kopi Arabika pilihan, disajikan dengan air pegunungan dingin yang segar.", "category": "coffee", "image": "./coffe-americano.jpeg", "accentColor": "#6F4E37", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-cappucino", "name": "Cappucino", "description": "Perpaduan sempurna antara espresso, susu panas, dan busa susu yang lembut.", "category": "coffee", "image": "./coffe-cappucino.jpeg", "accentColor": "#A67C52", "priceN": 12000, "priceL": 15000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-latte", "name": "Latte", "description": "Espresso dengan susu steamed yang creamy, menghasilkan rasa yang halus dan lembut.", "category": "coffee", "image": "./coffe-late.jpeg", "accentColor": "#8B5E3C", "priceN": 12000, "priceL": 15000, "isBestSeller": false, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-brown-sugar-latte", "name": "Brown Sugar Latte", "description": "Caramel gula merah Okinawa berpadu indah dengan espresso dan susu segar premium.", "category": "coffee", "image": "./coffe-late-brown-sugar.jpeg", "accentColor": "#4A2C2A", "priceN": 15000, "priceL": 18000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-strawberry", "name": "Strawberry", "description": "Puree stroberi segar organik dipadukan dengan es batu serut.", "category": "fruit", "image": "./fruit-strawberry.jpeg", "accentColor": "#E11D48", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-mango", "name": "Mango", "description": "Kesegaran puree mangga alami yang manis dan menyegarkan, cocok untuk cuaca panas.", "category": "fruit", "image": "./fruit-manggo.jpeg", "accentColor": "#F59E0B", "priceN": 10000, "priceL": 13000, "isBestSeller": false, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-taro", "name": "Taro Milk Tea", "description": "Minuman taro creamy dengan aroma khas dan rasa manis alami yang lembut di lidah.", "category": "cake", "image": "./taro.jpeg", "accentColor": "#9B59B6", "priceN": 10000, "priceL": 13000, "isBestSeller": true, "onlySizeL": false, "noToppings": false },
+        { "id": "prod-red-velvet", "name": "Red Velvet Latte", "description": "Perpaduan sempurna antara red velvet cake dan susu segar, menghasilkan rasa yang manis dan elegan.", "category": "cake", "image": "./red-velvet.jpeg", "accentColor": "#E74C3C", "priceN": 12000, "priceL": 15000, "isBestSeller": false, "onlySizeL": false, "noToppings": false }
     ],
     
     DEFAULT_CAMPAIGNS: [
@@ -358,8 +358,8 @@ function updateDeliveryFee() {
 
 // ==================== PRODUCT FUNCTIONS ====================
 function getProductPrice(product, size) {
-    if (product.id === "prod-solo-wasgitel") return product.priceB;
-    return size === 'B' ? product.priceB : product.priceK;
+    if (product.id === "prod-solo-wasgitel") return product.priceL;
+    return size === 'L' ? product.priceL : product.priceN;
 }
 
 function getToppingPrice(toppings, productId) {
@@ -569,7 +569,7 @@ function renderProductsByCategory(categoryId) {
 
 function setProductSize(productId, size) {
     const product = productsData.find(p => p.id === productId);
-    if (product && product.onlySizeB) size = 'B';
+    if (product && product.onlySizeL) size = 'L';
     productSizes[productId] = size;
     store.setState({ productSizes: productSizes });
     document.querySelectorAll(`.size-btn-${productId}`).forEach(btn => {
@@ -611,8 +611,8 @@ function addToCart(productId, size, temperature, toppings) {
     
     let finalSize = size;
     let finalToppings = { ...toppings };
-    if (product.onlySizeB) {
-        finalSize = 'B';
+    if (product.onlySizeL) {
+        finalSize = 'L';
         finalToppings = { boba: false, creamCheese: false };
     }
     if (product.noToppings) {
@@ -654,7 +654,7 @@ function addToCartFromCard(productId, size) {
     const product = productsData.find(p => p.id === productId);
     const temperature = productTemp[productId] || 'DINGIN';
     let finalSize = size;
-    if (product && product.onlySizeB) finalSize = 'B';
+    if (product && product.onlySizeL) finalSize = 'L';
     let bobaChecked = false, creamCheeseChecked = false;
     if (!product || !product.noToppings) {
         bobaChecked = document.getElementById(`topping-boba-${productId}`)?.checked || false;
@@ -676,13 +676,13 @@ function renderProducts(products) {
     });
     
     container.innerHTML = products.map(product => {
-        let defaultSize = 'B';
-        if (!product.onlySizeB) defaultSize = productSizes[product.id] || 'K';
+        let defaultSize = 'L';
+        if (!product.onlySizeL) defaultSize = productSizes[product.id] || 'N';
         const activeSize = defaultSize;
         const price = getProductPrice(product, activeSize);
-        const isKActive = (activeSize === 'K' && !product.onlySizeB);
-        const isBActive = (activeSize === 'B');
-        const showSizeOptions = !product.onlySizeB;
+        const isNActive = (activeSize === 'N' && !product.onlySizeL);
+        const isLActive = (activeSize === 'L');
+        const showSizeOptions = !product.onlySizeL;
         const showToppings = !product.noToppings;
         const currentTemp = productTemp[product.id] || 'DINGIN';
         
@@ -693,7 +693,7 @@ function renderProducts(products) {
             <div>
                 <div class="product-image-container relative w-full aspect-square bg-[#FBFBFB] rounded-[18px] mb-4 flex items-center justify-center overflow-hidden">
                     ${product.isBestSeller ? '<span class="absolute top-2.5 left-2.5 z-20 bg-neutral-900 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Terlaris</span>' : ''}
-                    ${product.onlySizeB ? '<span class="absolute top-2.5 right-2.5 z-20 bg-amber-600 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Only Size B</span>' : ''}
+                    ${product.onlySizeL ? '<span class="absolute top-2.5 right-2.5 z-20 bg-amber-600 text-[8px] font-extrabold text-white px-2 py-0.5 rounded-full shadow-sm">Only Size L</span>' : ''}
                     <img src="${product.image}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" onerror="this.src='https://placehold.co/600x800/1a1a1a/white?text=Image'">
                 </div>
                 <div class="text-left px-1">
@@ -705,12 +705,12 @@ function renderProducts(products) {
                 <div class="flex items-center justify-between gap-2">
                     ${showSizeOptions ? `
                     <div class="flex items-center space-x-0.5 bg-neutral-50 rounded-full p-0.5 border">
-                        <button onclick="setProductSize('${product.id}', 'K')" data-product="${product.id}" data-size="K" class="size-btn-${product.id} px-2 py-1 rounded-full text-[9px] font-extrabold transition-all ${isKActive ? 'bg-[#111111] text-white shadow-sm' : 'text-[#555555] hover:text-[#111111]'}">K</button>
-                        <button onclick="setProductSize('${product.id}', 'B')" data-product="${product.id}" data-size="B" class="size-btn-${product.id} px-2 py-1 rounded-full text-[9px] font-extrabold transition-all ${isBActive ? 'bg-[#111111] text-white shadow-sm' : 'text-[#555555] hover:text-[#111111]'}">B</button>
+                        <button onclick="setProductSize('${product.id}', 'N')" data-product="${product.id}" data-size="N" class="size-btn-${product.id} px-2 py-1 rounded-full text-[9px] font-extrabold transition-all ${isNActive ? 'bg-[#111111] text-white shadow-sm' : 'text-[#555555] hover:text-[#111111]'}">N</button>
+                        <button onclick="setProductSize('${product.id}', 'L')" data-product="${product.id}" data-size="L" class="size-btn-${product.id} px-2 py-1 rounded-full text-[9px] font-extrabold transition-all ${isLActive ? 'bg-[#111111] text-white shadow-sm' : 'text-[#555555] hover:text-[#111111]'}">L</button>
                     </div>
                     ` : `
                     <div class="flex items-center space-x-0.5 bg-neutral-50 rounded-full p-0.5 border">
-                        <button class="px-2 py-1 rounded-full text-[9px] font-extrabold bg-[#111111] text-white shadow-sm">B Only</button>
+                        <button class="px-2 py-1 rounded-full text-[9px] font-extrabold bg-[#111111] text-white shadow-sm">L Only</button>
                     </div>
                     `}
                     <div class="text-right font-mono font-bold text-[11px]">Rp ${price.toLocaleString('id-ID')}</div>
@@ -804,7 +804,7 @@ function renderCartItems() {
         if (!toppingsText) toppingsText = 'Tanpa Topping';
         const tempIcon = item.temperature === 'PANAS' ? '🔥' : '❄️';
         
-        return `<div class="p-3 bg-neutral-50 rounded-xl flex gap-3"><div class="w-14 h-14 bg-white rounded-lg p-1"><img src="${item.product.image}" class="w-full h-full object-contain"></div><div class="flex-grow"><div class="flex justify-between"><h4 class="font-bold text-xs">${item.product.name}</h4><button onclick="removeCartItem('${item.id}')" class="text-neutral-400 hover:text-red-500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div><div class="flex flex-wrap gap-1 mt-1"><span class="bg-neutral-900 text-white px-1.5 py-0.5 rounded text-[8px]">${item.size === 'B' ? 'Besar' : 'Kecil'}</span><span class="bg-neutral-200 text-neutral-800 px-1.5 py-0.5 rounded text-[8px]">${tempIcon} ${item.temperature}</span>${item.toppings.boba ? '<span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[8px]">+Boba</span>' : ''}${item.toppings.creamCheese ? '<span class="bg-pink-100 text-pink-800 px-1.5 py-0.5 rounded text-[8px]">+Cream Cheese</span>' : ''}</div><div class="flex justify-between mt-2"><div class="flex items-center bg-white rounded border"><button onclick="updateQuantity('${item.id}', -1)" class="w-6 h-6 flex items-center justify-center">-</button><span class="w-6 text-center text-xs">${item.quantity}</span><button onclick="updateQuantity('${item.id}', 1)" class="w-6 h-6 flex items-center justify-center">+</button></div><span class="font-mono text-xs font-bold">Rp ${totalItemPrice.toLocaleString()}</span></div></div></div>`;
+        return `<div class="p-3 bg-neutral-50 rounded-xl flex gap-3"><div class="w-14 h-14 bg-white rounded-lg p-1"><img src="${item.product.image}" class="w-full h-full object-contain"></div><div class="flex-grow"><div class="flex justify-between"><h4 class="font-bold text-xs">${item.product.name}</h4><button onclick="removeCartItem('${item.id}')" class="text-neutral-400 hover:text-red-500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button></div><div class="flex flex-wrap gap-1 mt-1"><span class="bg-neutral-900 text-white px-1.5 py-0.5 rounded text-[8px]">${item.size === 'L' ? 'Large' : 'Normal'}</span><span class="bg-neutral-200 text-neutral-800 px-1.5 py-0.5 rounded text-[8px]">${tempIcon} ${item.temperature}</span>${item.toppings.boba ? '<span class="bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded text-[8px]">+Boba</span>' : ''}${item.toppings.creamCheese ? '<span class="bg-pink-100 text-pink-800 px-1.5 py-0.5 rounded text-[8px]">+Cream Cheese</span>' : ''}</div><div class="flex justify-between mt-2"><div class="flex items-center bg-white rounded border"><button onclick="updateQuantity('${item.id}', -1)" class="w-6 h-6 flex items-center justify-center">-</button><span class="w-6 text-center text-xs">${item.quantity}</span><button onclick="updateQuantity('${item.id}', 1)" class="w-6 h-6 flex items-center justify-center">+</button></div><span class="font-mono text-xs font-bold">Rp ${totalItemPrice.toLocaleString()}</span></div></div></div>`;
     }).join('');
     if (footer) footer.classList.remove('hidden');
 }
@@ -1244,7 +1244,7 @@ async function checkoutViaWhatsApp() {
         if (item.toppings.boba) toppingsText += '+Boba ';
         if (item.toppings.creamCheese) toppingsText += '+Cream Cheese ';
         const tempIcon = item.temperature === 'PANAS' ? '🔥 Panas' : '❄️ Dingin';
-        return `${idx+1}. *${item.product.name}* (${item.size === 'B' ? 'Besar' : 'Kecil'}, ${tempIcon}${toppingsText ? ', ' + toppingsText : ''}) x${item.quantity} - Rp ${itemTotal.toLocaleString()}`;
+        return `${idx+1}. *${item.product.name}* (${item.size === 'L' ? 'Large' : 'Normal'}, ${tempIcon}${toppingsText ? ', ' + toppingsText : ''}) x${item.quantity} - Rp ${itemTotal.toLocaleString()}`;
     }).join('\n');
     
     const subtotal = getSubtotal();
@@ -1297,7 +1297,7 @@ function checkoutViaStorePickup() {
         if (item.toppings.boba) toppingsText += '+Boba ';
         if (item.toppings.creamCheese) toppingsText += '+Cream Cheese ';
         const tempIcon = item.temperature === 'PANAS' ? '🔥 Panas' : '❄️ Dingin';
-        return `${idx+1}. *${item.product.name}* (${item.size === 'B' ? 'Besar' : 'Kecil'}, ${tempIcon}${toppingsText ? ', ' + toppingsText : ''}) x${item.quantity} - Rp ${itemTotal.toLocaleString()}`;
+        return `${idx+1}. *${item.product.name}* (${item.size === 'L' ? 'Large' : 'Normal'}, ${tempIcon}${toppingsText ? ', ' + toppingsText : ''}) x${item.quantity} - Rp ${itemTotal.toLocaleString()}`;
     }).join('\n');
     
     const msg = APP_CONFIG.WHATSAPP_MESSAGE_TEMPLATE
@@ -1391,7 +1391,7 @@ function showReceipt() {
             if (item.toppings.creamCheese) toppingsText += ' +Cream Cheese';
             const tempIcon = item.temperature === 'PANAS' ? '🔥' : '❄️';
             return `<div class="flex justify-between text-[10px] py-0.5 border-b border-dashed border-neutral-100">
-                <span>${idx+1}. ${item.quantity}x ${item.product.name} ${tempIcon} ${item.size === 'B' ? 'B' : 'K'}${toppingsText}</span>
+                <span>${idx+1}. ${item.quantity}x ${item.product.name} ${tempIcon} ${item.size === 'L' ? 'L' : 'N'}${toppingsText}</span>
                 <span class="font-mono">Rp ${itemTotal.toLocaleString()}</span>
             </div>`;
         }).join('');
@@ -1472,7 +1472,7 @@ function downloadReceipt() {
         if (item.toppings.creamCheese) toppings += ' +CREAMCHS';
         const tempIcon = item.temperature === 'PANAS' ? 'HOT' : 'COLD';
         const itemTotal = (item.basePrice + item.toppingPrice) * item.quantity;
-        const sizeLabel = item.size === 'B' ? 'L' : 'R';
+        const sizeLabel = item.size === 'L' ? 'L' : 'N';
         return `<div style="display:flex;justify-content:space-between;font-size:11px;padding:2px 0;border-bottom:1px dashed #e5e5e5;">
             <span>${idx+1}. ${item.quantity}x ${item.product.name} ${tempIcon} ${sizeLabel}${toppings}</span>
             <span style="font-weight:bold;">Rp${itemTotal.toLocaleString()}</span>
@@ -1628,7 +1628,7 @@ function renderAdminProducts() {
         <div class="bg-neutral-50 rounded-xl p-3 flex justify-between items-center">
             <div class="flex-1">
                 <div class="font-bold text-xs">${product.name}</div>
-                <div class="text-[9px] text-neutral-500">${product.category} | Rp ${product.priceK.toLocaleString()} (K) / Rp ${product.priceB.toLocaleString()} (B)</div>
+                <div class="text-[9px] text-neutral-500">${product.category} | Rp ${product.priceN.toLocaleString()} (N) / Rp ${product.priceL.toLocaleString()} (L)</div>
             </div>
             <div class="flex gap-1">
                 <button onclick="editProduct('${product.id}')" class="px-2 py-1 bg-blue-500 text-white rounded text-[9px]">Edit</button>
@@ -1720,10 +1720,10 @@ function showAddProductForm() {
         <textarea id="form-desc" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="2"></textarea>
         <input type="text" id="form-category" placeholder="Kategori (chocolate/tea/cake/coffee/fruit)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-image" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" value="./default.jpeg">
-        <input type="number" id="form-priceK" placeholder="Harga Kecil (Rp)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="number" id="form-priceB" placeholder="Harga Besar (Rp)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="number" id="form-priceN" placeholder="Harga Normal (Rp)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="number" id="form-priceL" placeholder="Harga Large (Rp)" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-bestSeller"> Best Seller</label>
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-onlySizeB"> Only Size B</label>
+        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-onlySizeL"> Only Size L</label>
         <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-noToppings"> No Toppings</label>
         <input type="text" id="form-accentColor" placeholder="Warna Aksen (contoh: #4A2C2A)" class="w-full px-3 py-2 text-xs border rounded-lg">
     `;
@@ -1742,10 +1742,10 @@ function editProduct(id) {
         <textarea id="form-desc" placeholder="Deskripsi" class="w-full px-3 py-2 text-xs border rounded-lg mb-2" rows="2">${product.description}</textarea>
         <input type="text" id="form-category" value="${product.category}" placeholder="Kategori" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <input type="text" id="form-image" value="${product.image}" placeholder="URL Gambar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="number" id="form-priceK" value="${product.priceK}" placeholder="Harga Kecil" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
-        <input type="number" id="form-priceB" value="${product.priceB}" placeholder="Harga Besar" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="number" id="form-priceN" value="${product.priceN}" placeholder="Harga Normal" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
+        <input type="number" id="form-priceL" value="${product.priceL}" placeholder="Harga Large" class="w-full px-3 py-2 text-xs border rounded-lg mb-2">
         <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-bestSeller" ${product.isBestSeller ? 'checked' : ''}> Best Seller</label>
-        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-onlySizeB" ${product.onlySizeB ? 'checked' : ''}> Only Size B</label>
+        <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-onlySizeL" ${product.onlySizeL ? 'checked' : ''}> Only Size L</label>
         <label class="flex items-center gap-2 mb-2"><input type="checkbox" id="form-noToppings" ${product.noToppings ? 'checked' : ''}> No Toppings</label>
         <input type="text" id="form-accentColor" value="${product.accentColor || '#4A2C2A'}" placeholder="Warna Aksen" class="w-full px-3 py-2 text-xs border rounded-lg">
     `;
@@ -1928,10 +1928,10 @@ async function submitFormData() {
             description: document.getElementById('form-desc').value,
             category: document.getElementById('form-category').value,
             image: document.getElementById('form-image').value || './default.jpeg',
-            priceK: parseInt(document.getElementById('form-priceK').value) || 0,
-            priceB: parseInt(document.getElementById('form-priceB').value) || 0,
+            priceN: parseInt(document.getElementById('form-priceN').value) || 0,
+            priceL: parseInt(document.getElementById('form-priceL').value) || 0,
             isBestSeller: document.getElementById('form-bestSeller')?.checked || false,
-            onlySizeB: document.getElementById('form-onlySizeB')?.checked || false,
+            onlySizeL: document.getElementById('form-onlySizeL')?.checked || false,
             noToppings: document.getElementById('form-noToppings')?.checked || false,
             accentColor: document.getElementById('form-accentColor').value || '#4A2C2A'
         };
