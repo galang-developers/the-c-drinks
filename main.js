@@ -370,11 +370,65 @@ function getToppingPrice(toppings, productId) {
     return total;
 }
 
-// ==================== GEOLOCATION ====================
-function getUserLocationWA() {
+// ==================== GEOLOCATION WITH REVERSE GEOCODING ====================
+// Fungsi untuk mendapatkan alamat lengkap dari koordinat menggunakan Nominatim (OpenStreetMap)
+async function getAddressFromCoords(lat, lng) {
+    try {
+        const response = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lng}&format=json&addressdetails=1&zoom=18`,
+            {
+                headers: {
+                    'User-Agent': 'THE.C-DRINKS-WebApp/1.0'
+                }
+            }
+        );
+        
+        if (!response.ok) throw new Error('Gagal mendapatkan alamat');
+        
+        const data = await response.json();
+        
+        if (data && data.display_name) {
+            return {
+                fullAddress: data.display_name,
+                road: data.address?.road || '',
+                city: data.address?.city || data.address?.town || data.address?.village || '',
+                district: data.address?.suburb || data.address?.district || '',
+                province: data.address?.state || data.address?.province || '',
+                country: data.address?.country || 'Indonesia',
+                postcode: data.address?.postcode || '',
+                lat: lat,
+                lng: lng
+            };
+        }
+        return null;
+    } catch (error) {
+        console.error('Error getting address:', error);
+        return null;
+    }
+}
+
+// Fungsi untuk mendapatkan link Google Maps
+function getGoogleMapsLink(lat, lng) {
+    return `https://www.google.com/maps?q=${lat},${lng}`;
+}
+
+// Fungsi untuk mendapatkan link OpenStreetMap
+function getOpenStreetMapLink(lat, lng) {
+    return `https://www.openstreetmap.org/?mlat=${lat}&mlon=${lng}&zoom=15`;
+}
+
+// Fungsi untuk mendapatkan link Waze
+function getWazeLink(lat, lng) {
+    return `https://www.waze.com/ul?ll=${lat},${lng}&navigate=yes`;
+}
+
+// ==================== UPDATE GEOLOCATION FUNCTIONS ====================
+async function getUserLocationWA() {
     const statusEl = document.getElementById('location-status-wa');
     const resetBtn = document.getElementById('reset-permission-btn');
     const distanceInput = document.getElementById('delivery-distance');
+    const addressDisplay = document.getElementById('location-address-display');
+    const addressContent = document.getElementById('location-address-content');
     
     if (!navigator.geolocation) {
         if (statusEl) {
@@ -386,36 +440,122 @@ function getUserLocationWA() {
     }
     
     if (statusEl) {
-        statusEl.textContent = '📍 Mendapatkan lokasi Anda... Mohon izinkan akses lokasi.';
+        statusEl.innerHTML = '📍 Mendapatkan lokasi Anda... Mohon izinkan akses lokasi.';
         statusEl.classList.remove('hidden');
-        statusEl.classList.add('text-blue-600');
+        statusEl.className = 'text-blue-600 text-[8px]';
     }
     
     if (resetBtn) resetBtn.classList.add('hidden');
     
+    // Sembunyikan address display sebelumnya
+    if (addressDisplay) addressDisplay.classList.add('hidden');
+    
     navigator.geolocation.getCurrentPosition(
-        function(position) {
-            userLocation = { lat: position.coords.latitude, lng: position.coords.longitude };
-            store.setState({ userLocation: userLocation });
-            const distance = calculateDistance(APP_CONFIG.STORE_LOCATION.lat, APP_CONFIG.STORE_LOCATION.lng, userLocation.lat, userLocation.lng);
-            if (distanceInput) distanceInput.value = distance.toFixed(1);
+        async function(position) {
+            const lat = position.coords.latitude;
+            const lng = position.coords.longitude;
             
-            const fee = calculateDeliveryFee(distance);
+            userLocation = { lat, lng };
+            store.setState({ userLocation: userLocation });
+            
+            // Hitung jarak ke toko
+            const distance = calculateDistance(
+                APP_CONFIG.STORE_LOCATION.lat,
+                APP_CONFIG.STORE_LOCATION.lng,
+                lat,
+                lng
+            );
+            
+            if (distanceInput) {
+                distanceInput.value = distance.toFixed(1);
+            }
+            
+            // Update delivery fee
+            updateDeliveryFee();
+            
+            // Dapatkan alamat lengkap dari koordinat
+            const addressInfo = await getAddressFromCoords(lat, lng);
+            
+            // Tampilkan alamat di address display
+            if (addressDisplay && addressContent) {
+                addressDisplay.classList.remove('hidden');
+                
+                let addressHtml = '';
+                if (addressInfo) {
+                    addressHtml = `
+                        <div class="space-y-1">
+                            <div class="font-semibold text-[9px] text-emerald-700">📍 Alamat Detail:</div>
+                            <div class="text-[8px] text-neutral-700 break-words">${addressInfo.fullAddress}</div>
+                            <div class="text-[7px] text-neutral-500">
+                                ${addressInfo.city ? '🏙️ ' + addressInfo.city : ''}
+                                ${addressInfo.province ? '• ' + addressInfo.province : ''}
+                                ${addressInfo.postcode ? '• ' + addressInfo.postcode : ''}
+                            </div>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                <a href="${getGoogleMapsLink(lat, lng)}" target="_blank" 
+                                   class="text-[7px] bg-blue-600 text-white px-2 py-0.5 rounded hover:bg-blue-700 transition">
+                                    Google Maps
+                                </a>
+                                <a href="${getOpenStreetMapLink(lat, lng)}" target="_blank"
+                                   class="text-[7px] bg-green-600 text-white px-2 py-0.5 rounded hover:bg-green-700 transition">
+                                    OpenStreetMap
+                                </a>
+                                <a href="${getWazeLink(lat, lng)}" target="_blank"
+                                   class="text-[7px] bg-yellow-600 text-white px-2 py-0.5 rounded hover:bg-yellow-700 transition">
+                                    Waze
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    addressHtml = `
+                        <div class="space-y-1">
+                            <div class="text-[8px] text-yellow-700">⚠️ Tidak dapat mengambil alamat detail</div>
+                            <div class="flex flex-wrap gap-1 mt-1">
+                                <a href="${getGoogleMapsLink(lat, lng)}" target="_blank"
+                                   class="text-[7px] bg-blue-600 text-white px-2 py-0.5 rounded hover:bg-blue-700 transition">
+                                    Google Maps
+                                </a>
+                                <a href="${getOpenStreetMapLink(lat, lng)}" target="_blank"
+                                   class="text-[7px] bg-green-600 text-white px-2 py-0.5 rounded hover:bg-green-700 transition">
+                                    OpenStreetMap
+                                </a>
+                            </div>
+                        </div>
+                    `;
+                }
+                addressContent.innerHTML = addressHtml;
+            }
             
             if (statusEl) {
+                const fee = calculateDeliveryFee(distance);
                 let feeInfo = '';
                 if (distance <= APP_CONFIG.DELIVERY_FLAT_RATE_KM) {
-                    feeInfo = ` (Ongkir flat Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()})`;
+                    feeInfo = `Ongkir flat Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()}`;
                 } else {
                     const extraKm = Math.ceil(distance - APP_CONFIG.DELIVERY_FLAT_RATE_KM);
-                    feeInfo = ` (Ongkir Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()} + ${extraKm}km × Rp${APP_CONFIG.DELIVERY_EXTRA_PER_KM.toLocaleString()} = Rp${fee.toLocaleString()})`;
+                    feeInfo = `Ongkir: Rp${fee.toLocaleString()} (Rp${APP_CONFIG.DELIVERY_FLAT_FEE.toLocaleString()} + ${extraKm}km × Rp${APP_CONFIG.DELIVERY_EXTRA_PER_KM.toLocaleString()})`;
                 }
-                statusEl.innerHTML = `📍 Jarak ke toko: ${distance.toFixed(1)} km ✅${feeInfo}\n📌 Silakan share location Anda via WhatsApp`;
-                statusEl.classList.remove('text-blue-600');
-                statusEl.classList.add('text-emerald-600');
-                setTimeout(() => statusEl.classList.add('hidden'), 5000);
+                
+                statusEl.innerHTML = `
+                    <div class="text-left">
+                        <div class="font-semibold text-[9px] text-emerald-700">✅ Lokasi ditemukan!</div>
+                        <div class="text-[8px] text-neutral-600">Jarak ke toko: ${distance.toFixed(1)} km</div>
+                        <div class="text-[8px] font-semibold text-emerald-600">${feeInfo}</div>
+                        <div class="text-[7px] text-neutral-400 mt-1">
+                            📱 Silakan share lokasi Anda via WhatsApp untuk konfirmasi
+                        </div>
+                    </div>
+                `;
+                statusEl.className = 'text-emerald-600 text-[8px]';
+                
+                setTimeout(() => {
+                    if (!statusEl.classList.contains('hidden')) {
+                        statusEl.classList.add('hidden');
+                    }
+                }, 15000);
             }
-            updateDeliveryFee();
+            
             if (resetBtn) resetBtn.classList.add('hidden');
         },
         function(error) {
@@ -423,7 +563,7 @@ function getUserLocationWA() {
             let showResetButton = false;
             switch(error.code) {
                 case error.PERMISSION_DENIED:
-                    errorMessage = '❌ Izin lokasi ditolak. Silakan isi jarak manual atau klik Reset untuk meminta izin kembali.';
+                    errorMessage = '❌ Izin lokasi ditolak. Silakan isi jarak manual atau klik Reset.';
                     showResetButton = true;
                     break;
                 case error.POSITION_UNAVAILABLE:
@@ -440,8 +580,8 @@ function getUserLocationWA() {
             }
             if (statusEl) {
                 statusEl.innerHTML = errorMessage;
-                statusEl.classList.remove('hidden', 'text-blue-600', 'text-emerald-600');
-                statusEl.classList.add('text-red-600');
+                statusEl.className = 'text-red-600 text-[8px]';
+                statusEl.classList.remove('hidden');
                 setTimeout(() => {
                     if (statusEl.classList.contains('text-red-600')) {
                         statusEl.classList.add('hidden');
@@ -470,8 +610,8 @@ function resetLocationPermission() {
     
     if (statusEl) {
         statusEl.innerHTML = '🔄 Mereset perizinan... Silakan klik "Ambil Lokasi Saya" lagi.';
-        statusEl.classList.remove('hidden', 'text-red-600', 'text-emerald-600');
-        statusEl.classList.add('text-blue-600');
+        statusEl.className = 'text-blue-600 text-[8px]';
+        statusEl.classList.remove('hidden');
         setTimeout(() => statusEl.classList.add('hidden'), 3000);
     }
     if (resetBtn) resetBtn.classList.add('hidden');
@@ -483,9 +623,13 @@ function clearLocationWA() {
     const distanceInput = document.getElementById('delivery-distance');
     const statusEl = document.getElementById('location-status-wa');
     const resetBtn = document.getElementById('reset-permission-btn');
+    const addressDisplay = document.getElementById('location-address-display');
+    
     if (distanceInput) distanceInput.value = '';
     if (statusEl) statusEl.classList.add('hidden');
     if (resetBtn) resetBtn.classList.add('hidden');
+    if (addressDisplay) addressDisplay.classList.add('hidden');
+    
     updateDeliveryFee();
 }
 
