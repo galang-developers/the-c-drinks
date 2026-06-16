@@ -986,8 +986,21 @@ function confirmPayment() {
         return;
     }
     
-    closePaymentModal();
-    showPaymentConfirmModal(pendingCheckoutData);
+    // Hanya tampilkan payment confirm modal untuk WhatsApp Delivery
+    if (pendingCheckoutData.type === 'whatsapp') {
+        closePaymentModal();
+        showPaymentConfirmModal(pendingCheckoutData);
+    } else {
+        // Untuk Ambil di Toko, langsung proses checkout
+        closePaymentModal();
+        processCheckout(
+            pendingCheckoutData.type,
+            pendingCheckoutData.customerName,
+            pendingCheckoutData.deliveryFee,
+            pendingCheckoutData.distance
+        );
+        showNotification('✅ Pesanan berhasil diproses!', 'success');
+    }
 }
 
 // ==================== PAYMENT CONFIRMATION MODAL (UPLOAD BUKTI) ====================
@@ -1081,7 +1094,6 @@ function attachSendButtonListeners() {
     // Send With Proof button
     const sendWithProofBtn = document.getElementById('send-with-proof');
     if (sendWithProofBtn) {
-        // Remove existing listeners by cloning
         const newBtn = sendWithProofBtn.cloneNode(true);
         sendWithProofBtn.parentNode.replaceChild(newBtn, sendWithProofBtn);
         newBtn.addEventListener('click', sendWithProof);
@@ -1102,15 +1114,13 @@ function attachSendButtonListeners() {
     }
 }
 
-// ==================== SEND WITH PROOF (FIXED) ====================
+// ==================== SEND WITH PROOF ====================
 async function sendWithProof() {
     console.log('sendWithProof called');
     
-    // Ambil data dari store terlebih dahulu
     const storeState = store.getState();
     console.log('Store state:', storeState);
     
-    // Gunakan data dari store jika pendingPaymentData null
     let paymentData = pendingPaymentData || storeState.pendingPaymentData;
     let proofFile = uploadedProofFile || storeState.uploadedProofFile;
     
@@ -1161,7 +1171,7 @@ async function sendWithProof() {
     store.setState({ pendingPaymentData: null, uploadedProofFile: null });
 }
 
-// ==================== SEND WITHOUT PROOF (FIXED) ====================
+// ==================== SEND WITHOUT PROOF ====================
 async function sendWithoutProof() {
     console.log('sendWithoutProof called');
     
