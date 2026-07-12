@@ -94,8 +94,11 @@ Subtotal: Rp {SUBTOTAL}
 Total: Rp {TOTAL}
 
 Nama: {CUSTOMER_NAME}
+Nomor WhatsApp: {CUSTOMER_PHONE}
 Metode: {METHOD}
 Alamat: {ADDRESS}
+
+{GOOGLE_MAPS_LINK}
 
 Mohon informasi total pembayaran dan instruksi pembayaran. Terima kasih!
 
@@ -156,8 +159,11 @@ const store = createStore({
     pendingPaymentData: null,
     pendingCheckoutData: null,
     customerName: '',
+    customerPhone: '',
+    customerAddress: '',
     deliveryDistance: 0,
     pickupName: '',
+    pickupPhone: '',
 });
 
 // ==================== WHATSAPP API FUNCTIONS ====================
@@ -435,6 +441,7 @@ async function getUserLocationWA() {
     const resetBtn = document.getElementById('reset-permission-btn');
     const distanceInput = document.getElementById('delivery-distance');
     const addressInput = document.getElementById('customer-address');
+    const mapsLink = document.getElementById('location-google-maps');
     
     if (!addressInput) {
         const addressContainer = document.querySelector('.border-emerald-200.rounded-xl .mt-1');
@@ -466,6 +473,7 @@ async function getUserLocationWA() {
     if (resetBtn) resetBtn.classList.add('hidden');
     
     if (addressInput) addressInput.value = '';
+    if (mapsLink) mapsLink.classList.add('hidden');
     
     navigator.geolocation.getCurrentPosition(
         async function(position) {
@@ -496,6 +504,15 @@ async function getUserLocationWA() {
             } else if (addressInput) {
                 addressInput.value = `Lokasi: ${lat.toFixed(6)}, ${lng.toFixed(6)}`;
                 store.setState({ customerAddress: `Lokasi: ${lat.toFixed(6)}, ${lng.toFixed(6)}` });
+            }
+            
+            // Show Google Maps link
+            if (mapsLink) {
+                const link = mapsLink.querySelector('a');
+                if (link) {
+                    link.href = getGoogleMapsLink(lat, lng);
+                }
+                mapsLink.classList.remove('hidden');
             }
             
             if (statusEl) {
@@ -571,11 +588,13 @@ function resetLocationPermission() {
     const resetBtn = document.getElementById('reset-permission-btn');
     const distanceInput = document.getElementById('delivery-distance');
     const addressInput = document.getElementById('customer-address');
+    const mapsLink = document.getElementById('location-google-maps');
     
     userLocation = null;
     store.setState({ userLocation: null });
     if (distanceInput) distanceInput.value = '';
     if (addressInput) addressInput.value = '';
+    if (mapsLink) mapsLink.classList.add('hidden');
     store.setState({ customerAddress: '' });
     updateDeliveryFee();
     
@@ -595,9 +614,11 @@ function clearLocationWA() {
     const statusEl = document.getElementById('location-status-wa');
     const resetBtn = document.getElementById('reset-permission-btn');
     const addressInput = document.getElementById('customer-address');
+    const mapsLink = document.getElementById('location-google-maps');
     
     if (distanceInput) distanceInput.value = '';
     if (addressInput) addressInput.value = '';
+    if (mapsLink) mapsLink.classList.add('hidden');
     if (statusEl) statusEl.classList.add('hidden');
     if (resetBtn) resetBtn.classList.add('hidden');
     
@@ -1018,15 +1039,24 @@ function openCheckoutModal() {
         const statusEl = document.getElementById('location-status-wa');
         const feeDisplay = document.getElementById('delivery-fee-display');
         const resetBtn = document.getElementById('reset-permission-btn');
+        const mapsLink = document.getElementById('location-google-maps');
         
         const storeState = store.getState();
         if (storeState.customerName) {
             const nameInput = document.getElementById('customer-name');
             if (nameInput) nameInput.value = storeState.customerName;
         }
+        if (storeState.customerPhone) {
+            const phoneInput = document.getElementById('customer-phone');
+            if (phoneInput) phoneInput.value = storeState.customerPhone;
+        }
         if (storeState.pickupName) {
             const pickupInput = document.getElementById('pickup-name');
             if (pickupInput) pickupInput.value = storeState.pickupName;
+        }
+        if (storeState.pickupPhone) {
+            const pickupPhoneInput = document.getElementById('pickup-phone');
+            if (pickupPhoneInput) pickupPhoneInput.value = storeState.pickupPhone;
         }
         if (storeState.deliveryDistance > 0 && distanceInput) {
             distanceInput.value = storeState.deliveryDistance;
@@ -1036,6 +1066,7 @@ function openCheckoutModal() {
         if (statusEl) statusEl.classList.add('hidden');
         if (feeDisplay) feeDisplay.classList.add('hidden');
         if (resetBtn) resetBtn.classList.add('hidden');
+        if (mapsLink) mapsLink.classList.add('hidden');
         userLocation = null;
         updateCartTotals();
         const modal = document.getElementById('checkout-modal');
@@ -1136,6 +1167,7 @@ function confirmPayment() {
         processCheckout(
             checkoutData.type,
             checkoutData.customerName,
+            checkoutData.customerPhone,
             checkoutData.deliveryFee,
             checkoutData.distance
         );
@@ -1299,7 +1331,8 @@ async function sendWithProof() {
             
             processCheckout(
                 paymentData.type, 
-                paymentData.customerName, 
+                paymentData.customerName,
+                paymentData.customerPhone,
                 paymentData.deliveryFee, 
                 paymentData.distance
             );
@@ -1348,7 +1381,8 @@ async function sendWithoutProof() {
             
             processCheckout(
                 paymentData.type, 
-                paymentData.customerName, 
+                paymentData.customerName,
+                paymentData.customerPhone,
                 paymentData.deliveryFee, 
                 paymentData.distance
             );
@@ -1369,9 +1403,11 @@ async function sendWithoutProof() {
 async function checkoutViaWhatsApp() {
     if (cartItems.length === 0) return;
     const customerName = document.getElementById('customer-name')?.value || 'Pelanggan';
+    const customerPhone = document.getElementById('customer-phone')?.value || '';
     const customerAddress = document.getElementById('customer-address')?.value || 'Alamat akan dishare via WhatsApp';
     
     store.setState({ customerName: customerName });
+    store.setState({ customerPhone: customerPhone });
     store.setState({ customerAddress: customerAddress });
     
     const distance = parseFloat(document.getElementById('delivery-distance')?.value) || 0;
@@ -1403,6 +1439,13 @@ async function checkoutViaWhatsApp() {
         feeText = `Ongkir: GRATIS (Ambil Sendiri)`;
     }
     
+    // Build Google Maps link if location available
+    let mapsLinkText = '';
+    if (userLocation) {
+        const mapsLink = getGoogleMapsLink(userLocation.lat, userLocation.lng);
+        mapsLinkText = `📍 Google Maps: ${mapsLink}`;
+    }
+    
     const msg = APP_CONFIG.WHATSAPP_MESSAGE_TEMPLATE
         .replace('{ITEMS}', itemsText)
         .replace('{SHIPPING_INFO}', feeText)
@@ -1410,12 +1453,15 @@ async function checkoutViaWhatsApp() {
         .replace('{SUBTOTAL}', subtotal.toLocaleString())
         .replace('{TOTAL}', total.toLocaleString())
         .replace('{CUSTOMER_NAME}', customerName)
+        .replace('{CUSTOMER_PHONE}', customerPhone || '-')
         .replace('{METHOD}', 'WhatsApp Delivery')
-        .replace('{ADDRESS}', customerAddress || 'Akan dishare via WhatsApp');
+        .replace('{ADDRESS}', customerAddress || 'Akan dishare via WhatsApp')
+        .replace('{GOOGLE_MAPS_LINK}', mapsLinkText);
     
     const checkoutData = {
         type: 'whatsapp',
         customerName: customerName,
+        customerPhone: customerPhone,
         customerAddress: customerAddress,
         deliveryFee: deliveryFee,
         distance: distance,
@@ -1429,7 +1475,9 @@ function checkoutViaStorePickup() {
     if (cartItems.length === 0) return;
     
     const customerName = document.getElementById('pickup-name')?.value || 'Pelanggan';
+    const customerPhone = document.getElementById('pickup-phone')?.value || '';
     store.setState({ pickupName: customerName });
+    store.setState({ pickupPhone: customerPhone });
     
     const serviceFee = getServiceFee();
     const subtotal = getSubtotal();
@@ -1455,6 +1503,7 @@ Subtotal: Rp ${subtotal.toLocaleString()}
 Total: Rp ${total.toLocaleString()}
 
 Nama: ${customerName}
+Nomor WhatsApp: ${customerPhone || '-'}
 Metode: Ambil Sendiri di Toko (Bayar di Tempat)
 
 Saya akan datang ke toko untuk mengambil pesanan. Terima kasih!`;
@@ -1463,7 +1512,7 @@ Saya akan datang ke toko untuk mengambil pesanan. Terima kasih!`;
         .then(result => {
             if (result && result.status) {
                 showNotification('✅ Pesanan berhasil dikirim!', 'success');
-                processCheckout('pickup', customerName, 0, 0);
+                processCheckout('pickup', customerName, customerPhone, 0, 0);
             } else {
                 showNotification('⚠️ Gagal mengirim pesanan', 'error');
             }
@@ -1474,7 +1523,7 @@ Saya akan datang ke toko untuk mengambil pesanan. Terima kasih!`;
         });
 }
 
-function processCheckout(type, customerName, deliveryFee, distance) {
+function processCheckout(type, customerName, customerPhone, deliveryFee, distance) {
     const subtotal = getSubtotal();
     const serviceFee = getServiceFee();
     const total = subtotal + deliveryFee + serviceFee;
@@ -1485,7 +1534,8 @@ function processCheckout(type, customerName, deliveryFee, distance) {
             product: { ...item.product }
         })),
         orderType: type, 
-        customerName, 
+        customerName,
+        customerPhone,
         distance, 
         deliveryFee,
         serviceFee,
@@ -1510,9 +1560,11 @@ function processCheckout(type, customerName, deliveryFee, distance) {
     const statusEl = document.getElementById('location-status-wa');
     const resetBtn = document.getElementById('reset-permission-btn');
     const addressInput = document.getElementById('customer-address');
+    const mapsLink = document.getElementById('location-google-maps');
     
     if (distanceInput) distanceInput.value = '';
     if (addressInput) addressInput.value = '';
+    if (mapsLink) mapsLink.classList.add('hidden');
     if (feeDisplay) feeDisplay.classList.add('hidden');
     if (statusEl) statusEl.classList.add('hidden');
     if (resetBtn) resetBtn.classList.add('hidden');
@@ -1645,6 +1697,7 @@ function downloadReceipt() {
             <div style="font-size:8px;color:#9ca3af;">${new Date().toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })} ${new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</div>
             <div style="font-size:8px;color:#6b7280;margin-top:4px;font-weight:bold;">${orderTypeText}</div>
             <div style="font-size:8px;color:#6b7280;margin-top:2px;">${receiptData.customerName}</div>
+            ${receiptData.customerPhone ? `<div style="font-size:7px;color:#9ca3af;margin-top:1px;">📱 ${receiptData.customerPhone}</div>` : ''}
         </div>
         
         <div style="margin-bottom:12px;">
