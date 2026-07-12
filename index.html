@@ -280,6 +280,7 @@
                         </div>
                         <div class="mt-1 space-y-2">
                             <input type="text" id="customer-name" placeholder="Nama lengkap Anda" class="w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500 mb-2">
+                            <input type="tel" id="customer-phone" placeholder="Nomor WhatsApp (contoh: 08123456789)" class="w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500 mb-2">
                             <input type="text" id="customer-address" placeholder="Alamat lengkap Anda (akan terisi otomatis)" class="w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500 mb-2">
                             <div class="text-[9px] text-neutral-500 bg-neutral-100 p-2 rounded-lg">
                                 <p class="font-semibold mb-1">📍 Informasi Alamat:</p>
@@ -299,6 +300,9 @@
                                 <button type="button" onclick="clearLocationWA()" class="text-[9px] text-red-500 hover:text-red-600 px-2">Hapus</button>
                             </div>
                             <div id="delivery-fee-display" class="text-[9px] font-semibold text-emerald-700 hidden"></div>
+                            <div id="location-google-maps" class="text-[8px] text-blue-600 hidden">
+                                <a href="#" target="_blank" rel="noopener noreferrer" class="underline">📍 Lihat Lokasi di Google Maps</a>
+                            </div>
                             <button onclick="checkoutViaWhatsApp()" class="w-full bg-[#128C7E] hover:bg-[#075E54] text-white font-bold py-2 rounded-lg text-[10px] flex items-center justify-center gap-1 mt-1 transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Lanjut ke Pembayaran
                             </button>
@@ -320,6 +324,7 @@
                         </div>
                         <div class="mt-1">
                             <input type="text" id="pickup-name" placeholder="Nama lengkap Anda" class="w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-neutral-400 mb-2">
+                            <input type="tel" id="pickup-phone" placeholder="Nomor WhatsApp (contoh: 08123456789)" class="w-full text-xs bg-white border border-neutral-200 rounded-lg px-2 py-1.5 outline-none focus:border-neutral-400 mb-2">
                             <button onclick="checkoutViaStorePickup()" class="w-full bg-[#1C1C1C] hover:bg-neutral-800 text-white font-bold py-2 rounded-lg text-[10px] flex items-center justify-center gap-1 transition-all">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>Kirim Pesanan ke WhatsApp
                             </button>
