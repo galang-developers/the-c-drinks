@@ -36,7 +36,7 @@ const APP_CONFIG = {
         BCA: {
             name: 'Transfer Bank BCA',
             accountNumber: '1201075900',
-            accountName: 'THE. C DRINKS',
+            accountName: 'Edi Sudrajat',
             bank: 'BCA',
             instructions: 'Transfer ke rekening BCA atas nama THE. C DRINKS'
         }
