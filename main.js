@@ -15,7 +15,7 @@ const APP_CONFIG = {
     STORE_LOCATION: { lat: -7.9108787, lng: 113.8193598 },
     
     // WhatsApp API Configuration
-    WHATSAPP_API_URL: 'https://baileys-rest-api-production-959c.up.railway.app/api',
+    WHATSAPP_API_URL: 'https://baileys-rest-api--galangdeveloper.replit.app/api',
     WHATSAPP_SESSION_NAME: 'testsession',
     
     // Delivery Fee Configuration
